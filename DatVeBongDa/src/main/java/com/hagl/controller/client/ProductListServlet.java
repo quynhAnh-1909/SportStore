@@ -71,7 +71,7 @@ public class ProductListServlet extends HttpServlet {
             request.setAttribute("currentPage", page);
 
             // ===== 5. FORWARD =====
-
+            
             request.getRequestDispatcher("/WEB-INF/views/client/productList.jsp")
                    .forward(request, response);
 

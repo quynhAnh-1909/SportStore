@@ -5,11 +5,6 @@
 <c:set var="root" value="${pageContext.request.contextPath}" />
 <c:set var="isEn" value="${sessionScope.lang == 'en'}" />
 
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-
 <link
 	href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap"
 	rel="stylesheet">
@@ -173,23 +168,18 @@ body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)),
+	background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)),
 		url('${root}/resources/banner1.jpg');
 	background-size: cover;
 	background-position: center;
 	animation: zoomBanner 15s infinite alternate ease-in-out;
 }
 
-@
-keyframes zoomBanner {
-	from {transform: scale(1);
+@keyframes zoomBanner {
+	from { transform: scale(1); }
+	to { transform: scale(1.15); }
 }
 
-to {
-	transform: scale(1.15);
-}
-
-}
 .hero-content {
 	position: relative;
 	z-index: 2;
@@ -212,130 +202,133 @@ to {
 }
 </style>
 
-</head>
 
-<body>
+<header>	
+	<link rel="stylesheet"
+ 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
-	<header>
+	<div class="nav-bar">
 
-		<div class="nav-bar">
+		<!-- LOGO -->
+		<div class="logo">
+			<a href="${root}/productList">
+				<img src="${root}/resources/sport_store.jpg" alt="Logo">
+			</a>
+		</div>
 
-			<!-- LOGO -->
+		<!-- MENU -->
+		<nav class="nav-menu">
 
-			<div class="logo">
-				<a href="${root}/productList"> <img
-					src="${root}/resources/sport_store.jpg" alt="Logo">
-				</a>
+			<a href="${root}/productList">
+				${isEn ? 'PRODUCTS' : 'Sản phẩm'}
+			</a>
+
+			<c:choose>
+
+				<c:when test="${not empty sessionScope.user}">
+
+					<c:if test="${sessionScope.user.role == 'ADMIN'}">
+						<a href="${root}/admin/dashboard" style="color:#ffeb3b;">
+							${isEn ? 'ADMIN' : 'Quản trị'}
+						</a>
+					</c:if>
+
+					<a href="${root}/logout">
+						${isEn ? 'LOGOUT' : 'Đăng xuất'}
+					</a>
+
+				</c:when>
+
+				<c:otherwise>
+
+					<a href="${root}/login">
+						${isEn ? 'LOGIN' : 'Đăng nhập'}
+					</a>
+
+					<a href="${root}/register">
+						${isEn ? 'REGISTER' : 'Đăng ký'}
+					</a>
+
+				</c:otherwise>
+
+			</c:choose>
+
+		</nav>
+
+		<!-- SEARCH -->
+		<form class="header-search" action="${root}/productList" method="get">
+
+			<input type="text"
+				   name="keyword"
+				   value="${param.keyword}"
+				   placeholder="${isEn ? 'Search product...' : 'Tìm sản phẩm...'}">
+
+			<button type="submit">🔍</button>
+
+		</form>
+
+		<!-- LANGUAGE -->
+		<div class="lang-dropdown">
+
+			<div class="lang-current">
+				<div class="lang-flag">${isEn ? '🇬🇧' : '🇻🇳'}</div>
+				<span>${isEn ? 'English' : 'Tiếng Việt'}</span>
 			</div>
 
-			<!-- MENU -->
-
-			<nav class="nav-menu">
-
-				<a href="${root}/productList"> ${isEn ? 'PRODUCTS' : 'Sản phẩm'}
-				</a>
-
-				<c:choose>
-
-					<c:when test="${not empty sessionScope.user}">
-
-						<c:if test="${sessionScope.user.role == 'ADMIN'}">
-							<a href="${root}/admin/dashboard" style="color: #ffeb3b;">
-								${isEn ? 'ADMIN' : 'Quản trị'} </a>
-						</c:if>
-
-						<a href="${root}/logout"> ${isEn ? 'LOGOUT' : 'Đăng xuất'} </a>
-
-					</c:when>
-
-					<c:otherwise>
-
-						<a href="${root}/login"> ${isEn ? 'LOGIN' : 'Đăng nhập'} </a>
-
-						<a href="${root}/register"> ${isEn ? 'REGISTER' : 'Đăng ký'} </a>
-
-					</c:otherwise>
-
-				</c:choose>
-
-			</nav>
-
-			<!-- SEARCH -->
-
-			<form class="header-search" action="${root}/productList" method="get">
-
-				<input type="text" name="keyword" value="${param.keyword}"
-					placeholder="${isEn ? 'Search product...' : 'Tìm sản phẩm...'}">
-
-				<button type="submit">🔍</button>
-
-			</form>
-
-			<!-- LANGUAGE -->
-
-			<div class="lang-dropdown">
-
-				<div class="lang-current">
-					<div class="lang-flag">${isEn ? '🇬🇧' : '🇻🇳'}</div>
-					<span>${isEn ? 'English' : 'Tiếng Việt'}</span>
-				</div>
-
-				<div class="lang-menu">
-					<a href="?lang=vi">🇻🇳 Tiếng Việt</a> <a href="?lang=en">🇬🇧
-						English</a>
-				</div>
-
-			</div>
-
-			<!-- USER + CART -->
-
-			<div class="user-actions">
-
-				<a href="${root}/cart"> 🛒 <span class="cart-badge">
-						${sessionScope.cart != null ? sessionScope.cart.size() : 0} </span>
-				</a>
-
-				<c:if test="${not empty sessionScope.user}">
-					<a href="${root}/account" class="btn-user"> 👤
-						${sessionScope.user.fullName} </a>
-				</c:if>
-
+			<div class="lang-menu">
+				<a href="?lang=vi">🇻🇳 Tiếng Việt</a>
+				<a href="?lang=en">🇬🇧 English</a>
 			</div>
 
 		</div>
 
-		<!-- HERO BANNER -->
+		<!-- USER + CART -->
+		<div class="user-actions">
 
-		<div class="hero-container">
+			<a href="${root}/cart">
+				🛒
+				<span class="cart-badge">
+					${sessionScope.cart != null ? sessionScope.cart.size() : 0}
+				</span>
+			</a>
 
-    <div class="hero-bg"></div>
+			<c:if test="${not empty sessionScope.user}">
+				<a href="${root}/account" class="btn-user">
+					👤 ${sessionScope.user.fullName}
+				</a>
+			</c:if>
 
-    <div class="hero-content">
+		</div>
 
-        <h1>SPORT STORE</h1>
-        <p>BORN TO WIN</p>
+	</div>
 
-    </div>
+	<!-- HERO -->
+	<div class="hero-container">
 
-</div>
-	</header>
+		<div class="hero-bg"></div>
 
-	<script>
-		document.addEventListener("DOMContentLoaded", function() {
+		<div class="hero-content">
+			<h1>SPORT STORE</h1>
+			<p>BORN TO WIN</p>
+		</div>
 
-			const dropdown = document.querySelector(".lang-dropdown");
+	</div>
 
-			dropdown.addEventListener("click", function(e) {
-				e.stopPropagation();
-				dropdown.classList.toggle("open");
-			});
+</header>
 
-			document.addEventListener("click", function() {
-				dropdown.classList.remove("open");
-			});
+<script>
+document.addEventListener("DOMContentLoaded", function(){
 
-		});
-	</script>
+	const dropdown = document.querySelector(".lang-dropdown");
 
-</body>
-</html>
+	dropdown.addEventListener("click", function(e){
+		e.stopPropagation();
+		dropdown.classList.toggle("open");
+	});
+
+	document.addEventListener("click", function(){
+		dropdown.classList.remove("open");
+	});
+
+});
+</script>

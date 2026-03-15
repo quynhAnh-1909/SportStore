@@ -15,60 +15,90 @@
 
     <!-- DÙNG CHUNG FONT + STYLE VỚI LOGIN -->
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-        }
 
-        .register-box {
-            max-width: 400px;
-            margin: 80px auto;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-            background-color: #ffffff;
-        }
-
-        .register-box h2 {
-            color: #004d31;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            background-color: #004d31;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .btn-submit:hover {
-            background-color: #003321;
-        }
-
-        .error-msg {
-            color: #e41e31;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-    </style>
+			body{
+			    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			    background:#f4f6f9;
+			    margin:0;
+			}
+			
+			/* REGISTER CARD */
+			
+			.register-box{
+			    max-width:420px;
+			    margin:80px auto;
+			    padding:35px;
+			    border-radius:12px;
+			    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+			    background:white;
+			    text-align:center;
+			    position:relative;
+			}
+			
+			/* ACCENT LINE */
+			
+			.card-accent{
+			    position:absolute;
+			    top:0;
+			    left:0;
+			    width:100%;
+			    height:4px;
+			    background:#004d31;
+			}
+			
+			/* TITLE */
+			
+			.register-box h2{
+			    color:#d81f19;
+			    margin-bottom:20px;
+			    text-transform:uppercase;
+			}
+			
+			/* INPUT */
+			
+			.input-field{
+			    width:100%;
+			    padding:12px;
+			    margin:10px 0;
+			    border:1px solid #ddd;
+			    border-radius:6px;
+			    box-sizing:border-box;
+			    font-size:14px;
+			}
+			
+			.input-field:focus{
+			    border-color:#d81f19;
+			    outline:none;
+			}
+			
+			/* BUTTON */
+			
+			.btn-submit{
+			    width:100%;
+			    padding:14px;
+			    background:#d81f19;
+			    color:white;
+			    border:none;
+			    cursor:pointer;
+			    margin-top:15px;
+			    border-radius:8px;
+			    font-weight:bold;
+			    font-size:1rem;
+			}
+			
+			.btn-submit:hover{
+			    background:#d81f19;
+			}
+			
+			/* MESSAGE */
+			
+			.error-msg{
+			    color:#e41e31;
+			    font-weight:bold;
+			    font-size:0.9rem;
+			}
+	
+	</style>
 </head>
 
 <body>
@@ -76,8 +106,10 @@
 <jsp:include page="header.jsp" />
 
 <main class="register-box">
+	
+	<div class="card-accent"></div>
 
-    <img src="${root}/resources/hagl_logo.png"
+    <img src="${root}/resources/sport_store.jpg"
          alt="HAGL Logo"
          style="height: 70px; margin-bottom: 15px;">
 
