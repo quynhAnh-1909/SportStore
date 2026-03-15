@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.hagl.dao.TicketDAO;
-
 @WebServlet("/account")
 public class AccountServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -32,19 +30,10 @@ public class AccountServlet extends HttpServlet {
             return;
         }
 
-        try {
-            TicketDAO ticketDAO = new TicketDAO();
-            List<Map<String, Object>> ticketList = ticketDAO.getTicketsByUserId(userId);
-            
-            request.setAttribute("ticketList", ticketList);
+        
             
             // SỬA LỖI 404 TẠI ĐÂY: Trỏ đúng vào thư mục views/client/
             request.getRequestDispatcher("/WEB-INF/views/client/account.jsp").forward(request, response);
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Đảm bảo trang error.jsp cũng nằm trong thư mục đúng
-            request.getRequestDispatcher("/WEB-INF/views/client/error.jsp").forward(request, response);
-        }
+        
     }
 }
