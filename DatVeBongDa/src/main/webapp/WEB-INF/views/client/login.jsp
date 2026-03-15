@@ -33,7 +33,7 @@ body{
     text-align:center;
     position:relative;
 }
-
+	
 /* ACCENT LINE GIỐNG PRODUCT CARD */
 
 .card-accent{
@@ -151,7 +151,7 @@ ${isEn ? 'Login' : 'Đăng nhập'}
 ${isEn ? 'LOGIN' : 'ĐĂNG NHẬP'}
 </button>
 
-<p style="margin-top:20px;font-size:0.9rem;color: #d81f19;">
+<p style="margin-top:20px;font-size:0.9rem;color: #666;">
 <c:choose>
 
 <c:when test="${isEn}">
