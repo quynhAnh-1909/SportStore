@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="a157f2d7-fe1e-4308-af08-80d4106e4ecb" name="FootballDB (DDL) Mapping">
+      <data-sources db="4f8ee05f-2cd4-4658-afae-58ee07b42ed1" ddl="a5371af4-3690-47cc-a196-47ac574ad312" />
+      <scope>
+        <node kind="database" qname="HAGL_DB" />
+      </scope>
+    </mapping>
+  </component>
+</project>
