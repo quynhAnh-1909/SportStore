@@ -10,8 +10,8 @@
     <div class="card order-success-card p-5 mx-auto">
 
         <!-- Icon check -->
-        <div class="icon-check mb-4">
-            <i class="fas fa-check-circle"></i>
+        <div class="icon-check">
+            <div class="circle-check"> ✔</div>
         </div>
 
         <!-- Title -->
@@ -40,117 +40,112 @@
 <jsp:include page="/footer.jsp" />
 
 <style>
-    /* Card trung tâm */
+    /* CARD TRUNG TÂM */
     .order-success-card {
-        max-width: 500px; /* giảm từ 600px xuống 500px */
-        width: 90%;       /* responsive tự động */
+        max-width: 500px;
+        width: 90%;
         background-color: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        border-radius: 25px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.15); /* shadow sâu hơn */
         text-align: center;
-        margin: auto; /* canh giữa */
-        padding: 40px 30px;
+        margin: auto;
+        padding: 50px 30px;
+        position: relative;
+        z-index: 1;
     }
 
-    .order-info-box {
-        background-color: #fefefe;
-        border: 1px solid #e0e0e0;
-        border-radius: 15px;
-        padding: 20px;
-        text-align: left;
-        max-height: 300px; /* nếu danh sách quá dài */
-        overflow-y: auto;  /* scroll nội dung dài */
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+    /* ICON CHECK NỔI BẬT */
+    .icon-check {
+        position: relative;
+        margin-bottom: 30px;
     }
-
-    .btn-lg {
-        min-width: 150px;  /* tránh quá dài */
-    }
-
-    @media (max-width: 576px) {
-        .order-success-card {
-            padding: 30px 20px;
-            width: 95%;
-        }
-    }
-
-    /* Icon check */
     .icon-check i {
-        font-size: 90px;
-        color: #4BB543; /* xanh lá Shopee */
+        font-size: 100px; /* lớn hơn */
+        color: #4BB543; /* xanh lá */
+        background: linear-gradient(45deg, #4BB543, #66d26b); /* gradient xanh bóng */
+        border-radius: 50%;
+        padding: 25px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2); /* bóng mạnh hơn */
+    }
+    .circle-check {
+        width: 120px;
+        height: 120px;
         background: linear-gradient(45deg, #4BB543, #66d26b);
         border-radius: 50%;
-        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 60px;      /* chữ V lớn */
+        font-weight: 800;
+        color: white;          /* chữ màu trắng */
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        margin: auto;          /* canh giữa */
     }
-
-    /* Tiêu đề */
+    /* TIÊU ĐỀ */
     .order-title {
-        font-size: 32px;
+        font-size: 36px;
         font-weight: 800;
         color: #111111;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.08);
     }
 
-    /* Khung thông tin */
+    /* KHUNG THÔNG TIN */
     .order-info-box {
         background-color: #fefefe;
         border: 1px solid #e0e0e0;
-        border-radius: 15px;
-        padding: 25px;
+        border-radius: 20px;
+        padding: 30px;
         text-align: left;
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.03);
     }
 
-    /* Số tiền */
+    /* SỐ TIỀN NỔI BẬT */
     .order-info-box .text-danger {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 700;
         color: #E53935 !important; /* đỏ nổi bật */
     }
 
-    /* Buttons */
+    /* NÚT BUTTON */
     .btn-primary {
         background-color: #FF5722;
         border-color: #FF5722;
+        font-weight: 700;
+        padding: 12px 25px;
+        font-size: 1.1rem;
         transition: all 0.3s ease;
     }
-
     .btn-primary:hover {
         background-color: #E64A19;
         border-color: #E64A19;
         color: #fff;
     }
-
     .btn-outline-primary {
         color: #FF5722;
         border-color: #FF5722;
-        transition: all 0.3s ease;
+        font-weight: 700;
     }
-
     .btn-outline-primary:hover {
         background-color: #FF5722;
         color: #fff;
     }
 
-    /* Responsive */
+    /* RESPONSIVE */
     @media (max-width: 576px) {
         .order-success-card {
-            padding: 30px 20px;
+            padding: 35px 20px;
+            width: 95%;
         }
-
         .icon-check i {
-            font-size: 70px;
-            padding: 15px;
+            font-size: 80px;
+            padding: 20px;
         }
-
         .order-title {
-            font-size: 26px;
+            font-size: 28px;
         }
-
         .order-info-box {
             padding: 20px;
         }
-
         .btn-lg {
             width: 100%;
         }
