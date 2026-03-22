@@ -17,51 +17,102 @@
 
   <style>
     body {
-      background: #f5f5f5;
+      background: #f2f2f7; /* nền nhẹ, dịu mắt */
       font-family: 'Segoe UI', sans-serif;
     }
 
+    /* CARD CHUNG */
     .card {
-      border-radius: 10px;
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background: #ffffff; /* trắng sáng */
     }
 
+    /* TITLE */
+    .checkout-title {
+      color: #d81f19; /* đỏ nổi bật */
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+
+    /* FORM INPUT */
+    .form-control {
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      transition: all 0.3s;
+    }
+    .form-control:focus {
+      border-color: #d81f19;
+      box-shadow: 0 0 0 3px rgba(216,31,25,0.2);
+    }
+
+    /* PAYMENT BOX */
     .payment-box input[type="radio"] {
       display: none;
     }
-
     .payment-box .card {
-      cursor: pointer;
       transition: 0.3s;
-      border: 2px solid #f1f1f1;
-      border-radius: 10px;
+      border: 2px solid #eee;
+      cursor: pointer;
+      background: #fff;
     }
-
+    .payment-box:hover .card {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
     .payment-box input[type="radio"]:checked + .card {
-      border-color: #f57224; /* màu cam Lazada */
-      background-color: #fff4e6;
+      border-color: #d81f19;
+      background: linear-gradient(145deg, #ffe5e5, #fff0f0);
     }
 
-    .card-body h2, .card-body h5 {
+    /* BACK BUTTON */
+    .btn-back {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
       color: #333;
+      font-weight: 500;
+    }
+    .btn-back:hover {
+      background: #f8f8f8;
     }
 
-    .card-body .btn-success {
-      background-color: #f57224;
-      border-color: #f57224;
+    /* ORDER SUMMARY */
+    .order-summary .card-body {
+      background: #fff;
+    }
+    .total-price {
+      color: #d81f19;
+      font-size: 1.3rem;
       font-weight: bold;
     }
 
-    .card-body .btn-success:hover {
-      background-color: #e85b1e;
-      border-color: #e85b1e;
+    /* NÚT THANH TOÁN */
+    .btn-order {
+      background: linear-gradient(135deg, #ff4d4d, #d81f19);
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 0;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+    .btn-order:hover {
+      background: linear-gradient(135deg, #d81f19, #b71c1c);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
     }
 
-    .order-summary .text-danger {
-      color: #f57224 !important;
+    /* HÌNH ẢNH SẢN PHẨM */
+    .d-flex img {
+      border-radius: 6px;
+      border: 1px solid #eee;
     }
 
-    .order-summary .card-body {
-      background-color: #fff;
+    /* TỔNG HỢP GIỎ HÀNG */
+    .d-flex justify-content-between span {
+      font-size: 1rem;
     }
   </style>
 
@@ -82,9 +133,10 @@
       <div class="card shadow-sm border-0">
 
         <div class="card-body p-4">
-
-          <h2 class="fw-bold text-success mb-3">Thông tin thanh toán</h2>
-
+          <a href="${root}/cart" class="btn btn-back mb-3">
+            ← Quay lại giỏ hàng
+          </a>
+          <h2 class="checkout-title mb-3">Thông tin thanh toán</h2>
           <form action="${root}/checkout" method="post">
             <div class="mb-3">
               <label class="form-label fw-bold">Họ tên người nhận</label>
@@ -106,23 +158,35 @@
               <textarea name="note" class="form-control"></textarea>
             </div>
 
-            <h5 class="fw-bold">Phương thức thanh toán</h5>
+            <h5 class="fw-bold mt-4">Phương thức thanh toán</h5>
+
             <div class="row g-3 mt-2">
+
               <div class="col-6">
                 <label class="payment-box w-100">
                   <input type="radio" name="paymentMethod" value="COD" checked>
-                  <div class="card p-3 text-center">💵<div class="fw-bold mt-2">Thanh toán khi nhận hàng</div></div>
+                  <div class="card p-3 text-center">
+                    💵
+                    <div class="fw-bold mt-2">Thanh toán khi nhận hàng</div>
+                  </div>
                 </label>
               </div>
+
               <div class="col-6">
                 <label class="payment-box w-100">
                   <input type="radio" name="paymentMethod" value="VNPAY">
-                  <div class="card p-3 text-center">💳<div class="fw-bold mt-2">Thanh toán VNPay</div></div>
+                  <div class="card p-3 text-center">
+                    💳
+                    <div class="fw-bold mt-2">Thanh toán VNPay</div>
+                  </div>
                 </label>
               </div>
+
             </div>
 
-            <button type="submit" class="btn btn-success btn-lg w-100 mt-4">XÁC NHẬN ĐẶT HÀNG</button>
+            <button type="submit" class="btn btn-order w-100 mt-4">
+              🛒 XÁC NHẬN ĐẶT HÀNG
+            </button>
           </form>
         </div>
       </div>
@@ -189,12 +253,12 @@
 
           <hr>
 
-          <div class="d-flex justify-content-between fw-bold">
-
-            <span>TỔNG CỘNG</span> <span class="text-danger"> <fmt:formatNumber
-                  value="${total + 30000}" type="number" /> ₫
-
-							</span>
+          <div class="d-flex justify-content-between fw-bold mt-3">
+            <span>TỔNG CỘNG</span>
+            <span class="total-price">
+        <fmt:formatNumber value="${total + 30000}" type="number" /> ₫
+    </span>
+          </div>
 
           </div>
 
