@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
 <c:set var="root" value="${pageContext.request.contextPath}" />
 
 <!DOCTYPE html>
@@ -19,121 +20,127 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Container giỏ hàng */
+        /* CONTAINER */
         .cart-container {
             background: #fff;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
-        /* Header bảng */
+        /* HEADER */
         .cart-header {
-            font-weight: 600;
-            color: #555;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            background-color: #fafafa;
+            background: rgba(255, 0, 0, 0.85); /* đỏ hơi trong suốt */
+            color: white;
+            font-weight: bold;
+            padding: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            backdrop-filter: brightness(1.1) contrast(1.2);
         }
 
-        /* Item giỏ hàng */
+        /* ITEM */
         .cart-item {
             padding: 15px 10px;
             border-bottom: 1px solid #eee;
-            align-items: center;
-            transition: background 0.2s;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            transition: all 0.25s ease;
         }
 
         .cart-item:hover {
-            background: #f9f9f9;
+            background: #fff5f5;
+            transform: scale(1.01);
         }
 
-        /* Ảnh sản phẩm */
+        /* IMAGE */
         .product-img {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             object-fit: contain;
         }
 
         .product-name {
-            font-weight: 500;
-            margin-left: 15px;
+            font-weight: 600;
         }
 
-        /* Giá sản phẩm */
+        /* PRICE */
         .price {
-            color: #f57224; /* màu Lazada cam */
+            color: #d81f19;
             font-weight: bold;
         }
 
-        /* Số lượng */
-        .qty-box{
-            width: 40px;
+        /* QTY */
+        .qty-box {
+            width: 45px;
             height: 35px;
-            padding: 0;
             text-align: center;
+            border-radius: 6px;
         }
 
-        /* Button tăng giảm số lượng */
+        /* BUTTON QTY */
         .btn-qty {
-            border-color: #f57224;
-            color: #f57224;
+            border: 1px solid #ddd;
+            background: white;
             font-weight: bold;
         }
 
         .btn-qty:hover {
-            background-color: #f57224;
+            background: #d81f19;
             color: white;
+            border-color: #d81f19;
         }
 
-        /* Nút xóa */
+        /* REMOVE */
         .remove-btn {
-            color: red;
-            cursor: pointer;
-            font-size: 1.2rem;
+            color: #999;
+            font-size: 18px;
         }
 
-        /* Summary */
+        .remove-btn:hover {
+            color: #d81f19;
+        }
+
+        /* SUMMARY */
         .cart-summary {
             background: #fff;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
-        .cart-summary h5 {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .checkout-btn {
-            background-color: #f57224;
-            color: white;
+        /* TOTAL */
+        .total-price {
+            color: #d81f19;
+            font-size: 20px;
             font-weight: bold;
         }
 
+        /* BTN */
+        .checkout-btn {
+            background-color: #d81f19 !important;
+            color: white !important; /* chữ trắng */
+            font-weight: bold;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
         .checkout-btn:hover {
-            background-color: #e85b1e;
-            color: white;
+            background-color: #b71c1c!important; /* đỏ đậm khi hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* bóng nhẹ khi hover */
         }
 
-        /* Responsive */
-        @media(max-width: 768px){
-            .cart-header .col-md-5,
-            .cart-item .col-md-5 {
-                flex-basis: 100%;
-            }
-            .cart-item .col-md-2, .cart-item .col-md-1 {
-                flex-basis: 50%;
-                text-align: left;
-                margin-top: 5px;
-            }
+        .btn-back {
+            border-radius: 8px;
+            border: 1px solid #ddd;
         }
 
+        .btn-back:hover {
+            background: #eee;
+        }
     </style>
 
 </head>
@@ -144,122 +151,163 @@
 
 <div class="container mt-4">
 
-    <div class="row">
+    <!-- BACK -->
+    <a href="${root}/products" class="btn btn-back mb-3">
+        ← Tiếp tục mua hàng
+    </a>
 
-        <!-- CART LIST -->
+    <!-- EMPTY CART -->
+    <c:if test="${empty sessionScope.cart}">
+        <div class="text-center p-5 bg-white rounded shadow-sm">
+            <h4>🛒 Giỏ hàng của bạn đang trống</h4>
+            <a href="${root}/products" class="btn checkout-btn mt-3">
+                Mua sắm ngay
+            </a>
+        </div>
+    </c:if>
 
-        <div class="col-md-8">
+    <c:if test="${not empty sessionScope.cart}">
 
-            <div class="cart-container">
+        <div class="row">
 
-                <div class="row cart-header">
+            <!-- LEFT -->
+            <div class="col-md-8">
 
-                    <div class="col-md-5">Sản phẩm</div>
-                    <div class="col-md-2 text-center">Đơn giá</div>
-                    <div class="col-md-2 text-center">Số lượng</div>
-                    <div class="col-md-2 text-center">Thành tiền</div>
-                    <div class="col-md-1 text-center">Xóa</div>
+                <div class="cart-container">
 
-                </div>
-
-                <c:set var="total" value="0" />
-
-                <c:forEach var="item" items="${sessionScope.cart}">
-
-                    <div class="row cart-item">
-
-                        <div class="col-md-5 d-flex align-items-center">
-
-                            <img src="${root}/resources/${item.product.imageUrl}"
-                                 class="product-img">
-
-                            <div class="ms-3 product-name">${item.product.name}</div>
-
-                        </div>
-
-                        <div class="col-md-2 text-center price">
-
-                            <fmt:formatNumber value="${item.product.price}" type="number" />
-
-                        </div>
-
-                        <div class="col-md-2 text-center">
-
-                            <form action="${root}/cart" method="post">
-
-                                <input type="hidden" name="action" value="update"> <input
-                                    type="hidden" name="productId" value="${item.product.id}">
-
-                                <div class="d-flex justify-content-center align-items-center">
-
-                                    <form action="${root}/cart" method="post" class="d-flex">
-
-                                        <input type="hidden" name="action" value="update"> <input
-                                            type="hidden" name="productId" value="${item.product.id}">
-
-                                        <button type="submit" name="quantity" value="${item.quantity - 1}" class="btn btn-outline-secondary btn-sm btn-qty">-</button>
-                                        <input type="text" value="${item.quantity}" class="form-control text-center mx-1 qty-box" readonly>
-                                        <button type="submit" name="quantity" value="${item.quantity + 1}" class="btn btn-outline-secondary btn-sm btn-qty">+</button>
-                                    </form>
-
-                                </div>
-
-                            </form>
-
-                        </div>
-
-                        <div class="col-md-2 text-center price">
-
-                            <fmt:formatNumber value="${item.product.price * item.quantity}"
-                                              type="number" />
-
-                        </div>
-
-                        <div class="col-md-1 text-center">
-
-                            <a href="${root}/cart?action=remove&id=${item.product.id}"
-                               class="remove-btn"> ❌ </a>
-
-                        </div>
-
+                    <div class="row cart-header">
+                        <div class="col-md-5">Sản phẩm</div>
+                        <div class="col-md-2 text-center">Đơn giá</div>
+                        <div class="col-md-2 text-center">Số lượng</div>
+                        <div class="col-md-2 text-center">Thành tiền</div>
+                        <div class="col-md-1 text-center">Xóa</div>
                     </div>
 
-                    <c:set var="total"
-                           value="${total + (item.product.price * item.quantity)}" />
+                    <c:set var="total" value="0" />
 
-                </c:forEach>
+                    <c:forEach var="item" items="${sessionScope.cart}">
 
-            </div>
+                        <div class="row cart-item">
 
-        </div>
+                            <!-- PRODUCT -->
+                            <div class="col-md-5 d-flex align-items-center">
 
-        <!-- SUMMARY -->
+                                <img src="${root}/resources/${item.product.imageUrl}"
+                                     class="product-img">
 
-        <div class="col-md-4">
+                                <div class="ms-3">
+                                    <div class="product-name">
+                                            ${item.product.name}
+                                    </div>
 
-            <div class="cart-summary">
+                                    <small class="text-muted">
+                                        Size: ${item.product.size} |
+                                        Màu: ${item.product.color}
+                                    </small>
+                                </div>
 
-                <h5>Tóm tắt đơn hàng</h5>
+                            </div>
 
-                <hr>
+                            <!-- PRICE -->
+                            <div class="col-md-2 text-center price">
+                                <fmt:formatNumber value="${item.product.price}" />
+                            </div>
 
-                <div class="d-flex justify-content-between">
+                            <!-- QTY -->
+                            <div class="col-md-2 text-center">
 
-                    <span>Tổng tiền</span> <b class="price"> <fmt:formatNumber
-                        value="${total}" type="number" /> VNĐ
+                                <form action="${root}/cart" method="post"
+                                      class="d-flex justify-content-center">
 
-                </b>
+                                    <input type="hidden" name="action" value="update">
+                                    <input type="hidden" name="productId" value="${item.product.id}">
+
+                                    <button type="submit"
+                                            name="quantity"
+                                            value="${item.quantity > 1 ? item.quantity - 1 : 1}"
+                                            class="btn btn-qty btn-sm">-</button>
+
+                                    <input type="text"
+                                           value="${item.quantity}"
+                                           class="form-control mx-1 qty-box"
+                                           readonly>
+
+                                    <button type="submit"
+                                            name="quantity"
+                                            value="${item.quantity + 1}"
+                                            class="btn btn-qty btn-sm">+</button>
+
+                                </form>
+
+                            </div>
+
+                            <!-- TOTAL -->
+                            <div class="col-md-2 text-center price">
+                                <fmt:formatNumber value="${item.product.price * item.quantity}" />
+                            </div>
+
+                            <!-- REMOVE -->
+                            <div class="col-md-1 text-center">
+                                <a href="${root}/cart?action=remove&id=${item.product.id}"
+                                   class="remove-btn"
+                                   onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                                    ❌
+                                </a>
+                            </div>
+
+                        </div>
+
+                        <c:set var="total"
+                               value="${total + (item.product.price * item.quantity)}" />
+
+                    </c:forEach>
 
                 </div>
 
-                <a href="${root}/checkout" class="btn checkout-btn w-100 mt-3">
-                    Thanh toán </a>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="col-md-4">
+
+                <div class="cart-summary">
+
+                    <h5>Tóm tắt đơn hàng</h5>
+                    <hr>
+
+                    <c:set var="shipping" value="30000" />
+
+                    <div class="d-flex justify-content-between">
+                        <span>Tạm tính</span>
+                        <span>
+                            <fmt:formatNumber value="${total}" /> VNĐ
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-2">
+                        <span>Phí vận chuyển</span>
+                        <span>30,000 VNĐ</span>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <span>Tổng cộng</span>
+                        <span class="total-price">
+                            <fmt:formatNumber value="${total + shipping}" /> VNĐ
+                        </span>
+                    </div>
+
+                    <a href="${root}/checkout" class="btn checkout-btn w-100 mt-3">
+                        🛒 Thanh toán ngay
+                    </a>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+    </c:if>
 
 </div>
 
