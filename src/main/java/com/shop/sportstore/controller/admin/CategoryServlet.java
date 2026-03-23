@@ -84,7 +84,7 @@ public class CategoryServlet extends HttpServlet {
         List<Category> categories = dao.buildTree(dao.getAllCategories());
 
         request.setAttribute("categories", categories);
-        request.setAttribute("contentPage", "/WEB-INF/admin/createCategory.jsp");
+        request.setAttribute("contentPage", "/WEB-INF/admin/categoryCreate.jsp");
 
         request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp")
                 .forward(request, response);

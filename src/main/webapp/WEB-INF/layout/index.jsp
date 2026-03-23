@@ -19,7 +19,7 @@
         align-items:center;
         padding:0 25px;
         height:70px;
-        gap:20px; /* 🔥 quan trọng để đều */
+        gap:20px;
     }
 
     /* LOGO */
@@ -112,7 +112,38 @@
         color:white;
         text-decoration:none;
     }
+    /* dropdown account */
 
+    /* dropdown account */
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown:hover .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        background: white;
+        min-width: 180px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        border-radius: 6px;
+        z-index: 999;
+    }
+
+    .dropdown-menu a {
+        display: block;
+        padding: 10px 15px;
+        color: black;   /* chữ hiện rõ luôn */
+        text-decoration: none;
+        opacity: 1;     /* không mờ */
+    }
+
+    .dropdown-menu a:hover {
+        background: #f0f0f0;
+    }
 </style>
 
 <!-- AUTH -->
@@ -148,13 +179,19 @@
 
             <c:choose>
                 <c:when test="${not empty sessionScope.user}">
-                    <a href="${root}/account" class="account">
-                        👤 ${sessionScope.user.fullName}
-                    </a>
-
-                    <c:if test="${sessionScope.user.role == 'ADMIN'}">
-                        <a href="${root}/admin/dashboard">⚙️ Trang quản trị</a>
-                    </c:if>
+                    <div class="dropdown">
+                        <button class="account dropdown-toggle" type="button" id="accountMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            👤 ${sessionScope.user.fullName}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountMenu">
+                            <li><a class="dropdown-item" href="${root}/account">Thông tin cá nhân</a></li>
+                            <c:if test="${sessionScope.user.role == 'ADMIN'}">
+                                <li><a class="dropdown-item" href="${root}/admin/dashboard">⚙️ Trang quản trị</a></li>
+                            </c:if>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="${root}/logout">🚪 Đăng xuất</a></li>
+                        </ul>
+                    </div>
                 </c:when>
 
                 <c:otherwise>
