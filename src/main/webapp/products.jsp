@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<c:set var="root" value="${pageContext.request.contextPath}" />
+<c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <!DOCTYPE html>
 <html>
@@ -18,6 +18,7 @@
             background: #f4f6f9;
             font-family: Segoe UI;
         }
+
         /* ===== HERO SLIDER FIXED ===== */
         .hero-container {
             width: 100%;
@@ -34,7 +35,7 @@
             width: 100%;
             height: 100%;
 
-            background-size: contain;      /* giữ nguyên ảnh */
+            background-size: contain; /* giữ nguyên ảnh */
             background-repeat: no-repeat;
             background-position: center;
 
@@ -59,33 +60,34 @@
         .hero-content p {
             font-size: 18px;
         }
+
         /* PRODUCT CARD */
         .product-card {
             border-radius: 12px;
             background: white;
             transition: 0.3s;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         .product-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
         }
 
         .product-img-area {
             height: 200px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .product-img {
-            max-height:180px;
+            max-height: 180px;
         }
 
         .price {
-            color:#e41e31;
-            font-weight:bold;
+            color: #e41e31;
+            font-weight: bold;
         }
 
         a.product-link {
@@ -147,7 +149,7 @@
                                 </a>
 
                                 <div class="price">
-                                    <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true" /> VNĐ
+                                    <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> VNĐ
                                 </div>                                <!-- ADD TO CART -->
                                 <form action="${root}/cart" method="post">
                                     <input type="hidden" name="action" value="add">
@@ -185,6 +187,6 @@
 
 <!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<jsp:include page="footer.jsp" />
+<jsp:include page="footer.jsp"/>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<c:set var="root" value="${pageContext.request.contextPath}" />
+<c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <style>
     .image-picker-grid {
@@ -14,9 +14,23 @@
         border: 1px solid #ddd;
         background: #fdfdfd;
     }
-    .img-option { cursor: pointer; border: 2px solid transparent; padding: 2px; }
-    .img-option.active { border-color: #28a745; background: #e8f5e9; }
-    .img-option img { width: 100%; height: 80px; object-fit: cover; }
+
+    .img-option {
+        cursor: pointer;
+        border: 2px solid transparent;
+        padding: 2px;
+    }
+
+    .img-option.active {
+        border-color: #28a745;
+        background: #e8f5e9;
+    }
+
+    .img-option img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+    }
 </style>
 
 <div class="container">

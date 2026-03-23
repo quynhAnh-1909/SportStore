@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<c:set var="root" value="${pageContext.request.contextPath}" />
+<c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <!DOCTYPE html>
 <html>
@@ -22,17 +22,22 @@
 
         /* CARD */
         .detail-card {
-            border-radius: 12px;
+            border-radius: 14px;
             background: white;
             padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         /* IMAGE */
         .product-image {
             width: 100%;
-            max-height: 400px;
+            max-height: 420px;
             object-fit: contain;
+            transition: 0.3s;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
         }
 
         /* TITLE */
@@ -43,10 +48,10 @@
 
         /* PRICE */
         .product-price {
-            color:#e41e31;
-            font-size: 26px;
+            color: #d81f19;
+            font-size: 30px;
             font-weight: bold;
-            margin: 10px 0;
+            margin: 12px 0;
         }
 
         .product-info {
@@ -60,13 +65,41 @@
         }
 
         .btn-cart {
-            background: #198754;
+            background: #d81f19;
             border: none;
             font-weight: 600;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            transition: 0.3s;
         }
 
         .btn-cart:hover {
-            background: #157347;
+            background: #b71c17;
+            transform: translateY(-2px);
+        }
+
+        /* BUTTON BACK */
+        .btn-back {
+            background: white;
+            border: 2px solid #d81f19;
+            color: #d81f19;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #d81f19;
+            color: white;
+        }
+
+        /* INPUT QUANTITY */
+        input[type="number"] {
+            border-radius: 8px;
+            text-align: center;
         }
     </style>
 
@@ -82,7 +115,9 @@
     <div class="detail-card">
 
         <div class="row">
-
+            <a href="${root}/products" class="btn-back">
+                ← Quay lại
+            </a>
             <!-- IMAGE -->
             <div class="col-md-5 text-center">
                 <img src="${root}/resources/${product.imageUrl}"
@@ -95,7 +130,7 @@
                 <div class="product-title">${product.name}</div>
 
                 <div class="product-price">
-                    <fmt:formatNumber value="${product.price}" />
+                    <fmt:formatNumber value="${product.price}"/>
                     VNĐ
                 </div>
 
@@ -133,17 +168,24 @@
                                            value="1"
                                            min="1"
                                            max="${product.stockQuantity}"
-                                           class="form-control">
+                                           class="form-control text-center">
                                 </div>
 
-                                <div class="col-md-8">
-                                    <button class="btn btn-cart w-100">
-                                        🛒 Thêm vào giỏ hàng
-                                    </button>
-                                </div>
-
+                                <button class="btn-cart w-100">
+                                    🛒 Thêm vào giỏ hàng
+                                </button>
                             </div>
 
+                            <div class="stock">
+                                <c:choose>
+                                    <c:when test="${product.stockQuantity > 0}">
+                                        ✔ Còn hàng (${product.stockQuantity})
+                                    </c:when>
+                                    <c:otherwise>
+                                        ❌ Hết hàng
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                         </form>
 
                         <c:if test="${param.added == 'true'}">

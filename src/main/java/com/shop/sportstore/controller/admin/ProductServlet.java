@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.Part;
 
@@ -203,16 +204,33 @@ public class ProductServlet extends HttpServlet {
 
             Product product = dao.getProductById(id);
 
-            request.setAttribute("product", product);
+            CategoryDAO cdao = new CategoryDAO();
+            List<Category> categories = cdao.buildTree(cdao.getAllCategories());
 
-            request.getRequestDispatcher("/WEB-INF/admin/productEdit.jsp")
+            String uploadPath = getServletContext().getRealPath("/resources");
+            File folder = new File(uploadPath);
+
+            List<String> imageList = new ArrayList<>();
+
+            if (folder.exists()) {
+                for (File f : folder.listFiles()) {
+                    imageList.add(f.getName());
+                }
+            }
+
+            request.setAttribute("product", product);
+            request.setAttribute("categories", categories);
+            request.setAttribute("imageList", imageList);
+
+            request.setAttribute("contentPage", "/WEB-INF/admin/productEdit.jsp");
+
+            request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp")
                     .forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
     /* =============================
        UPDATE PRODUCT
     ============================= */
@@ -228,7 +246,7 @@ public class ProductServlet extends HttpServlet {
             p.setName(request.getParameter("name"));
             p.setPrice(Double.parseDouble(request.getParameter("price")));
             p.setStockQuantity(Integer.parseInt(request.getParameter("stockQuantity")));
-           
+
             p.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             p.setUnit(request.getParameter("unit"));
             dao.updateProduct(p);
