@@ -1,91 +1,90 @@
-<%@ page contentType="text/html;charset=UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <div class="bg-light text-center rounded p-4 shadow-sm">
 
-	<div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
 
-		<h4 class="mb-0 text-success fw-bold">Quản lý kho hàng</h4>
+        <h4 class="mb-0 text-success fw-bold">Quản lý kho hàng</h4>
 
-		<a
-			href="${pageContext.request.contextPath}/admin/products?action=create"
-			class="btn btn-success rounded-pill px-4"> <i
-			class="fas fa-plus me-1"></i> Thêm sản phẩm
+        <a
+                href="${pageContext.request.contextPath}/admin/products?action=create"
+                class="btn btn-success rounded-pill px-4"> <i
+                class="fas fa-plus me-1"></i> Thêm sản phẩm
 
-		</a>
+        </a>
 
-	</div>
-
-
-	<div class="row mb-3 gx-2">
-
-		<div class="col-md-4">
-
-			<input type="text" id="searchInput" class="form-control"
-				placeholder="🔍 Tìm tên sản phẩm">
-
-		</div>
+    </div>
 
 
-		<div class="col-md-3">
+    <div class="row mb-3 gx-2">
 
-			<select id="categoryFilter" class="form-control">
+        <div class="col-md-4">
 
-				<option value="">-- Tất cả danh mục --</option>
+            <input type="text" id="searchInput" class="form-control"
+                   placeholder="🔍 Tìm tên sản phẩm">
 
-				<c:forEach var="c" items="${categories}">
-					<option value="${c.id}">${c.name}</option>
-				</c:forEach>
-
-			</select>
-
-		</div>
+        </div>
 
 
-		<div class="col-md-3">
+        <div class="col-md-3">
 
-			<select id="stockFilter" class="form-control">
+            <select id="categoryFilter" class="form-control">
 
-				<option value="">-- Tất cả trạng thái --</option>
-				<option value="in">✅ Còn hàng</option>
-				<option value="out">❌ Hết hàng</option>
+                <option value="">-- Tất cả danh mục --</option>
 
-			</select>
+                <c:forEach var="c" items="${categories}">
+                    <option value="${c.id}">${c.name}</option>
+                </c:forEach>
 
-		</div>
+            </select>
 
-	</div>
+        </div>
 
 
+        <div class="col-md-3">
 
-	<div class="table-responsive">
+            <select id="stockFilter" class="form-control">
 
-		<table class="table table-bordered table-hover">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="in">✅ Còn hàng</option>
+                <option value="out">❌ Hết hàng</option>
 
-			<thead class="table-dark">
+            </select>
 
-				<tr>
+        </div>
 
-					<th>Hình ảnh</th>
-					<th>Tên</th>
-					<th>Giá</th>
-					<th>Tồn kho</th>
-					<th>Đơn vị</th>
-					<th>Danh mục</th>
-					<th class="text-center">Thao tác</th>
+    </div>
 
-				</tr>
 
-			</thead>
+    <div class="table-responsive">
 
-			<tbody id="productTableBody">
+        <table class="table table-bordered table-hover">
 
-				<jsp:include page="products.jsp" />
+            <thead class="table-dark">
 
-			</tbody>
+            <tr>
 
-		</table>
+                <th>Hình ảnh</th>
+                <th>Tên</th>
+                <th>Giá</th>
+                <th>Tồn kho</th>
+                <th>Đơn vị</th>
+                <th>Danh mục</th>
+                <th class="text-center">Thao tác</th>
 
-	</div>
+            </tr>
+
+            </thead>
+
+            <tbody id="productTableBody">
+
+            <jsp:include page="products.jsp"/>
+
+            </tbody>
+
+        </table>
+
+    </div>
 
 </div>

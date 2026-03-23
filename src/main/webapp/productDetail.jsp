@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<c:set var="root" value="${pageContext.request.contextPath}" />
+<c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <!DOCTYPE html>
 <html>
@@ -25,7 +25,7 @@
             border-radius: 14px;
             background: white;
             padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         /* IMAGE */
@@ -35,9 +35,11 @@
             object-fit: contain;
             transition: 0.3s;
         }
-.product-image:hover{
-    transform: scale(1.05);
-}
+
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+
         /* TITLE */
         .product-title {
             font-weight: 700;
@@ -46,7 +48,7 @@
 
         /* PRICE */
         .product-price {
-            color:#d81f19;
+            color: #d81f19;
             font-size: 30px;
             font-weight: bold;
             margin: 12px 0;
@@ -76,6 +78,7 @@
             background: #b71c17;
             transform: translateY(-2px);
         }
+
         /* BUTTON BACK */
         .btn-back {
             background: white;
@@ -127,7 +130,7 @@
                 <div class="product-title">${product.name}</div>
 
                 <div class="product-price">
-                    <fmt:formatNumber value="${product.price}" />
+                    <fmt:formatNumber value="${product.price}"/>
                     VNĐ
                 </div>
 
@@ -171,7 +174,7 @@
                                 <button class="btn-cart w-100">
                                     🛒 Thêm vào giỏ hàng
                                 </button>
-                                </div>
+                            </div>
 
                             <div class="stock">
                                 <c:choose>

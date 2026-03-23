@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.List;
 
 
-
 @WebServlet("/products")
 public class ProductServlet extends HttpServlet {
     private static final int LIMIT = 40; // 5 sản phẩm * 8 hàng
@@ -73,7 +72,6 @@ public class ProductServlet extends HttpServlet {
             if (categoryList == null) categoryList = List.of();
 
             request.setAttribute("products", productList);
-
 
 
             // 🔥 FIX QUAN TRỌNG
