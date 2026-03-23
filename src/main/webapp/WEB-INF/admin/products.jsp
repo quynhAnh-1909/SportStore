@@ -140,7 +140,7 @@
 
                                 <a href="${root}/admin/products?action=delete&id=${item.id}"
                                    class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('Xóa sản phẩm này?')">
+                                   onclick="return confirmDelete(event, this.href)">
                                     <i class="fas fa-trash"></i>
                                 </a>
 
@@ -185,27 +185,54 @@
 </style>
 
 <!-- SIMPLE FILTER JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    const searchInput = document.getElementById("searchInput");
-    const categoryFilter = document.getElementById("categoryFilter");
+    document.addEventListener("DOMContentLoaded", function () {
 
-    searchInput.addEventListener("keyup", filterTable);
-    categoryFilter.addEventListener("change", filterTable);
+        const searchInput = document.getElementById("searchInput");
+        const categoryFilter = document.getElementById("categoryFilter");
 
-    function filterTable() {
-        let keyword = searchInput.value.toLowerCase();
-        let category = categoryFilter.value;
+        if (searchInput) searchInput.addEventListener("keyup", filterTable);
+        if (categoryFilter) categoryFilter.addEventListener("change", filterTable);
 
-        let rows = document.querySelectorAll("tbody tr");
+        function filterTable() {
+            let keyword = searchInput.value.toLowerCase();
+            let category = categoryFilter.value;
 
-        rows.forEach(row => {
-            let name = row.children[1].innerText.toLowerCase();
-            let catText = row.children[5].innerText;
+            let rows = document.querySelectorAll("tbody tr");
 
-            let matchName = name.includes(keyword);
-            let matchCategory = !category || catText.includes(category);
+            rows.forEach(row => {
+                let name = row.children[1].innerText.toLowerCase();
+                let catText = row.children[5].innerText;
 
-            row.style.display = (matchName && matchCategory) ? "" : "none";
+                let matchName = name.includes(keyword);
+                let matchCategory = !category || catText.includes(category);
+
+                row.style.display = (matchName && matchCategory) ? "" : "none";
+            });
+        }
+
+    });
+
+    function confirmDelete(event, url) {
+        event.preventDefault();
+
+        Swal.fire({
+            title: 'Bạn chắc chắn?',
+            text: 'Sản phẩm sẽ bị xóa!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d81f19',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
         });
+
+        return false;
     }
 </script>
