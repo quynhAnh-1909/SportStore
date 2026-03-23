@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.Part;
 
 @WebServlet("/admin/products")
@@ -120,7 +119,7 @@ public class ProductServlet extends HttpServlet {
 
         request.setAttribute("categories", categories);
         request.setAttribute("imageList", imageList);
-        request.setAttribute("contentPage", "/WEB-INF/admin/createProduct.jsp");
+        request.setAttribute("contentPage", "/WEB-INF/admin/productCreate.jsp");
         request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp")
                 .forward(request, response);
     }

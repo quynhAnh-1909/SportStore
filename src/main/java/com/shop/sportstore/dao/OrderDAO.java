@@ -1,9 +1,11 @@
 package com.shop.sportstore.dao;
 
+import com.shop.sportstore.model.Order;
 import com.shop.sportstore.untils.DBConnection;
 import com.shop.sportstore.model.CartItem;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,5 +113,38 @@ public class OrderDAO extends DBConnection {
         } catch (SQLException e) {
             throw e; // để servlet xử lý và báo lỗi 500 nếu cần
         }
+    }
+
+    public List<Order> getAllOrders() {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT o.Id, o.UserId, o.OrderCode, o.TotalPrice, o.Status, o.PaymentMethod, o.Note, o.CreatedAt, " +
+                "u.Full_Name AS userFullName " +
+                "FROM orders o " +
+                "JOIN users u ON o.UserId = u.User_id " +
+                "ORDER BY o.CreatedAt DESC";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setId(rs.getInt("Id"));
+                order.setUserId(rs.getInt("UserId"));
+                order.setOrderCode(rs.getString("OrderCode"));
+                order.setTotalPrice(rs.getDouble("TotalPrice"));
+                order.setStatus(rs.getString("Status"));
+                order.setPaymentMethod(rs.getString("PaymentMethod"));
+                order.setNote(rs.getString("Note"));
+                order.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                order.setUserFullName(rs.getString("userFullName")); // join từ bảng users
+                orders.add(order);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // hoặc ném ra servlet để xử lý
+        }
+
+        return orders;
     }
 }
