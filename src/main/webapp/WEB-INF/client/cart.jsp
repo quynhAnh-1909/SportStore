@@ -41,25 +41,22 @@
 
         /* ITEM */
         .cart-item {
-            padding: 15px 10px;
-            border-bottom: 1px solid #eee;
-            transition: all 0.25s ease;
-        }
-
-        .cart-item:hover {
-            background: #fff5f5;
-            transform: scale(1.01);
+            display: flex;
+            align-items: center;
         }
 
         /* IMAGE */
         .product-img {
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             object-fit: contain;
+            margin-right: 10px;
+
         }
 
         .product-name {
-            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.4;
         }
 
         /* PRICE */
@@ -73,14 +70,51 @@
             width: 45px;
             height: 35px;
             text-align: center;
+            border: 1px solid #ccc;
             border-radius: 6px;
+        }
+
+        .qty-control {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .qty-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: #f5f5f5;
+            font-size: 18px;
+        }
+
+        .qty-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .qty-input {
+            width: 50px;
+            height: 35px;
+            text-align: center;
+            border: none;
+            outline: none;
+            background: #fff;
+            font-weight: bold;
+        }
+
+        .cart-item:hover {
+            background: #fff5f5;
+            transition: 0.2s;
         }
 
         /* BUTTON QTY */
         .btn-qty {
-            border: 1px solid #ddd;
-            background: white;
-            font-weight: bold;
+            width: 30px;
+            height: 30px;
+            padding: 0;
         }
 
         .btn-qty:hover {
@@ -141,6 +175,16 @@
         .btn-back:hover {
             background: #eee;
         }
+
+        .item-check {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .cart-container {
+            border-radius: 12px;
+        }
     </style>
 
 </head>
@@ -151,18 +195,13 @@
 
 <div class="container mt-4">
 
-    <!-- BACK -->
-    <a href="${root}/products" class="btn btn-back mb-3">
+    <a href="${root}/products" class="btn btn-secondary mb-3">
         ← Tiếp tục mua hàng
     </a>
 
-    <!-- EMPTY CART -->
     <c:if test="${empty sessionScope.cart}">
         <div class="text-center p-5 bg-white rounded shadow-sm">
-            <h4>🛒 Giỏ hàng của bạn đang trống</h4>
-            <a href="${root}/products" class="btn checkout-btn mt-3">
-                Mua sắm ngay
-            </a>
+            <h4>🛒 Giỏ hàng trống</h4>
         </div>
     </c:if>
 
@@ -173,92 +212,54 @@
             <!-- LEFT -->
             <div class="col-md-8">
 
-                <div class="cart-container">
+                <div class="card p-3">
 
-                    <div class="row cart-header">
-                        <div class="col-md-5">Sản phẩm</div>
-                        <div class="col-md-2 text-center">Đơn giá</div>
-                        <div class="col-md-2 text-center">Số lượng</div>
-                        <div class="col-md-2 text-center">Thành tiền</div>
-                        <div class="col-md-1 text-center">Xóa</div>
+                    <div class="row fw-bold text-white bg-danger p-2 rounded text-center align-items-center">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-4 text-start">Sản phẩm</div>
+                        <div class="col-md-2">Đơn giá</div>
+                        <div class="col-md-2">Số lượng</div>
+                        <div class="col-md-2">Thành tiền</div>
+                        <div class="col-md-1">Xóa</div>
                     </div>
-
-                    <c:set var="total" value="0" />
 
                     <c:forEach var="item" items="${sessionScope.cart}">
 
-                        <div class="row cart-item">
+                        <div class="row align-items-center mt-3 cart-item text-center g-0"
+                             data-id="${item.product.id}">
 
-                            <!-- PRODUCT -->
-                            <div class="col-md-5 d-flex align-items-center">
-
-                                <img src="${root}/resources/${item.product.imageUrl}"
-                                     class="product-img">
-
-                                <div class="ms-3">
-                                    <div class="product-name">
-                                            ${item.product.name}
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Size: ${item.product.size} |
-                                        Màu: ${item.product.color}
-                                    </small>
-                                </div>
-
+                            <div class="col-md-1">
+                                <input type="checkbox" class="item-check"
+                                       data-price="${item.product.price}" checked>
                             </div>
 
-                            <!-- PRICE -->
-                            <div class="col-md-2 text-center price">
-                                <fmt:formatNumber value="${item.product.price}" />
+                            <div class="col-md-4 d-flex align-items-center">
+                                <img src="${root}/resources/${item.product.imageUrl}" width="70">
+                                <div class="ms-2">${item.product.name}</div>
                             </div>
 
-                            <!-- QTY -->
+                            <div class="col-md-2 text-danger fw-bold">
+                                <fmt:formatNumber value="${item.product.price}" /> VNĐ
+                            </div>
+
                             <div class="col-md-2 text-center">
-
-                                <form action="${root}/cart" method="post"
-                                      class="d-flex justify-content-center">
-
-                                    <input type="hidden" name="action" value="update">
-                                    <input type="hidden" name="productId" value="${item.product.id}">
-
-                                    <button type="submit"
-                                            name="quantity"
-                                            value="${item.quantity > 1 ? item.quantity - 1 : 1}"
-                                            class="btn btn-qty btn-sm">-</button>
-
-                                    <input type="text"
-                                           value="${item.quantity}"
-                                           class="form-control mx-1 qty-box"
-                                           readonly>
-
-                                    <button type="submit"
-                                            name="quantity"
-                                            value="${item.quantity + 1}"
-                                            class="btn btn-qty btn-sm">+</button>
-
-                                </form>
-
+                                <div class="qty-control">
+                                    <button type="button" class="qty-btn minus">-</button>
+                                    <input type="text" value="${item.quantity}" class="qty-input" readonly>
+                                    <button type="button" class="qty-btn plus">+</button>
+                                </div>
                             </div>
 
-                            <!-- TOTAL -->
-                            <div class="col-md-2 text-center price">
+                            <div class="col-md-2 text-danger fw-bold item-total">
                                 <fmt:formatNumber value="${item.product.price * item.quantity}" />
                             </div>
 
-                            <!-- REMOVE -->
-                            <div class="col-md-1 text-center">
-                                <a href="${root}/cart?action=remove&id=${item.product.id}"
-                                   class="remove-btn"
-                                   onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
-                                    ❌
-                                </a>
+                            <div class="col-md-1">
+                                <button onclick="confirmDelete(${item.product.id})"
+                                        class="btn btn-danger">X</button>
                             </div>
 
                         </div>
-
-                        <c:set var="total"
-                               value="${total + (item.product.price * item.quantity)}" />
 
                     </c:forEach>
 
@@ -269,37 +270,34 @@
             <!-- RIGHT -->
             <div class="col-md-4">
 
-                <div class="cart-summary">
+                <div class="card p-3">
 
-                    <h5>Tóm tắt đơn hàng</h5>
+                    <h5>Tóm tắt</h5>
                     <hr>
-
-                    <c:set var="shipping" value="30000" />
 
                     <div class="d-flex justify-content-between">
                         <span>Tạm tính</span>
-                        <span>
-                            <fmt:formatNumber value="${total}" /> VNĐ
-                        </span>
+                        <span id="totalPrice">0 VNĐ</span>
                     </div>
 
                     <div class="d-flex justify-content-between mt-2">
-                        <span>Phí vận chuyển</span>
+                        <span>Phí ship</span>
                         <span>30,000 VNĐ</span>
                     </div>
 
                     <hr>
 
                     <div class="d-flex justify-content-between">
-                        <span>Tổng cộng</span>
-                        <span class="total-price">
-                            <fmt:formatNumber value="${total + shipping}" /> VNĐ
-                        </span>
+                        <span>Tổng</span>
+                        <span id="finalTotal" class="text-danger fw-bold"></span>
                     </div>
 
-                    <a href="${root}/checkout" class="btn checkout-btn w-100 mt-3">
-                        🛒 Thanh toán ngay
-                    </a>
+                    <form id="checkoutForm" action="${root}/checkout" method="get">
+                        <input type="hidden" name="selectedIds" id="selectedIds">
+                        <button class="btn btn-danger w-100 mt-3">
+                            Thanh toán
+                        </button>
+                    </form>
 
                 </div>
 
@@ -310,6 +308,131 @@
     </c:if>
 
 </div>
+
+<script>
+    const root = "${pageContext.request.contextPath}";
+
+    function confirmDelete(productId) {
+        if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
+            fetch(root + "/cart", {
+                method: "POST",
+                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                body: "action=remove&productId=" + productId
+            }).then(() => location.reload());
+        }
+    }
+
+    // ===== TOTAL =====
+    function updateTotal() {
+        let total = 0;
+
+        document.querySelectorAll('.cart-item').forEach(item => {
+            let checkbox = item.querySelector('.item-check');
+
+            if (checkbox.checked) {
+                let price = Number(checkbox.dataset.price);
+                let qty = parseInt(item.querySelector('.qty-input').value);
+                total += price * qty;
+            }
+        });
+
+        document.getElementById("totalPrice").innerText =
+            total.toLocaleString('vi-VN') + " VNĐ";
+
+        document.getElementById("finalTotal").innerText =
+            (total + 30000).toLocaleString('vi-VN') + " VNĐ";
+    }
+
+    // ===== UPDATE QTY =====
+    function updateQuantity(productId, quantity) {
+
+        fetch(root + "/cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=update&productId=" + productId + "&quantity=" + quantity
+        })
+            .then(res => res.text())
+            .then(() => {
+                updateCartCount(); // 🔥 QUAN TRỌNG NHẤT
+            });
+    }
+
+    // ===== BUTTON +/- =====
+    document.querySelectorAll('.cart-item').forEach(item => {
+
+        let plus = item.querySelector('.plus');
+        let minus = item.querySelector('.minus');
+        let qtyBox = item.querySelector('.qty-input');
+        let id = item.dataset.id;
+        let price = Number(item.querySelector('.item-check').dataset.price);
+
+        plus.onclick = () => {
+            let qty = parseInt(qtyBox.value) + 1;
+
+            updateQuantity(id, qty);
+            qtyBox.value = qty;
+
+            item.querySelector('.item-total').innerText =
+                (qty * price).toLocaleString('vi-VN');
+
+            updateTotal();
+        }
+
+        minus.onclick = () => {
+            let qty = Math.max(1, parseInt(qtyBox.value) - 1);
+
+            updateQuantity(id, qty);
+            qtyBox.value = qty;
+
+            item.querySelector('.item-total').innerText =
+                (qty * price).toLocaleString('vi-VN');
+
+            updateTotal();
+        }
+
+    });
+
+    function updateCartCount() {
+        fetch(root + "/cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=count"
+        })
+            .then(res => res.text())
+            .then(count => {
+                document.getElementById("cart-count").innerText = count;
+            });
+    }
+
+    document.getElementById("checkoutForm").onsubmit = function () {
+
+        let selected = [];
+
+        document.querySelectorAll('.cart-item').forEach(item => {
+            let checkbox = item.querySelector('.item-check');
+
+            if (checkbox.checked) {
+                selected.push(item.dataset.id);
+            }
+        });
+
+        document.getElementById("selectedIds").value = selected.join(",");
+
+        return true;
+    }
+
+    // ===== CHECKBOX =====
+    document.querySelectorAll('.item-check').forEach(cb => {
+        cb.addEventListener('change', updateTotal);
+    });
+
+    window.onload = updateTotal;
+
+</script>
 
 </body>
 </html>

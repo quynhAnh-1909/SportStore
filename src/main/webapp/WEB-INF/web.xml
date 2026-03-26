@@ -5,7 +5,7 @@
 
     <!-- Trang mặc định -->
     <welcome-file-list>
-        <welcome-file>products.jsp</welcome-file>
+        <welcome-file>products</welcome-file>
     </welcome-file-list>
 
 </web-app>

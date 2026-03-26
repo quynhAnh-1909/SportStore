@@ -138,6 +138,7 @@
           </a>
           <h2 class="checkout-title mb-3">Thông tin thanh toán</h2>
           <form action="${root}/checkout" method="post">
+            <input type="hidden" name="selectedIds" value="${param.selectedIds}">
             <div class="mb-3">
               <label class="form-label fw-bold">Họ tên người nhận</label>
               <input type="text" name="receiverName" class="form-control" required>
@@ -205,7 +206,7 @@
 
           <c:set var="total" value="0" />
 
-          <c:forEach var="item" items="${sessionScope.cart}">
+          <c:forEach var="item" items="${selectedItems}">
 
             <div class="d-flex align-items-center mb-3">
 
