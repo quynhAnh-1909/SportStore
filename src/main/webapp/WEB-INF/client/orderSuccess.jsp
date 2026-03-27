@@ -21,6 +21,27 @@
         <!-- Order Info Box -->
         <div class="order-info-box mb-4">
             <p class="mb-2"><strong>Mã đơn hàng:</strong> <span class="fw-bold">${sessionScope.lastOrderCode}</span></p>
+            <h4>Chi tiết sản phẩm</h4>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                </tr>
+                </thead>
+                <tbody>
+                <c:forEach var="item" items="${items}">
+                    <tr>
+                        <td>${item.productName}</td>
+                        <td>${item.price} VND</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.subtotal} VND</td>
+                    </tr>
+                </c:forEach>
+                </tbody>
+            </table>
             <p class="mb-2"><strong>Tổng thanh toán:</strong>
                 <span class="fw-bold text-danger">
                     <fmt:formatNumber value="${sessionScope.lastTotal}" type="number"/> ₫
