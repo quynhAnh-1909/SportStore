@@ -103,8 +103,8 @@
 </head>
 
 <body>
-<jsp:include page="WEB-INF/layout/index.jsp"/>
-<jsp:include page="WEB-INF/layout/auth.jsp"/>
+<jsp:include page="/WEB-INF/layout/index.jsp"/>
+<%--<jsp:include page="/WEB-INF/layout/auth.jsp"/>--%>
 <jsp:include page="banner.jsp"/>
 
 <!-- CONTENT -->
@@ -151,15 +151,11 @@
                                 <div class="price">
                                     <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> VNĐ
                                 </div>                                <!-- ADD TO CART -->
-                                <form action="${root}/cart" method="post">
-                                    <input type="hidden" name="action" value="add">
-                                    <input type="hidden" name="productId" value="${p.id}">
-                                    <input type="hidden" name="quantity" value="1">
-
-                                    <button class="btn btn-success btn-sm mt-2 w-100">
-                                        🛒 Thêm vào giỏ hàng
-                                    </button>
-                                </form>
+                                <button type="button"
+                                        onclick="addToCart(this, ${p.id})"
+                                        class="btn btn-success btn-sm mt-2 w-100">
+                                    🛒 Thêm vào giỏ hàng
+                                </button>
 
                             </div>
 
@@ -188,5 +184,89 @@
 <!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <jsp:include page="footer.jsp"/>
+<script>
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.get("showLogin") === "true") {
+        openAuth('login');
+    }
+
+    function addToCart(btn, productId) {
+
+        // 🔥 gọi backend trước
+        fetch("${root}/cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=add&productId=" + productId
+        })
+            .then(res => res.text())
+            .then(() => {
+                animateToCart(btn);
+                updateCartCount();
+            });
+    }
+
+    /* ================= ANIMATION ================= */
+
+    function animateToCart(button) {
+
+        // lấy ảnh sản phẩm gần nút
+        let card = button.closest(".product-card");
+        let img = card.querySelector("img");
+
+        // clone ảnh
+        let flyingImg = img.cloneNode(true);
+
+        let rect = img.getBoundingClientRect();
+
+        flyingImg.style.position = "fixed";
+        flyingImg.style.left = rect.left + "px";
+        flyingImg.style.top = rect.top + "px";
+        flyingImg.style.width = rect.width + "px";
+        flyingImg.style.height = rect.height + "px";
+        flyingImg.style.transition = "all 0.8s ease";
+        flyingImg.style.zIndex = 9999;
+        flyingImg.style.borderRadius = "10px";
+
+        document.body.appendChild(flyingImg);
+
+        // vị trí giỏ hàng
+        let cart = document.querySelector(".cart");
+        let cartRect = cart.getBoundingClientRect();
+
+        setTimeout(() => {
+            flyingImg.style.left = cartRect.left + "px";
+            flyingImg.style.top = cartRect.top + "px";
+            flyingImg.style.width = "20px";
+            flyingImg.style.height = "20px";
+            flyingImg.style.opacity = "0.5";
+        }, 10);
+
+        // xóa sau khi bay xong
+        setTimeout(() => {
+            flyingImg.remove();
+        }, 800);
+    }
+
+    /* ================= UPDATE COUNT ================= */
+
+    function updateCartCount() {
+        fetch("${root}/cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=count"
+        })
+            .then(res => res.text())
+            .then(count => {
+                document.querySelector(".cart").innerHTML = "🛒 " + count;
+            });
+    }
+
+</script>
 </body>
 </html>
