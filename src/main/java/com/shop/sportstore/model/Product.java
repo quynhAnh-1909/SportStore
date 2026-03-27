@@ -17,6 +17,13 @@ public class Product {
     private String unit;
     private String categoryName; // thêm dòng này
 
+    public Product(int id, String name, double price, String imageUrl) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.imageUrl = imageUrl;
+    }
+
     public String getCategoryName() {
         return categoryName;
     }

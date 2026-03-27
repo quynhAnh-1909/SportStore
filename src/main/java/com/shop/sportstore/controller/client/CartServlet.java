@@ -34,6 +34,12 @@ public class CartServlet extends HttpServlet {
             cart = new ArrayList<>();
         }
 
+        if ("count".equals(action)) {
+            int total = cart.stream().mapToInt(CartItem::getQuantity).sum();
+            response.getWriter().print(total);
+            return;
+        }
+
         if("remove".equals(action)){
 
             int id = Integer.parseInt(request.getParameter("id"));
@@ -48,70 +54,71 @@ public class CartServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request,HttpServletResponse response)
-            throws ServletException,IOException{
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
 
         String action = request.getParameter("action");
 
         HttpSession session = request.getSession();
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
 
-        if(cart == null){
-            cart = new ArrayList<>();
-        }
+        if (cart == null) cart = new ArrayList<>();
 
-        int productId = Integer.parseInt(request.getParameter("productId"));
-
-        if("count".equals(action)){
-
-            int total = 0;
-
-            for(CartItem item : cart){
-                total += item.getQuantity();
-            }
-
-            response.setContentType("text/plain");
+        // COUNT (AJAX)
+        if ("count".equals(action)) {
+            int total = cart.stream().mapToInt(CartItem::getQuantity).sum();
             response.getWriter().print(total);
             return;
         }
 
-        if("add".equals(action)){
+        int productId = Integer.parseInt(request.getParameter("productId"));
 
+        // ADD
+        if ("add".equals(action)) {
             Product product = productDAO.getProductById(productId);
 
             boolean found = false;
 
-            for(CartItem item : cart){
-
-                if(item.getProduct().getId()==productId){
-
-                    item.setQuantity(item.getQuantity()+1);
+            for (CartItem item : cart) {
+                if (item.getProduct().getId() == productId) {
+                    int quantity = Integer.parseInt(request.getParameter("quantity"));
+                    item.setQuantity(item.getQuantity() + quantity);
                     found = true;
                     break;
                 }
             }
 
-            if(!found){
-                cart.add(new CartItem(product,1));
-            }
+            if (!found) cart.add(new CartItem(product, 1));
         }
 
-        if("update".equals(action)){
-
+        // UPDATE
+        if ("update".equals(action)) {
             int quantity = Integer.parseInt(request.getParameter("quantity"));
 
-            for(CartItem item : cart){
-
-                if(item.getProduct().getId()==productId){
-
+            for (CartItem item : cart) {
+                if (item.getProduct().getId() == productId) {
                     item.setQuantity(quantity);
                 }
             }
         }
 
+        // REMOVE
+        if ("remove".equals(action)) {
+            cart.removeIf(i -> i.getProduct().getId() == productId);
+        }
+
+        // xử lý add/update/remove ở trên...
+
         session.setAttribute("cart", cart);
 
-        response.sendRedirect(
-                request.getContextPath() + "/productDetail?id=" + productId);
+        // 👉 FIX QUAN TRỌNG NHẤT (KHÔNG KHAI BÁO LẠI action)
+        if ("update".equals(action) || "add".equals(action) || "remove".equals(action)) {
+            response.setContentType("text/plain");
+            response.getWriter().print("OK");
+            return;
+        }
+
+        // fallback
+        response.sendRedirect(request.getContextPath() + "/cart");
     }
 }

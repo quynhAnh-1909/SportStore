@@ -147,7 +147,7 @@
 </style>
 
 <!-- AUTH -->
-<jsp:include page="auth.jsp"/>
+<jsp:include page="/WEB-INF/layout/auth.jsp"/>
 
 <div class="top-bar">
     <div class="container">
@@ -174,7 +174,17 @@
         <div class="user-actions">
 
             <a href="${root}/cart" class="cart">
-                🛒 ${sessionScope.cart!=null?sessionScope.cart.size():0}
+                🛒 <span id="cart-count">
+                    <c:set var="cartCount" value="0"/>
+
+                    <c:if test="${not empty sessionScope.cart}">
+                        <c:forEach var="item" items="${sessionScope.cart}">
+                            <c:set var="cartCount" value="${cartCount + item.quantity}"/>
+                        </c:forEach>
+                    </c:if>
+
+                    ${cartCount}
+                </span>
             </a>
 
             <c:choose>
