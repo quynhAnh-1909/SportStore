@@ -75,9 +75,8 @@ public class AuthServlet extends HttpServlet {
                 break;
 
             case "/login":
-            case "/register": // cả 2 đều load popup chung
-                request.getRequestDispatcher("/WEB-INF/client/auth.jsp")
-                        .forward(request, response);
+            case "/register":
+                response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
                 break;
 
             case "/login-google":
@@ -108,8 +107,7 @@ public class AuthServlet extends HttpServlet {
             loginUser(session, request, response, user);
         } else {
             request.setAttribute("errorLogin", "Email hoặc mật khẩu không chính xác!");
-            request.getRequestDispatcher("/WEB-INF/client/auth.jsp")
-                    .forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
         }
     }
 

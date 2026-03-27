@@ -3,6 +3,7 @@ package com.shop.sportstore.controller.client;
 import com.shop.sportstore.dao.OrderDAO;
 import com.shop.sportstore.model.CartItem;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequestWrapper;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @WebServlet("/checkout")
@@ -18,7 +21,33 @@ public class CheckoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Hiển thị trang checkout
+
+        HttpSession session = request.getSession();
+
+        String selectedIds = request.getParameter("selectedIds");
+
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+
+        List<CartItem> selectedItems = new ArrayList<>();
+
+        if (selectedIds != null && !selectedIds.isEmpty()) {
+
+            List<Integer> ids = Arrays.stream(selectedIds.split(","))
+                    .map(Integer::parseInt)
+                    .toList();
+
+            for (CartItem item : cart) {
+                if (ids.contains(item.getProduct().getId())) {
+                    selectedItems.add(item);
+                }
+            }
+
+        } else {
+            selectedItems = cart;
+        }
+
+        request.setAttribute("selectedItems", selectedItems);
+
         request.getRequestDispatcher("/WEB-INF/client/checkout.jsp")
                 .forward(request, response);
     }
@@ -28,9 +57,49 @@ public class CheckoutServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+
+        String selectedIds = request.getParameter("selectedIds");
+
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
 
-        if (cart == null || cart.isEmpty()) {
+        List<CartItem> selectedItems = new ArrayList<>();
+
+        if (selectedIds != null && !selectedIds.isEmpty()) {
+
+            List<Integer> ids = Arrays.stream(selectedIds.split(","))
+                    .map(Integer::parseInt)
+                    .toList();
+
+            for (CartItem item : cart) {
+                if (ids.contains(item.getProduct().getId())) {
+                    selectedItems.add(item);
+                }
+            }
+
+        } else {
+            selectedItems = cart; // fallback
+        }
+
+        request.setAttribute("selectedItems", selectedItems);
+
+        String selectedIdsStr = request.getParameter("selectedIds");
+
+        List<CartItem> selectedCart = new ArrayList<>();
+
+        if (cart != null && selectedIdsStr != null && !selectedIdsStr.isEmpty()) {
+
+            String[] ids = selectedIdsStr.split(",");
+
+            for (CartItem item : cart) {
+                for (String id : ids) {
+                    if (item.getProduct().getId() == Integer.parseInt(id)) {
+                        selectedCart.add(item);
+                    }
+                }
+            }
+        }
+
+        if (selectedCart.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
@@ -50,7 +119,7 @@ public class CheckoutServlet extends HttpServlet {
 
         // Tính tổng
         double total = 0;
-        for (CartItem item : cart) {
+        for (CartItem item : selectedCart) {
             if (item.getProduct() != null) {
                 total += item.getProduct().getPrice() * item.getQuantity();
             }
@@ -61,7 +130,7 @@ public class CheckoutServlet extends HttpServlet {
 
         try {
             OrderDAO orderDAO = new OrderDAO();
-            orderDAO.createOrder(userId, orderCode, total, "Pending", note, cart);
+            orderDAO.createOrder(userId, orderCode, total, "Pending", note, selectedCart);
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(500, "Đặt hàng thất bại. Vui lòng thử lại.");

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/productDetail")
 public class ProductDetailServlet extends HttpServlet {
@@ -50,6 +51,24 @@ public class ProductDetailServlet extends HttpServlet {
             // ✅ Set data
             request.setAttribute("product", product);
 
+            List<Product> relatedProducts = productDAO.getAll();
+
+            // tránh trùng sản phẩm hiện tại
+            relatedProducts.removeIf(p -> p.getId() == id);
+
+            // kiểm tra có bấm "xem thêm" chưa
+            String showAll = request.getParameter("showAll");
+
+            if (showAll == null && relatedProducts.size() > 4) {
+                relatedProducts = relatedProducts.subList(0, 4);
+            }
+
+            // ✅ THÊM DÒNG NÀY (QUAN TRỌNG)
+            request.setAttribute("relatedProducts", relatedProducts);
+
+            // gửi flag xuống JSP
+            request.setAttribute("showAll", showAll);
+
             // 👉 Forward sang JSP
             request.getRequestDispatcher("/productDetail.jsp")
                     .forward(request, response);
@@ -61,6 +80,7 @@ public class ProductDetailServlet extends HttpServlet {
             e.printStackTrace();
             forwardError(request, response, "Lỗi tải chi tiết sản phẩm");
         }
+
     }
 
     // ✅ Tách hàm xử lý lỗi cho clean code
@@ -73,4 +93,6 @@ public class ProductDetailServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/client/error.jsp")
                 .forward(request, response);
     }
+
 }
+
