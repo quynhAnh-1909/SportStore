@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet("/orderSuccess")
@@ -25,8 +26,9 @@ public class OrderSuccessServlet extends HttpServlet {
         try {
             OrderDAO orderDAO = new OrderDAO();
             Map<String, String> orderData = orderDAO.getOrderDetailForEmail(orderCode);
-
+            List<Map<String, String>> orderItems = orderDAO.getOrderItems(orderCode);
             request.setAttribute("order", orderData); // truyền vào JSP
+            request.setAttribute("items", orderItems);
             request.getSession().removeAttribute("orderCode"); // xóa session
         } catch (Exception e) {
             e.printStackTrace();
