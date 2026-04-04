@@ -27,9 +27,9 @@ public class OrderSuccessServlet extends HttpServlet {
             OrderDAO orderDAO = new OrderDAO();
             Map<String, String> orderData = orderDAO.getOrderDetailForEmail(orderCode);
             List<Map<String, String>> orderItems = orderDAO.getOrderItems(orderCode);
-            request.setAttribute("order", orderData);
+            request.setAttribute("order", orderData); // truyền vào JSP
             request.setAttribute("items", orderItems);
-            request.getSession().removeAttribute("orderCode");
+            request.getSession().removeAttribute("orderCode"); // xóa session
         } catch (Exception e) {
             e.printStackTrace();
         }

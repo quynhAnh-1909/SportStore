@@ -20,13 +20,13 @@ public class AccountServlet extends HttpServlet {
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
             if (user.getAvatar() == null) {
-                user.setAvatar("/images/default-avatar.png");
+                user.setAvatar("/images/default-avatar.png"); // default nếu chưa có
             }
             request.setAttribute("user", user);
-            request.setAttribute("user", user);
+            request.setAttribute("user", user); // chuyển sang JSP
             request.getRequestDispatcher("/WEB-INF/client/account.jsp").forward(request, response);
         } else {
-            response.sendRedirect("/authjsp");
+            response.sendRedirect("/authjsp"); // nếu chưa login
         }
     }
 }

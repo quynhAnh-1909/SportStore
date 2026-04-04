@@ -9,9 +9,8 @@ public class User implements Serializable {
     private String email;
     private String password;
     private String phoneNumber;
-    private String role;
+    private String role; // ADMIN / USER
     private String avatar;
-
 
 
 
@@ -89,7 +88,7 @@ public class User implements Serializable {
                 ", role='" + role + '\'' +
                 '}';
     }
-
+    // Getter & Setter cho avatar
     public String getAvatar() {
         return avatar;
     }
