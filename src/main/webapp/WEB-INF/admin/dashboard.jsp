@@ -148,6 +148,15 @@
             <a href="${root}/admin/categories"
                class="list-group-item list-group-item-action"> <i class="fas fa-layer-group me-2"></i> Quản lý danh mục
             </a>
+            <a href="${root}/admin/vouchers"
+               class="list-group-item list-group-item-action">
+                <i class="fas fa-ticket-alt me-2"></i> Quản lý voucher
+            </a>
+
+            <a href="${root}/admin/customers"
+               class="list-group-item list-group-item-action">
+                <i class="fas fa-users me-2"></i> Quản lý khách hàng
+            </a>
 
             <div class="border-top my-3"></div>
 

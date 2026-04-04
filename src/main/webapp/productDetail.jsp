@@ -64,7 +64,7 @@
         /* LABEL */
         .label {
             width: 100px;
-            flex-shrink: 0; /* cực kỳ quan trọng */
+            flex-shrink: 0;
             color: #757575;
             font-size: 14px;
         }
@@ -73,7 +73,7 @@
         .quantity-box {
             display: flex;
             align-items: center;
-            /*border: 1px solid #ccc;   */
+
             width: fit-content;
         }
 
@@ -81,7 +81,7 @@
             width: 40px;
             height: 32px;
             text-align: center;
-            border: none;             /* ❌ bỏ border */
+            border: none;
             outline: none;
         }
 
@@ -99,7 +99,7 @@
         }
 
         .label {
-            min-width: 90px; /* QUAN TRỌNG để không bị lệch */
+            min-width: 90px;
         }
 
         .qty-btn:hover {
@@ -239,7 +239,7 @@
         .suggest-img {
             width: 100%;
             height: 200px;
-            object-fit: contain; /* QUAN TRỌNG */
+            object-fit: contain;
             background: #f5f5f5;
             padding: 10px;
         }
@@ -249,7 +249,7 @@
             font-size: 14px;
             margin: 10px 0;
             color: #333;
-            min-height: 40px; /* giữ layout đều */
+            min-height: 40px;
         }
 
         /* PRICE */
@@ -287,7 +287,7 @@
         }
 
         .zoom-container:hover .zoom-img {
-            transform: scale(2); /* mức zoom */
+            transform: scale(2);
         }
 
     </style>
@@ -311,9 +311,6 @@
 
             <!-- IMAGE -->
             <div class="col-md-5 text-center">
-<%--                <img src="${root}/resources/${product.imageUrl}"--%>
-<%--                     class="product-image">--%>
-
                 <div class="zoom-container">
                     <img src="${root}/resources/${product.imageUrl}" class="zoom-img">
                 </div>
@@ -494,15 +491,13 @@
     container.addEventListener('mousemove', function(e) {
         const rect = container.getBoundingClientRect();
 
-        // vị trí chuột trong box
+
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // chuyển sang %
         const xPercent = (x / rect.width) * 100;
         const yPercent = (y / rect.height) * 100;
 
-        // 🔥 QUAN TRỌNG
         img.style.transformOrigin = xPercent + '% ' + yPercent + '%';
         img.style.transform = 'scale(2)';
     });
@@ -544,7 +539,7 @@
 
         let quantity = document.getElementById("quantity").value;
 
-        fetch("${pageContext.request.contextPath}/cart", {
+        fetch("${pageContext.request.contextPath}/checkout", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -552,7 +547,7 @@
             body: "action=add&productId=" + productId + "&quantity=" + quantity
         })
             .then(() => {
-                window.location.href = "${pageContext.request.contextPath}/cart";
+                window.location.href = "${pageContext.request.contextPath}/checkout";
             });
     }
 

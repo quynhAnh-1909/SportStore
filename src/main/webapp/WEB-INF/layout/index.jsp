@@ -42,7 +42,7 @@
 
     /* SEARCH (đẩy giữa) */
     .search-bar {
-        flex:1; /* 🔥 ăn hết khoảng giữa */
+        flex:1;
         max-width:500px;
         position:relative;
     }
@@ -93,7 +93,7 @@
         display:flex;
         gap:18px;
         align-items:center;
-        margin-left:auto; /* 🔥 đẩy về phải */
+        margin-left:auto;
     }
 
     .cart {
@@ -112,9 +112,9 @@
         color:white;
         text-decoration:none;
     }
-    /* dropdown account */
 
-    /* dropdown account */
+
+
     .dropdown {
         position: relative;
     }
@@ -136,9 +136,9 @@
     .dropdown-menu a {
         display: block;
         padding: 10px 15px;
-        color: black;   /* chữ hiện rõ luôn */
+        color: black;
         text-decoration: none;
-        opacity: 1;     /* không mờ */
+        opacity: 1;
     }
 
     .dropdown-menu a:hover {
@@ -160,12 +160,12 @@
             <span class="logo-text">SportStore</span>
         </div>
 
-        <!-- 🔥 SEARCH (đưa lên trước) -->
+        <!--SEARCH  -->
         <form class="search-bar" action="${root}/products" method="get">
             <input type="text" name="keyword" placeholder="🔍 Tìm sản phẩm...">
         </form>
 
-        <!-- 🔥 MENU (đưa xuống sau search) -->
+        <!-- MENU -->
         <div class="nav-links">
             <a href="${root}/products">Sản phẩm</a>
         </div>

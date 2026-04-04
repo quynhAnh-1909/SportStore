@@ -6,7 +6,7 @@ public class FacebookUser {
     private String name;
     private String email;
 
-    // ===== GETTER =====
+
     public String getId() {
         return id;
     }
@@ -19,7 +19,7 @@ public class FacebookUser {
         return email;
     }
 
-    // ===== SETTER =====
+
     public void setId(String id) {
         this.id = id;
     }

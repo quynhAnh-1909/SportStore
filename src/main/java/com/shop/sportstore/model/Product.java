@@ -15,7 +15,7 @@ public class Product {
     private String imageUrl;
     private int categoryId;
     private String unit;
-    private String categoryName; // thêm dòng này
+    private String categoryName;
 
     public Product(int id, String name, double price, String imageUrl) {
         this.id = id;
@@ -52,8 +52,6 @@ public class Product {
         this.categoryId = categoryId;
     }
 
-
-    // Getter và Setter
 
     public String getUnit() {
         return unit;

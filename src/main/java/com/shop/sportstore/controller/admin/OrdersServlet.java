@@ -26,14 +26,14 @@ public class OrdersServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Lấy danh sách đơn hàng từ DB
+
         List<Order> orders = orderDAO.getAllOrders();
 
-        // Gửi danh sách lên JSP
+
         request.setAttribute("orders", orders);
 
 
-        // Forward sang JSP hiển thị
+
         request.setAttribute("contentPage", "/WEB-INF/admin/order.jsp");
         request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
     }

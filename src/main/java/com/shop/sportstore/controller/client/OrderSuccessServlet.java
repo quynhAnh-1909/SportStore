@@ -16,7 +16,7 @@ public class OrderSuccessServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Giả sử orderCode được lưu trong session
+
         String orderCode = (String) request.getSession().getAttribute("orderCode");
         if (orderCode == null) {
             response.sendRedirect(request.getContextPath() + "/");

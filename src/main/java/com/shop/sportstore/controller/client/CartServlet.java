@@ -107,18 +107,12 @@ public class CartServlet extends HttpServlet {
             cart.removeIf(i -> i.getProduct().getId() == productId);
         }
 
-        // xử lý add/update/remove ở trên...
-
         session.setAttribute("cart", cart);
-
-        // 👉 FIX QUAN TRỌNG NHẤT (KHÔNG KHAI BÁO LẠI action)
         if ("update".equals(action) || "add".equals(action) || "remove".equals(action)) {
             response.setContentType("text/plain");
             response.getWriter().print("OK");
             return;
         }
-
-        // fallback
         response.sendRedirect(request.getContextPath() + "/cart");
     }
 }

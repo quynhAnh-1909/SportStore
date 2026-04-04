@@ -19,7 +19,7 @@
             font-family: Segoe UI;
         }
 
-        /* ===== HERO SLIDER FIXED ===== */
+
         .hero-container {
             width: 100%;
             height: 420px;
@@ -27,15 +27,15 @@
 
         .carousel-item {
             height: 420px;
-            background-color: #000; /* nền đen cho đẹp */
+            background-color: #000;
         }
 
-        /* ẢNH KHÔNG ZOOM - NẰM GIỮA */
+
         .hero-bg {
             width: 100%;
             height: 100%;
 
-            background-size: contain; /* giữ nguyên ảnh */
+            background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
 
@@ -104,10 +104,9 @@
 
 <body>
 <jsp:include page="/WEB-INF/layout/index.jsp"/>
-<%--<jsp:include page="/WEB-INF/layout/auth.jsp"/>--%>
 <jsp:include page="banner.jsp"/>
 
-<!-- CONTENT -->
+
 <div class="container mt-4">
 
     <!-- TITLE -->
@@ -194,7 +193,6 @@
 
     function addToCart(btn, productId) {
 
-        // 🔥 gọi backend trước
         fetch("${root}/cart", {
             method: "POST",
             headers: {
@@ -212,12 +210,9 @@
     /* ================= ANIMATION ================= */
 
     function animateToCart(button) {
-
-        // lấy ảnh sản phẩm gần nút
         let card = button.closest(".product-card");
         let img = card.querySelector("img");
 
-        // clone ảnh
         let flyingImg = img.cloneNode(true);
 
         let rect = img.getBoundingClientRect();
@@ -233,7 +228,7 @@
 
         document.body.appendChild(flyingImg);
 
-        // vị trí giỏ hàng
+
         let cart = document.querySelector(".cart");
         let cartRect = cart.getBoundingClientRect();
 
@@ -245,7 +240,7 @@
             flyingImg.style.opacity = "0.5";
         }, 10);
 
-        // xóa sau khi bay xong
+
         setTimeout(() => {
             flyingImg.remove();
         }, 800);

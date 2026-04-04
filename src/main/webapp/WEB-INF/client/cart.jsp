@@ -355,11 +355,10 @@
         })
             .then(res => res.text())
             .then(() => {
-                updateCartCount(); // 🔥 QUAN TRỌNG NHẤT
+                updateCartCount();
             });
     }
 
-    // ===== BUTTON +/- =====
     document.querySelectorAll('.cart-item').forEach(item => {
 
         let plus = item.querySelector('.plus');

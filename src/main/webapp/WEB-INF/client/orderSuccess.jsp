@@ -67,7 +67,7 @@
         width: 90%;
         background-color: #ffffff;
         border-radius: 25px;
-        box-shadow: 0 12px 32px rgba(0,0,0,0.15); /* shadow sâu hơn */
+        box-shadow: 0 12px 32px rgba(0,0,0,0.15);
         text-align: center;
         margin: auto;
         padding: 50px 30px;
@@ -75,18 +75,18 @@
         z-index: 1;
     }
 
-    /* ICON CHECK NỔI BẬT */
+
     .icon-check {
         position: relative;
         margin-bottom: 30px;
     }
     .icon-check i {
-        font-size: 100px; /* lớn hơn */
-        color: #4BB543; /* xanh lá */
-        background: linear-gradient(45deg, #4BB543, #66d26b); /* gradient xanh bóng */
+        font-size: 100px;
+        color: #4BB543;
+        background: linear-gradient(45deg, #4BB543, #66d26b);
         border-radius: 50%;
         padding: 25px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2); /* bóng mạnh hơn */
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
     .circle-check {
         width: 120px;
@@ -96,13 +96,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 60px;      /* chữ V lớn */
+        font-size: 60px;
         font-weight: 800;
-        color: white;          /* chữ màu trắng */
+        color: white;
         box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        margin: auto;          /* canh giữa */
+        margin: auto;
     }
-    /* TIÊU ĐỀ */
+
     .order-title {
         font-size: 36px;
         font-weight: 800;
@@ -110,7 +110,7 @@
         text-shadow: 2px 2px 4px rgba(0,0,0,0.08);
     }
 
-    /* KHUNG THÔNG TIN */
+
     .order-info-box {
         background-color: #fefefe;
         border: 1px solid #e0e0e0;
@@ -120,14 +120,13 @@
         box-shadow: inset 0 0 15px rgba(0,0,0,0.03);
     }
 
-    /* SỐ TIỀN NỔI BẬT */
+
     .order-info-box .text-danger {
         font-size: 22px;
         font-weight: 700;
-        color: #E53935 !important; /* đỏ nổi bật */
+        color: #E53935 !important;
     }
 
-    /* NÚT BUTTON */
     .btn-primary {
         background-color: #FF5722;
         border-color: #FF5722;
