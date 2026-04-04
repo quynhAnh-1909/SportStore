@@ -21,9 +21,9 @@ import jakarta.servlet.http.Part;
 
 @WebServlet("/admin/products")
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024, // 1MB
-        maxFileSize = 5 * 1024 * 1024,   // 5MB
-        maxRequestSize = 10 * 1024 * 1024 // 10MB
+        fileSizeThreshold = 1024 * 1024,
+        maxFileSize = 5 * 1024 * 1024,
+        maxRequestSize = 10 * 1024 * 1024
 )
 public class ProductServlet extends HttpServlet {
 
@@ -78,9 +78,8 @@ public class ProductServlet extends HttpServlet {
         }
     }
 
-    /* =============================
-       LIST PRODUCT
-    ============================= */
+    // LIST PRODUCT
+
 
     private void listProducts(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -97,9 +96,8 @@ public class ProductServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
     }
 
-    /* =============================
-         SHOW CREATE
-    ============================= */
+    //SHOW CREATE
+
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -124,9 +122,8 @@ public class ProductServlet extends HttpServlet {
                 .forward(request, response);
     }
 
-    /* =============================
-       INSERT PRODUCT
-    ============================= */
+    //INSERT PRODUCT
+
 
     private void insertProduct(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -140,25 +137,23 @@ public class ProductServlet extends HttpServlet {
             p.setStockQuantity(Integer.parseInt(request.getParameter("stockQuantity")));
             p.setUnit(request.getParameter("unit"));
 
-            // ⚠ FIX NULL category
+
             String cateId = request.getParameter("categoryId");
             if (cateId != null && !cateId.isEmpty()) {
                 p.setCategoryId(Integer.parseInt(cateId));
             }
 
-            /* ===== XỬ LÝ ẢNH ===== */
 
-            // 1. ƯU TIÊN ảnh từ gallery
             String imageUrl = request.getParameter("imageUrl");
 
             if (imageUrl != null && !imageUrl.isEmpty()) {
-                // cắt /resources/
+
                 String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
                 p.setImageUrl(fileName);
 
             } else {
 
-                // 2. nếu không chọn gallery thì upload file
+
                 Part filePart = request.getPart("imageFile");
                 String fileName = filePart.getSubmittedFileName();
 
@@ -176,12 +171,12 @@ public class ProductServlet extends HttpServlet {
                     p.setImageUrl(newFileName);
 
                 } else {
-                    // fallback
+
                     p.setImageUrl("no-image.png");
                 }
             }
 
-            // ✅ QUAN TRỌNG NHẤT
+
             dao.insertProduct(p);
 
         } catch (Exception e) {
@@ -190,9 +185,8 @@ public class ProductServlet extends HttpServlet {
 
         response.sendRedirect(request.getContextPath() + "/admin/products");
     }
-    /* =============================
-       SHOW EDIT
-    ============================= */
+    //SHOW EDIT
+
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -230,9 +224,7 @@ public class ProductServlet extends HttpServlet {
             e.printStackTrace();
         }
     }
-    /* =============================
-       UPDATE PRODUCT
-    ============================= */
+    // UPDATE PRODUCT
 
     private void updateProduct(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -257,9 +249,8 @@ public class ProductServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/admin/products");
     }
 
-    /* =============================
-       DELETE PRODUCT
-    ============================= */
+    //DELETE PRODUCT
+
 
     private void deleteProduct(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -277,9 +268,8 @@ public class ProductServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/admin/products");
     }
 
-    /* =============================
-       DETAIL PRODUCT
-    ============================= */
+    //DETAIL PRODUCT
+
 
     private void showDetail(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

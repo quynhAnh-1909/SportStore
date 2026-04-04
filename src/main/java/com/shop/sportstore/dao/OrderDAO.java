@@ -111,7 +111,7 @@ public class OrderDAO extends DBConnection {
             }
             conn.commit();
         } catch (SQLException e) {
-            throw e; // để servlet xử lý và báo lỗi 500 nếu cần
+            throw e;
         }
     }
 
@@ -142,7 +142,7 @@ public class OrderDAO extends DBConnection {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace(); // hoặc ném ra servlet để xử lý
+            e.printStackTrace();
         }
 
         return orders;

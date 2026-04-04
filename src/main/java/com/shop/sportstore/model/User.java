@@ -9,12 +9,12 @@ public class User implements Serializable {
     private String email;
     private String password;
     private String phoneNumber;
-    private String role; // ADMIN / USER
+    private String role;
     private String avatar;
 
 
 
-    // ===== CONSTRUCTOR =====
+
     public User() {
     }
 
@@ -28,7 +28,7 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    // ===== GETTER & SETTER =====
+
 
     public int getUserId() {
         return userId;
@@ -78,7 +78,7 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    // ===== TO STRING (debug) =====
+
     @Override
     public String toString() {
         return "User{" +
@@ -89,7 +89,7 @@ public class User implements Serializable {
                 ", role='" + role + '\'' +
                 '}';
     }
-    // Getter & Setter cho avatar
+
     public String getAvatar() {
         return avatar;
     }

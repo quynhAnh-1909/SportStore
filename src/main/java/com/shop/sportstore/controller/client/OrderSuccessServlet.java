@@ -16,7 +16,7 @@ public class OrderSuccessServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Giả sử orderCode được lưu trong session
+
         String orderCode = (String) request.getSession().getAttribute("orderCode");
         if (orderCode == null) {
             response.sendRedirect(request.getContextPath() + "/");
@@ -27,9 +27,9 @@ public class OrderSuccessServlet extends HttpServlet {
             OrderDAO orderDAO = new OrderDAO();
             Map<String, String> orderData = orderDAO.getOrderDetailForEmail(orderCode);
             List<Map<String, String>> orderItems = orderDAO.getOrderItems(orderCode);
-            request.setAttribute("order", orderData); // truyền vào JSP
+            request.setAttribute("order", orderData);
             request.setAttribute("items", orderItems);
-            request.getSession().removeAttribute("orderCode"); // xóa session
+            request.getSession().removeAttribute("orderCode");
         } catch (Exception e) {
             e.printStackTrace();
         }

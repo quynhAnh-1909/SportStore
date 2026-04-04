@@ -11,7 +11,7 @@ public class Order {
     private String paymentMethod;
     private Timestamp createdAt;
     private String note;
-    private String userFullName; // join từ users
+    private String userFullName;
 
     // getters và setters
     public int getId() { return id; }

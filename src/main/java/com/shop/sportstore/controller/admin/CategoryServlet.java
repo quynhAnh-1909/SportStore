@@ -19,9 +19,8 @@ public class CategoryServlet extends HttpServlet {
         dao = new CategoryDAO();
     }
 
-    /* =============================
-       GET
-    ============================= */
+    //GET
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -44,9 +43,8 @@ public class CategoryServlet extends HttpServlet {
         }
     }
 
-    /* =============================
-       POST
-    ============================= */
+    // POST
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -59,9 +57,8 @@ public class CategoryServlet extends HttpServlet {
         }
     }
 
-    /* =============================
-       LIST
-    ============================= */
+    // LIST
+
     private void listCategories(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -75,9 +72,8 @@ public class CategoryServlet extends HttpServlet {
                 .forward(request, response);
     }
 
-    /* =============================
-       SHOW CREATE
-    ============================= */
+    //SHOW CREATE
+
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 

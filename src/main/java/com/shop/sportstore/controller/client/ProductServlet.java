@@ -56,8 +56,7 @@ public class ProductServlet extends HttpServlet {
 
             int offset = (page - 1) * LIMIT;
 
-            List<Product> productList =
-                    productDAO.searchProducts(keyword, categoryId, offset, LIMIT);
+            List<Product> productList = productDAO.searchProducts(keyword, categoryId, offset, LIMIT);
 
             int totalProduct = productDAO.countProducts(keyword, categoryId);
             int totalPage = (int) Math.ceil((double) totalProduct / LIMIT);
@@ -67,14 +66,11 @@ public class ProductServlet extends HttpServlet {
             List<Category> categories = categoryDAO.buildTree(all);
 
             request.setAttribute("categories", categories);
-            // chống null
             if (productList == null) productList = List.of();
             if (categoryList == null) categoryList = List.of();
 
             request.setAttribute("products", productList);
 
-
-            // 🔥 FIX QUAN TRỌNG
             request.getRequestDispatcher("/products.jsp")
                     .forward(request, response);
 

@@ -12,9 +12,8 @@ public class ProductDAO extends DBConnection {
         super();
     }
 
-    /* ===============================
-       1. LẤY TẤT CẢ SẢN PHẨM
-    =============================== */
+    //ListProduct
+
     public List<Product> getAllProducts() {
 
         List<Product> list = new ArrayList<>();
@@ -43,9 +42,8 @@ public class ProductDAO extends DBConnection {
         return list;
     }
 
-    /* ===============================
-       2. LẤY PRODUCT THEO ID
-    =============================== */
+    //get product by id
+
     public Product getProductById(int id) {
 
         String sql = """
@@ -75,9 +73,7 @@ public class ProductDAO extends DBConnection {
     }
 
 
-    /* ===============================
-       3. SEARCH + PAGINATION
-    =============================== */
+    //search
     public List<Product> searchProducts(String keyword, int categoryId, int offset, int limit) {
 
         List<Product> list = new ArrayList<>();
@@ -123,9 +119,6 @@ public class ProductDAO extends DBConnection {
         return list;
     }
 
-    /* ===============================
-       4. THÊM SẢN PHẨM
-    =============================== */
     public void insertProduct(Product p) throws SQLException {
 
         String sql = """
@@ -151,9 +144,6 @@ public class ProductDAO extends DBConnection {
     }
 
 
-    /* ===============================
-       5. UPDATE
-    =============================== */
     public void updateProduct(Product p) throws SQLException {
 
         String sql = """
@@ -180,9 +170,6 @@ public class ProductDAO extends DBConnection {
         }
     }
 
-    /* ===============================
-       6. DELETE
-    =============================== */
     public void deleteProduct(int id) throws SQLException {
 
         String sql = "DELETE FROM products WHERE id=?";
@@ -196,9 +183,6 @@ public class ProductDAO extends DBConnection {
     }
 
 
-    /* ===============================
-       7. FILTER
-    =============================== */
     public List<Product> filterProducts(String search, Integer categoryId, String stockStatus) {
 
         List<Product> list = new ArrayList<>();
@@ -249,9 +233,6 @@ public class ProductDAO extends DBConnection {
         return list;
     }
 
-    /* ===============================
-       8. COUNT
-    =============================== */
     public int countProducts(String keyword, Integer categoryId) {
 
         int count = 0;
@@ -292,9 +273,6 @@ public class ProductDAO extends DBConnection {
         return count;
     }
 
-    /* ===============================
-       MAP RESULTSET
-    =============================== */
     private Product mapResultSetToProduct(ResultSet rs) throws SQLException {
 
         Product p = new Product();

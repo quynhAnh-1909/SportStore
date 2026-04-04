@@ -28,7 +28,6 @@ public class AuthServlet extends HttpServlet {
         dao = new UserDAO();
     }
 
-    /* ================= COMMON LOGIN ================= */
     private void loginUser(HttpSession session, HttpServletRequest request,
                            HttpServletResponse response, User user) throws IOException {
 
@@ -38,7 +37,6 @@ public class AuthServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/products");
     }
 
-    /* ================= POST ================= */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -59,7 +57,7 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-    /* ================= GET ================= */
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -92,7 +90,7 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-    /* ================= LOGIN ================= */
+    //LOGIN
     private void handleLogin(HttpServletRequest request,
                              HttpServletResponse response,
                              HttpSession session)
@@ -111,7 +109,7 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-    /* ================= REGISTER ================= */
+    // REGISTER
     private void handleRegister(HttpServletRequest request,
                                 HttpServletResponse response,
                                 HttpSession session)

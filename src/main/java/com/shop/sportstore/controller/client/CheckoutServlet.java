@@ -77,7 +77,7 @@ public class CheckoutServlet extends HttpServlet {
             }
 
         } else {
-            selectedItems = cart; // fallback
+            selectedItems = cart;
         }
 
         request.setAttribute("selectedItems", selectedItems);
@@ -104,7 +104,7 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        // Lấy thông tin form
+
         String receiverName = request.getParameter("receiverName");
         String receiverPhone = request.getParameter("receiverPhone");
         String address = request.getParameter("address");
@@ -117,14 +117,14 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        // Tính tổng
+
         double total = 0;
         for (CartItem item : selectedCart) {
             if (item.getProduct() != null) {
                 total += item.getProduct().getPrice() * item.getQuantity();
             }
         }
-        total += 30000; // phí ship
+        total += 30000;
 
         String orderCode = "ORD" + System.currentTimeMillis();
 
@@ -137,14 +137,14 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        // Nếu VNPay
+
         if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
             session.setAttribute("orderCode", orderCode);
             response.sendRedirect(request.getContextPath() + "/vnpayPayment");
             return;
         }
 
-        // COD
+
         session.removeAttribute("cart");
         session.setAttribute("lastOrderCode", orderCode);
         session.setAttribute("lastTotal", total + 30000);

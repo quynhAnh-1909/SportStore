@@ -7,7 +7,6 @@ public class GoogleUser {
     private String name;
     private String picture;
 
-    // ===== GETTER =====
     public String getId() {
         return id;
     }
@@ -24,7 +23,7 @@ public class GoogleUser {
         return picture;
     }
 
-    // ===== SETTER =====
+
     public void setId(String id) {
         this.id = id;
     }

@@ -16,7 +16,6 @@ public class GoogleUtils {
     private static final String CLIENT_SECRET = "YOUR_CLIENT_SECRET";
     private static final String REDIRECT_URI = "http://localhost:8080/your-app/login-google";
 
-    /* ================= GET ACCESS TOKEN ================= */
     public static String getToken(String code) throws Exception {
 
         String url = "https://oauth2.googleapis.com/token";
@@ -54,7 +53,6 @@ public class GoogleUtils {
         return json.get("access_token").getAsString();
     }
 
-    /* ================= GET USER INFO ================= */
     public static GoogleUser getUserInfo(String accessToken) throws Exception {
 
         String url = "https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + accessToken;
