@@ -48,7 +48,6 @@
         </button>
     </div>
 
-    <!-- ===== MENU NỔI ===== -->
     <div class="menu-bar">
 
         <!-- CATEGORY -->
@@ -113,7 +112,7 @@
     }
 
     .mega-menu{
-        display:none; /* chỉ để 1 cái này */
+        display:none;
         position:absolute;
         top:40px;
         left:0;
@@ -155,14 +154,14 @@
 
         let isOpen = false;
 
-        // 👉 CLICK để mở (quan trọng nhất)
+
         title.addEventListener('click', (e) => {
             e.stopPropagation();
             isOpen = !isOpen;
             mega.style.display = isOpen ? 'grid' : 'none';
         });
 
-        // 👉 Hover vẫn giữ menu (PC)
+
         menu.addEventListener('mouseenter', () => {
             mega.style.display = 'grid';
             isOpen = true;
@@ -177,7 +176,7 @@
             }, 150);
         });
 
-        // 👉 Click ngoài → đóng menu
+
         document.addEventListener('click', () => {
             mega.style.display = 'none';
             isOpen = false;

@@ -14,7 +14,6 @@ public class User implements Serializable {
 
 
 
-    // ===== CONSTRUCTOR =====
     public User() {
     }
 
@@ -28,7 +27,7 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    // ===== GETTER & SETTER =====
+
 
     public int getUserId() {
         return userId;
@@ -78,7 +77,7 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    // ===== TO STRING (debug) =====
+
     @Override
     public String toString() {
         return "User{" +

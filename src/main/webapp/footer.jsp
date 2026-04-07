@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
+
 <footer class="footer">
 
     <style>
@@ -31,7 +32,6 @@
             font-weight: bold;
         }
 
-        /* LINKS */
         .footer-column a {
             color: white;
             text-decoration: none;
@@ -41,7 +41,6 @@
             text-decoration: underline;
         }
 
-        /* SOCIAL */
         .social {
             display: flex;
             gap: 10px;
@@ -65,24 +64,11 @@
             transform: scale(1.1);
         }
 
-        /* SOCIAL COLORS */
-        .fb {
-            background: #1877F2;
-        }
+        .fb { background: #1877F2; }
+        .tw { background: #8aa4c3; }
+        .yt { background: #cc0000; }
+        .ig { background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4); }
 
-        .tw {
-            background: #8aa4c3;
-        }
-
-        .yt {
-            background: #cc0000;
-        }
-
-        .ig {
-            background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af, #515bd4);
-        }
-
-        /* PAYMENT */
         .payment-accept {
             display: flex;
             align-items: center;
@@ -99,7 +85,6 @@
             object-fit: contain;
         }
 
-        /* FOOTER BOTTOM */
         .footer-bottom {
             text-align: center;
             border-top: 1px solid rgba(255, 255, 255, 0.3);
@@ -109,140 +94,60 @@
         }
     </style>
 
-
     <div class="footer-container">
 
-        <!-- CONTACT -->
-        <!-- CONTACT -->
+        <!-- LIÊN HỆ -->
         <div class="footer-column">
-
-            <h4 class="title-menu">
-                <c:choose>
-                    <c:when test="${sessionScope.lang == 'en'}">CONTACT</c:when>
-                    <c:otherwise>LIÊN HỆ</c:otherwise>
-                </c:choose>
-            </h4>
+            <h4 class="title-menu">LIÊN HỆ</h4>
 
             <p>Sport Store - Chuyên đồ thể thao chính hãng</p>
 
-            <p>
-                <c:choose>
-                    <c:when test="${sessionScope.lang == 'en'}">Address</c:when>
-                    <c:otherwise>Địa chỉ</c:otherwise>
-                </c:choose>
-                : 123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh
-            </p>
+            <p>Địa chỉ: 123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh</p>
 
             <p>Email: support@sportstore.vn</p>
 
-            <p>
-                <c:choose>
-                    <c:when test="${sessionScope.lang == 'en'}">Hotline</c:when>
-                    <c:otherwise>Hotline</c:otherwise>
-                </c:choose>
-                : 1900 6886
-            </p>
-
+            <p>Hotline: 1900 6886</p>
         </div>
 
-
-        <!-- POLICY -->
+        <!-- CHÍNH SÁCH -->
         <div class="footer-column">
-
-            <h4 class="title-menu">
-                <c:choose>
-                    <c:when test="${sessionScope.lang == 'en'}">POLICY</c:when>
-                    <c:otherwise>CHÍNH SÁCH</c:otherwise>
-                </c:choose>
-            </h4>
+            <h4 class="title-menu">CHÍNH SÁCH</h4>
 
             <ul style="list-style: none; padding: 0">
-
-                <li><a href="${pageContext.request.contextPath}/privacy"> <c:choose>
-                    <c:when test="${sessionScope.lang == 'en'}">Privacy Policy</c:when>
-                    <c:otherwise>Chính sách bảo mật</c:otherwise>
-                </c:choose>
-                </a></li>
-
-                <li><a href="${pageContext.request.contextPath}/terms"> <c:choose>
-                    <c:when test="${sessionScope.lang == 'en'}">Terms & Conditions</c:when>
-                    <c:otherwise>Điều khoản & điều kiện</c:otherwise>
-                </c:choose>
-                </a></li>
-
-                <li><a href="${pageContext.request.contextPath}/guide"> <c:choose>
-                    <c:when test="${sessionScope.lang == 'en'}">Shipping Guide</c:when>
-                    <c:otherwise>Hướng dẫn giao hàng</c:otherwise>
-                </c:choose>
-                </a></li>
-
+                <li><a href="${pageContext.request.contextPath}/privacy">Chính sách bảo mật</a></li>
+                <li><a href="${pageContext.request.contextPath}/terms">Điều khoản & điều kiện</a></li>
+                <li><a href="${pageContext.request.contextPath}/guide">Hướng dẫn giao hàng</a></li>
             </ul>
-
         </div>
 
-
-        <!-- SOCIAL -->
+        <!-- MẠNG XÃ HỘI -->
         <div class="footer-column">
-
-            <h4 class="title-menu">
-                <c:choose>
-                    <c:when test="${sessionScope.lang == 'en'}">FOLLOW US</c:when>
-                    <c:otherwise>Liên kết xã hội</c:otherwise>
-                </c:choose>
-            </h4>
+            <h4 class="title-menu">MẠNG XÃ HỘI</h4>
 
             <div class="social">
-
-                <a href="https://www.facebook.com/hagl.fc.official" target="_blank"
-                   class="fb">f</a> <a href="https://twitter.com" target="_blank"
-                                       class="tw">t</a> <a href="https://www.youtube.com/@HAGLFC"
-                                                           target="_blank" class="yt">▶</a> <a
-                    href="https://www.instagram.com/hagl_fc/" target="_blank"
-                    class="ig">◎</a>
-
+                <a href="https://www.facebook.com/hagl.fc.official" target="_blank" class="fb">f</a>
+                <a href="https://twitter.com" target="_blank" class="tw">t</a>
+                <a href="https://www.youtube.com/@HAGLFC" target="_blank" class="yt">▶</a>
+                <a href="https://www.instagram.com/hagl_fc/" target="_blank" class="ig">◎</a>
             </div>
-
         </div>
 
-
-        <!-- PAYMENT -->
+        <!-- THANH TOÁN -->
         <div class="footer-column">
-
-            <h4 class="title-menu">
-                <c:choose>
-                    <c:when test="${sessionScope.lang == 'en'}">PAYMENT METHOD</c:when>
-                    <c:otherwise>Phương thức thanh toán</c:otherwise>
-                </c:choose>
-            </h4>
+            <h4 class="title-menu">PHƯƠNG THỨC THANH TOÁN</h4>
 
             <div class="payment-accept">
-                <img src="${pageContext.request.contextPath}/resources/visa.jpg"
-                     alt="Visa"> <img
-                    src="${pageContext.request.contextPath}/resources/momo.jpg"
-                    alt="MoMo"> <img
-                    src="${pageContext.request.contextPath}/resources/VN_PAY.jpg"
-                    alt="VNPay"> <img
-                    src="${pageContext.request.contextPath}/resources/zaloPay.jpg"
-                    alt="ZaloPay">
+                <img src="${pageContext.request.contextPath}/resources/visa.jpg" alt="Visa">
+                <img src="${pageContext.request.contextPath}/resources/momo.jpg" alt="MoMo">
+                <img src="${pageContext.request.contextPath}/resources/VN_PAY.jpg" alt="VNPay">
+                <img src="${pageContext.request.contextPath}/resources/zaloPay.jpg" alt="ZaloPay">
             </div>
         </div>
 
     </div>
 
-
     <div class="footer-bottom">
-
-        © 2025 Sport Store |
-
-        <c:choose>
-            <c:when test="${sessionScope.lang == 'en'}">
-                All Rights Reserved | Designed for Sports Lovers
-            </c:when>
-            <c:otherwise>
-                Bảo lưu mọi quyền | Dành cho người yêu thể thao
-            </c:otherwise>
-        </c:choose>
-
+        © 2025 Sport Store | Bảo lưu mọi quyền | Dành cho người yêu thể thao
     </div>
 
 </footer>
