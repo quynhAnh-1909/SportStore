@@ -24,18 +24,21 @@
 
         html, body{
             width:100%;
-            height:100%;
+            /*height:100%;*/
             margin:0;
             padding:0;
             overflow-x:hidden;
             background:var(--light-bg);
             font-family:'Segoe UI', sans-serif;
         }
-
+        body{
+            overflow-y:auto;
+        }
         #wrapper{
             display:flex;
             width:100%;
-            min-height:100vh;
+            height:100vh;
+            overflow-x:hidden;
         }
 
         #sidebar-wrapper{
@@ -74,7 +77,8 @@
         #page-content-wrapper{
             margin-left:260px;
             width:calc(100% - 260px);
-            min-height:100vh;
+            height:100vh;
+            overflow-y:auto;
         }
 
         .admin-navbar{
@@ -86,7 +90,10 @@
         #mainContent{
             padding:30px;
         }
-
+        #sidebar-wrapper{
+            height:100vh;
+            overflow-y:auto;
+        }
         .dashboard-title{
             font-size:42px;
             font-weight:bold;
@@ -156,6 +163,10 @@
             <a href="${root}/admin/customers"
                class="list-group-item list-group-item-action">
                 <i class="fas fa-users me-2"></i> Quản lý khách hàng
+            </a>
+            <a href="${root}/admin/banners"
+               class="list-group-item list-group-item-action">
+               <i class="fas fa-image me-2"></i> Quản lý banners
             </a>
 
             <div class="border-top my-3"></div>
