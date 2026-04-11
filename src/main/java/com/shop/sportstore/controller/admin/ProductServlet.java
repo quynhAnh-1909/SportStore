@@ -3,8 +3,12 @@ package com.shop.sportstore.controller.admin;
 
 import com.shop.sportstore.dao.CategoryDAO;
 import com.shop.sportstore.dao.ProductDAO;
+import com.shop.sportstore.dao.ProductVoucherDAO;
+import com.shop.sportstore.dao.VoucherDAO;
 import com.shop.sportstore.model.Category;
 import com.shop.sportstore.model.Product;
+import com.shop.sportstore.model.Voucher;
+import com.shop.sportstore.untils.DBConnection;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +92,7 @@ public class ProductServlet extends HttpServlet {
         List<Product> products = dao.getAllProducts();
 
         CategoryDAO cdao = new CategoryDAO();
-        List<Category> categories = cdao.buildTree(cdao.getAllCategories()); // ✅ FIX
+        List<Category> categories = cdao.buildTree(cdao.getAllCategories());
 
         request.setAttribute("products", products);
         request.setAttribute("categories", categories);
@@ -103,7 +108,7 @@ public class ProductServlet extends HttpServlet {
             throws ServletException, IOException {
 
         CategoryDAO cdao = new CategoryDAO();
-        List<Category> categories = cdao.buildTree(cdao.getAllCategories()); // ✅ FIX
+        List<Category> categories = cdao.buildTree(cdao.getAllCategories());
         String uploadPath = getServletContext().getRealPath("/resources");
         File folder = new File(uploadPath);
 
@@ -192,9 +197,13 @@ public class ProductServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
+            Connection conn = DBConnection.getConnection();
 
             int id = Integer.parseInt(request.getParameter("id"));
-
+            ProductDAO dao = new ProductDAO();
+            ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
+            VoucherDAO voucherDAO = new VoucherDAO(conn);
+            int ids = Integer.parseInt(request.getParameter("id"));
             Product product = dao.getProductById(id);
 
             CategoryDAO cdao = new CategoryDAO();
@@ -202,9 +211,10 @@ public class ProductServlet extends HttpServlet {
 
             String uploadPath = getServletContext().getRealPath("/resources");
             File folder = new File(uploadPath);
-
             List<String> imageList = new ArrayList<>();
 
+            List<Voucher> vouchers = voucherDAO.getAll();
+            List<Integer> selectedVouchers = pvDAO.getVoucherIdsByProduct(id);
             if (folder.exists()) {
                 for (File f : folder.listFiles()) {
                     imageList.add(f.getName());
@@ -214,7 +224,8 @@ public class ProductServlet extends HttpServlet {
             request.setAttribute("product", product);
             request.setAttribute("categories", categories);
             request.setAttribute("imageList", imageList);
-
+            request.setAttribute("vouchers", vouchers);
+            request.setAttribute("selectedVouchers", selectedVouchers);
             request.setAttribute("contentPage", "/WEB-INF/admin/productEdit.jsp");
 
             request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp")
@@ -230,9 +241,13 @@ public class ProductServlet extends HttpServlet {
             throws IOException {
 
         try {
+            Connection  conn = DBConnection.getConnection();
+            ProductDAO dao = new ProductDAO();
+            ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
 
+            String [] voucherIds = request.getParameterValues("voucherIds");
             Product p = new Product();
-
+            int productId =Integer.parseInt(request.getParameter("id"));
             p.setId(Integer.parseInt(request.getParameter("id")));
             p.setName(request.getParameter("name"));
             p.setPrice(Double.parseDouble(request.getParameter("price")));
@@ -242,6 +257,13 @@ public class ProductServlet extends HttpServlet {
             p.setUnit(request.getParameter("unit"));
             dao.updateProduct(p);
 
+            pvDAO.deleteByProduct(productId);
+
+            if(voucherIds !=null){
+                for(String vid : voucherIds){
+                    pvDAO.insert(productId,Integer.parseInt(vid));
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
