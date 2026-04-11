@@ -86,4 +86,16 @@
         </table>
     </div>
 
+    </div>
 </div>
+
+
+<style>
+    table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    td, th {
+        vertical-align: middle !important;
+    }
+</style>
