@@ -47,28 +47,27 @@
         <c:forEach var="v" items="${vouchers}">
 
           <tr class="
-          ${v.quantity == v.usedCount ? 'bg-danger text-white' : ''}
-          ${!v.status ? 'table-secondary' : ''}
-      ">
+    ${v.quantity == v.usedCount ? 'bg-danger text-white' : ''}
+    ${!v.status ? 'table-secondary' : ''}
+">
 
             <!-- CODE -->
             <td class="fw-bold text-primary">
                 ${v.code}
             </td>
 
-            <!-- GIẢM GIÁ -->
+            <!-- GIẢM -->
             <td>
-              <c:if test="${v.discountType == 'PERCENT'}">
-            <span class="badge bg-success">
-              ${v.discountValue} %
-            </span>
-              </c:if>
-
-              <c:if test="${v.discountType == 'FIXED'}">
-            <span class="badge bg-info">
-              <fmt:formatNumber value="${v.discountValue}"/> ₫
-            </span>
-              </c:if>
+              <c:choose>
+                <c:when test="${v.discountType == 'PERCENT'}">
+                  <span class="badge bg-success">${v.discountValue}%</span>
+                </c:when>
+                <c:otherwise>
+                <span class="badge bg-info">
+                    <fmt:formatNumber value="${v.discountValue}"/> ₫
+                </span>
+                </c:otherwise>
+              </c:choose>
 
               <br>
               <small class="text-muted">
@@ -77,72 +76,62 @@
             </td>
 
             <!-- ĐIỀU KIỆN -->
-            <td style="text-align:left">
-              🛒 Đơn hàng từ :
-              <fmt:formatNumber value="${v.minOrderValue}"/> ₫ <br>
-
-              🏷 Giá từ :
-              <fmt:formatNumber value="${v.minProductPrice}"/> ₫ <br>
-
-              📂 Sản phẩm:
-              <c:choose>
-                <c:when test="${v.categoryId == 0}">Tất cả</c:when>
-                <c:otherwise>${v.categoryId}</c:otherwise>
-              </c:choose> <br>
-
-              💳 ${v.paymentMethod}
+            <td class="text-start small">
+              <div>🛒 Tối thiểu: <b><fmt:formatNumber value="${v.minOrderValue}"/> ₫</b></div>
+              <div>🏷 Giá SP: <b><fmt:formatNumber value="${v.minProductPrice}"/> ₫</b></div>
+              <div>📂 Danh mục:
+                <b>
+                  <c:choose>
+                    <c:when test="${v.categoryId == 0}">Tất cả</c:when>
+                    <c:otherwise>${v.categoryId}</c:otherwise>
+                  </c:choose>
+                </b>
+              </div>
+              <div>💳 ${v.paymentMethod}</div>
             </td>
 
             <!-- SỬ DỤNG -->
             <td>
-          <span class="badge bg-warning text-dark">
-              ${v.usedCount}
-          </span>
-              /
-              <span class="badge bg-primary">
-                  ${v.quantity}
-              </span>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar bg-warning"
+                     style="width: ${v.usedCount * 100 / v.quantity}%">
+                </div>
+              </div>
+              <small>${v.usedCount} / ${v.quantity}</small>
             </td>
 
             <!-- THỜI GIAN -->
-            <td>
-              <small>
-                🟢<fmt:formatDate value="${voucher.startDate}" pattern="yyyy-MM-dd" var="start"/>
-                <input type="date" name="startDate" value="${start}">
-                🔴 <fmt:formatDate value="${voucher.expiryDate}" pattern="yyyy-MM-dd" var="end"/>
-                <input type="date" name="expiryDate" value="${end}">
-              </small>
+            <td class="small">
+              🟢 <fmt:formatDate value="${v.startDate}" pattern="dd/MM/yyyy"/><br>
+              🔴 <fmt:formatDate value="${v.expiryDate}" pattern="dd/MM/yyyy"/>
             </td>
 
             <!-- STATUS -->
             <td>
-              <c:if test="${v.status}">
-                <span class="badge bg-success">Hoạt động</span>
-              </c:if>
-              <c:if test="${!v.status}">
-                <span class="badge bg-secondary">Tắt</span>
-              </c:if>
+              <c:choose>
+                <c:when test="${v.status}">
+                  <span class="badge bg-success">Hoạt động</span>
+                </c:when>
+                <c:otherwise>
+                  <span class="badge bg-secondary">Tắt</span>
+                </c:otherwise>
+              </c:choose>
             </td>
 
             <!-- ACTION -->
             <td>
               <a href="${root}/admin/vouchers?action=edit&id=${v.id}"
-                 class="btn btn-sm btn-primary">
-                ✏️
-              </a>
+                 class="btn btn-sm btn-primary">✏️</a>
 
               <a href="${root}/admin/vouchers?action=delete&id=${v.id}"
                  class="btn btn-sm btn-danger"
-                 onclick="return confirm('Xóa voucher này?')">
-                🗑
-              </a>
+                 onclick="return confirm('Xóa voucher này?')">🗑</a>
             </td>
 
           </tr>
 
         </c:forEach>
         </tbody>
-
       </table>
     </div>
 
@@ -168,6 +157,14 @@
 
   .table-secondary {
     background-color: #e2e3e5 !important;
+  }
+  td {
+    vertical-align: middle !important;
+  }
+
+  .progress {
+    background: #eee;
+    border-radius: 10px;
   }
 </style>
 

@@ -1,7 +1,10 @@
 package com.shop.sportstore.model;
 
 
+import lombok.Data;
 
+import java.util.List;
+@Data
 public class Product {
 
     private int id;
@@ -16,7 +19,7 @@ public class Product {
     private int categoryId;
     private String unit;
     private String categoryName;
-
+    private List<Voucher> vouchers;
     public Product(int id, String name, double price, String imageUrl) {
         this.id = id;
         this.name = name;
@@ -141,5 +144,11 @@ public class Product {
         this.categoryId = categoryId;
     }
 
+    public List<Voucher> getVouchers() {
+        return vouchers;
+    }
+    public void setVouchers(List<Voucher> vouchers) {
+        this.vouchers = vouchers;
+    }
 
 }
