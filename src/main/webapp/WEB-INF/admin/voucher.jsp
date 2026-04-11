@@ -107,8 +107,10 @@
             <!-- THỜI GIAN -->
             <td>
               <small>
-                🟢 <fmt:formatDate value="${v.startDate}" pattern="dd-MM-yyyy"/> <br>
-                🔴 <fmt:formatDate value="${v.expiryDate}" pattern="dd-MM-yyyy"/>
+                🟢<fmt:formatDate value="${voucher.startDate}" pattern="yyyy-MM-dd" var="start"/>
+                <input type="date" name="startDate" value="${start}">
+                🔴 <fmt:formatDate value="${voucher.expiryDate}" pattern="yyyy-MM-dd" var="end"/>
+                <input type="date" name="expiryDate" value="${end}">
               </small>
             </td>
 

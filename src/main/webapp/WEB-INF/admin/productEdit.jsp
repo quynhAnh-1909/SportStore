@@ -97,7 +97,17 @@
           <input type="file" name="imageFile" class="form-control"
                  id="fileInput" onchange="previewNewFile(this)">
         </div>
+        <label class="fw-bold">🎫 Voucher</label>
 
+        <c:forEach var="v" items="${vouchers}">
+          <div>
+            <input type="checkbox" name="voucherIds"
+                   value="${v.id}"
+                   <c:if test="${selectedVouchers.contains(v.id)}">checked</c:if> />
+
+              ${v.code}
+          </div>
+        </c:forEach>
         <!-- category -->
         <select name="categoryId" class="form-control mb-3">
 
