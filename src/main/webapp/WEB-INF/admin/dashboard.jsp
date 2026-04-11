@@ -177,7 +177,7 @@
         </div>
     </div>
 
-    <!-- PAGE CONTENT -->
+
     <div id="page-content-wrapper">
 
         <!-- NAVBAR -->
