@@ -74,9 +74,8 @@
         </div>
 
         <!-- hidden image -->
-        <input type="hidden" name="imageUrl" id="hiddenImageUrl"
+        <input type="hidden" name="oldImage" id="hiddenImageUrl"
                value="${product.imageUrl}">
-
         <!-- gallery -->
         <div class="form-group mb-3">
           <label class="text-primary">Chọn ảnh có sẵn</label>
@@ -84,7 +83,7 @@
           <div class="image-picker-grid">
             <c:forEach var="img" items="${imageList}">
               <div class="img-option"
-                   onclick="selectGalleryImage(this, '${root}/resources/${img}')">
+                   onclick="selectGalleryImage(this, '${img}')">
                 <img src="${root}/resources/${img}">
               </div>
             </c:forEach>
@@ -149,12 +148,19 @@
 </div>
 
 <script>
-  function selectGalleryImage(element, url) {
-    document.querySelectorAll('.img-option').forEach(el => el.classList.remove('active'));
+  function selectGalleryImage(element, fileName) {
+
+
+    document.querySelectorAll('.img-option')
+            .forEach(el => el.classList.remove('active'));
+
     element.classList.add('active');
 
-    document.getElementById('hiddenImageUrl').value = url;
-    document.getElementById('finalPreview').src = url;
+    document.getElementById('hiddenImageUrl').value = fileName;
+
+
+    document.getElementById('finalPreview').src =
+            '${root}/resources/' + fileName;
 
     document.getElementById('fileInput').value = '';
   }
