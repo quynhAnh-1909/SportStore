@@ -1,16 +1,12 @@
 package com.shop.sportstore.dao;
 
-import com.shop.sportstore.model.Voucher;
-import com.shop.sportstore.untils.DBConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductVoucherDAO  extends DBConnection{
-
+public class ProductVoucherDAO {
     private Connection conn;
 
     public ProductVoucherDAO(Connection conn) {
@@ -40,56 +36,21 @@ public class ProductVoucherDAO  extends DBConnection{
             e.printStackTrace();
         }
     }
-    // ================= LẤY LIST ID (CHO CHECKBOX) =================
-    public List<Integer> getVoucherIdsByProduct(int productId) {
-        List<Integer> list = new ArrayList<>();
+    public List<Integer> getVoucherIdsByProduct(int productId){
+        List<Integer> list= new ArrayList<>();
+        try{
+            String sql =" SELECT voucher_id FROM product_voucher WHERE product_id=?";
+            PreparedStatement ps =  conn.prepareStatement(sql);
+            ps.setInt(1,productId);
 
-        String sql = "SELECT voucher_id FROM product_voucher WHERE product_id = ?";
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, productId);
             ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
+            while (rs.next()){
                 list.add(rs.getInt("voucher_id"));
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return list;
+        return  list ;
     }
 
-    // ================= LẤY FULL VOUCHER =================
-    public List<Voucher> getVouchersByProduct(int productId) {
-        List<Voucher> list = new ArrayList<>();
-
-        String sql = """
-            SELECT v.*
-            FROM vouchers v
-            JOIN product_voucher pv ON v.id = pv.voucher_id
-            WHERE pv.product_id = ?
-        """;
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, productId);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                Voucher v = new Voucher();
-                v.setId(rs.getInt("id"));
-                v.setCode(rs.getString("code"));
-                v.setDiscountType(rs.getString("discount_type"));
-                v.setDiscountValue(rs.getDouble("discount_value"));
-
-                list.add(v);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
 }
