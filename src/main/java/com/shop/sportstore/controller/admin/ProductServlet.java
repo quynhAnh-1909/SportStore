@@ -93,7 +93,17 @@ public class ProductServlet extends HttpServlet {
 
         CategoryDAO cdao = new CategoryDAO();
         List<Category> categories = cdao.buildTree(cdao.getAllCategories());
+        try {
+            Connection conn = DBConnection.getConnection();
+            ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
 
+            for (Product p : products) {
+                List<Voucher> vouchers = pvDAO.getVouchersByProduct(p.getId());
+                p.setVouchers(vouchers);
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
         request.setAttribute("products", products);
         request.setAttribute("categories", categories);
 
@@ -203,7 +213,7 @@ public class ProductServlet extends HttpServlet {
             ProductDAO dao = new ProductDAO();
             ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
             VoucherDAO voucherDAO = new VoucherDAO(conn);
-            int ids = Integer.parseInt(request.getParameter("id"));
+
             Product product = dao.getProductById(id);
 
             CategoryDAO cdao = new CategoryDAO();
@@ -215,6 +225,7 @@ public class ProductServlet extends HttpServlet {
 
             List<Voucher> vouchers = voucherDAO.getAll();
             List<Integer> selectedVouchers = pvDAO.getVoucherIdsByProduct(id);
+
             if (folder.exists()) {
                 for (File f : folder.listFiles()) {
                     imageList.add(f.getName());
@@ -252,9 +263,27 @@ public class ProductServlet extends HttpServlet {
             p.setName(request.getParameter("name"));
             p.setPrice(Double.parseDouble(request.getParameter("price")));
             p.setStockQuantity(Integer.parseInt(request.getParameter("stockQuantity")));
-
             p.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             p.setUnit(request.getParameter("unit"));
+
+            String oldImage = request.getParameter("oldImage");
+
+            Part filePart = request.getPart("imageFile");
+            String fileName = filePart.getSubmittedFileName();
+
+            if (fileName != null && !fileName.isEmpty()) {
+                String newFileName = System.currentTimeMillis() + "_" + fileName;
+
+                String uploadPath = getServletContext().getRealPath("/") + "resources";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) uploadDir.mkdirs();
+
+                filePart.write(uploadPath + File.separator + newFileName);
+
+                p.setImageUrl(newFileName);
+            } else {
+                p.setImageUrl(oldImage);
+            }
             dao.updateProduct(p);
 
             pvDAO.deleteByProduct(productId);
