@@ -58,7 +58,7 @@
                     <th class="text-start">Tên sản phẩm</th>
                     <th>Giá</th>
                     <th>Tồn</th>
-                    <th>Voucher</th>
+                    <th>Đơn vị</th>
                     <th>Danh mục</th>
                     <th style="width: 220px;">Thao tác</th>
                 </tr>
@@ -114,16 +114,8 @@
                             </c:choose>
                         </td>
 
-                        <!-- VOUCHER -->
-                        <td>
-                            <c:if test="${empty item.vouchers}">
-                                <span class="text-muted">Không có</span>
-                            </c:if>
-
-                            <c:forEach var="v" items="${item.vouchers}">
-                                <span class="badge bg-success me-1">${v.code}</span>
-                            </c:forEach>
-                        </td>
+                        <!-- UNIT -->
+                        <td>${item.unit}</td>
 
                         <!-- CATEGORY -->
                         <td>
