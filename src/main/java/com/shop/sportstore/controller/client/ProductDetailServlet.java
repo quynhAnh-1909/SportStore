@@ -49,16 +49,13 @@ public class ProductDetailServlet extends HttpServlet {
             List<Product> relatedProducts = productDAO.getAll();
 
             relatedProducts.removeIf(p -> p.getId() == id);
-            String showAll = request.getParameter("showAll");
 
-            if (showAll == null && relatedProducts.size() > 4) {
-                relatedProducts = relatedProducts.subList(0, 4);
-            }
+//            String showAll = request.getParameter("showAll");
 
             request.setAttribute("relatedProducts", relatedProducts);
 
 
-            request.setAttribute("showAll", showAll);
+//            request.setAttribute("showAll", showAll);
             request.getRequestDispatcher("/productDetail.jsp")
                     .forward(request, response);
 

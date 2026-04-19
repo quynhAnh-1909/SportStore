@@ -290,6 +290,10 @@
             transform: scale(2);
         }
 
+        .hidden-product {
+            display: none;
+        }
+
     </style>
 
 </head>
@@ -436,9 +440,9 @@
 
         <div class="row">
 
-                    <c:forEach var="p" items="${relatedProducts}">
+                    <c:forEach var="p" items="${relatedProducts}" varStatus="status">
 
-                        <div class="col-md-3 mb-4">
+                        <div class="col-md-3 mb-4 ${status.index >= 4 ? 'hidden-product' : ''}">
 
                             <!-- Tạo URL đúng -->
                             <c:url var="link" value="/productDetail">
@@ -469,14 +473,19 @@
 
         </div>
 
-        <c:if test="${showAll == null}">
-            <div style="text-align: center; margin-top: 20px;">
-                <a href="${root}/productDetail?id=${product.id}&showAll=true"
-                   class="btn btn-outline-danger">
-                    Xem thêm
-                </a>
-            </div>
-        </c:if>
+<%--        <c:if test="${showAll == null}">--%>
+<%--            <div style="text-align: center; margin-top: 20px;">--%>
+<%--                <a href="${root}/productDetail?id=${product.id}&showAll=true"--%>
+<%--                   class="btn btn-outline-danger">--%>
+<%--                    Xem thêm--%>
+<%--                </a>--%>
+<%--            </div>--%>
+<%--        </c:if>--%>
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="toggleProducts()" class="btn btn-outline-danger">
+                Xem thêm
+            </button>
+        </div>
 
     </div>
 
@@ -532,6 +541,14 @@
         })
             .then(() => {
                 updateCartCount();
+
+                // hiệu ứng nhẹ
+                const badge = document.querySelector(".cart-badge");
+                if (badge) {
+                    badge.classList.remove("animate");
+                    void badge.offsetWidth;
+                    badge.classList.add("animate");
+                }
             });
     }
 
@@ -552,12 +569,50 @@
     }
 
     function updateCartCount() {
-        fetch("${pageContext.request.contextPath}/cart?action=count")
+        fetch("${pageContext.request.contextPath}/cart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=count"
+        })
             .then(res => res.text())
             .then(count => {
-                let cart = document.getElementById("cart-count");
-                if (cart) cart.innerText = count;
+
+                const badge = document.querySelector(".cart-badge");
+
+                if (!badge) return;
+
+                badge.innerText = count;
+
+                if (count > 0) {
+                    badge.style.display = "block";
+                } else {
+                    badge.style.display = "none";
+                }
+
+                // animation nhẹ
+                badge.classList.remove("animate");
+                void badge.offsetWidth;
+                badge.classList.add("animate");
             });
+    }
+
+    let expanded = false;
+
+    function toggleProducts() {
+        const items = document.querySelectorAll('.hidden-product');
+        const btn = event.target;
+
+        if (!expanded) {
+            items.forEach(i => i.style.display = 'block');
+            btn.innerText = "Thu gọn";
+        } else {
+            items.forEach(i => i.style.display = 'none');
+            btn.innerText = "Xem thêm";
+        }
+
+        expanded = !expanded;
     }
 </script>
 
