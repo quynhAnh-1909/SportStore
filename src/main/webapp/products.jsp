@@ -200,7 +200,6 @@
             },
             body: "action=add&productId=" + productId
         })
-            .then(res => res.text())
             .then(() => {
                 animateToCart(btn);
                 updateCartCount();
@@ -229,7 +228,7 @@
         document.body.appendChild(flyingImg);
 
 
-        let cart = document.querySelector(".cart");
+        let cart = document.querySelector(".cart-wrapper");
         let cartRect = cart.getBoundingClientRect();
 
         setTimeout(() => {
@@ -258,10 +257,63 @@
         })
             .then(res => res.text())
             .then(count => {
-                document.querySelector(".cart").innerHTML = "🛒 " + count;
+
+                const badge = document.querySelector(".cart-badge");
+
+                if (!badge) return; // tránh lỗi null
+
+                badge.innerText = count;
+
+                if (count > 0) {
+                    badge.style.display = "block";
+                } else {
+                    badge.style.display = "none";
+                }
+
+                // animation badge
+                badge.classList.remove("animate");
+                void badge.offsetWidth;
+                badge.classList.add("animate");
             });
     }
 
+    function loadCartDropdown() {
+
+        fetch("${root}/cart?action=get")
+            .then(res => res.json())
+            .then(data => {
+
+                const container = document.getElementById("cart-items");
+
+                if (!container) return;
+
+                if (data.length === 0) {
+                    container.innerHTML = "<div>Giỏ hàng trống</div>";
+                    return;
+                }
+
+                let html = "";
+
+                data.forEach(item => {
+                    html += `
+                    <div class="cart-item">
+                        <img src="${root}/resources/${item.image}">
+                        <div>
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">
+                                ${item.price} x ${item.quantity}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                });
+
+                container.innerHTML = html;
+            });
+    }
+
+    document.querySelector(".cart-wrapper")
+        .addEventListener("mouseenter", loadCartDropdown);
 </script>
 </body>
 </html>
