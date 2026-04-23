@@ -194,7 +194,7 @@
     </div>
 
 
-    <!-- RIGHT ORDER SUMMARY -->
+
 
     <div class="col-lg-5">
 
