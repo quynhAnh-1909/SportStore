@@ -33,6 +33,34 @@ public class CartServlet extends HttpServlet {
         if(cart == null){
             cart = new ArrayList<>();
         }
+        if ("get".equals(action)) {
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            StringBuilder json = new StringBuilder("[");
+
+            for (int i = 0; i < cart.size(); i++) {
+                CartItem item = cart.get(i);
+
+                String context = request.getContextPath();
+
+                json.append("{")
+                        .append("\"id\":").append(item.getProduct().getId()).append(",")
+                        .append("\"name\":\"").append(item.getProduct().getName()).append("\",")
+                        .append("\"image\":\"").append(context + "/" + item.getProduct().getImageUrl()).append("\",")
+                        .append("\"price\":").append(item.getProduct().getPrice()).append(",")
+                        .append("\"quantity\":").append(item.getQuantity())
+                        .append("}");
+
+                if (i < cart.size() - 1) json.append(",");
+            }
+
+            json.append("]");
+
+            response.getWriter().write(json.toString());
+            return; // 🔥 QUAN TRỌNG
+        }
 
         if ("count".equals(action)) {
             int total = cart.stream().mapToInt(CartItem::getQuantity).sum();
