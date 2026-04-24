@@ -340,8 +340,18 @@
                 <div class="voucher-box mt-3">
                     <div class="label">Mã giảm giá</div>
                     <div>
-                        <span class="voucher">Giảm 10k</span>
-                        <span class="voucher">Giảm 20k</span>
+
+                        <c:if test="${empty product.vouchers}">
+                            <span class="text-muted">Không có</span>
+                        </c:if>
+
+                        <c:forEach var="v" items="${product.vouchers}">
+            <span class="voucher">
+                ${v.code} -
+                <fmt:formatNumber value="${v.discountValue}"/>₫
+            </span>
+                        </c:forEach>
+
                     </div>
                 </div>
 

@@ -147,6 +147,7 @@
                                     <div>${p.name}</div>
                                 </a>
 
+
                                 <div class="price">
                                     <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> VNĐ
                                 </div>                                <!-- ADD TO CART -->

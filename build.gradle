@@ -1,0 +1,50 @@
+
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'com.shop'
+version = '1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    // Servlet
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+
+    // JSP (Tomcat)
+    implementation 'org.apache.tomcat:tomcat-jasper:10.1.52'
+
+    // JSTL API
+    implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.1'
+
+    // JSTL Implementation
+    implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    // Test (optional)
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.2'
+
+    // MySQL JDBC Driver <---
+    implementation 'com.mysql:mysql-connector-j:8.3.0'
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
