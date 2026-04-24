@@ -1,7 +1,6 @@
 package com.shop.sportstore.dao;
 
 
-
 import com.shop.sportstore.model.Category;
 import com.shop.sportstore.untils.DBConnection;
 

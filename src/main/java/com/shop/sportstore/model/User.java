@@ -11,23 +11,21 @@ public class User implements Serializable {
     private String phoneNumber;
     private String role; // ADMIN / USER
     private String avatar;
-
-
+    private String provider;
+    private String address;
+    private boolean status = true;
 
     public User() {
     }
 
-    public User(int userId, String fullName, String email,
-                String password, String phoneNumber, String role) {
+    public User(int userId, String fullName, String email, String password, String phoneNumber, String role) {
         this.userId = userId;
         this.fullName = fullName;
-        this.email = email;
+        this.email = email; // Đã bổ sung gán giá trị cho email
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.role = role;
     }
-
-
 
     public int getUserId() {
         return userId;
@@ -77,6 +75,37 @@ public class User implements Serializable {
         this.role = role;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 
     @Override
     public String toString() {
@@ -86,13 +115,7 @@ public class User implements Serializable {
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", role='" + role + '\'' +
+                ", status=" + status +
                 '}';
-    }
-    // Getter & Setter cho avatar
-    public String getAvatar() {
-        return avatar;
-    }
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
     }
 }

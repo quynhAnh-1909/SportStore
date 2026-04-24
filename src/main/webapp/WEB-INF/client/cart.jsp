@@ -20,13 +20,6 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* CONTAINER */
-        .cart-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
 
         /* HEADER */
         .cart-header {
@@ -37,6 +30,23 @@
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             backdrop-filter: brightness(1.1) contrast(1.2);
+        }
+
+
+        .cart-count {
+            position: absolute;
+            top: -5px;          /* Đẩy lên phía trên */
+            right: -8px;        /* Đẩy sang phải */
+            background-color: #ff0000;
+            color: white;
+            border-radius: 50%; /* Làm cho badge hình tròn */
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1;
+            border: 2px solid white; /* Tạo viền trắng để nổi bật trên nền đỏ */
+            min-width: 18px;
+            text-align: center;
         }
 
         /* ITEM */
@@ -181,10 +191,13 @@
             height: 16px;
             cursor: pointer;
         }
-
         .cart-container {
             border-radius: 12px;
+
         }
+
+
+
     </style>
 
 </head>
@@ -424,7 +437,7 @@
         return true;
     }
 
-    // ===== CHECKBOX =====
+
     document.querySelectorAll('.item-check').forEach(cb => {
         cb.addEventListener('change', updateTotal);
     });

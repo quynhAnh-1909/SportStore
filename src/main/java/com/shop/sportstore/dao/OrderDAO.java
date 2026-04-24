@@ -12,7 +12,6 @@ import java.util.Map;
 
 public class OrderDAO extends DBConnection {
 
-    // Cập nhật trạng thái đơn hàng
     public void updateOrderStatus(String orderCode, String status) throws SQLException {
         String sql = "UPDATE Orders SET Status = ? WHERE OrderCode = ?";
         try (Connection conn = getConnection();
@@ -23,7 +22,6 @@ public class OrderDAO extends DBConnection {
         }
     }
 
-    // Lấy thông tin đơn hàng để gửi email
     public Map<String, String> getOrderDetailForEmail(String orderCode) throws SQLException {
         Map<String, String> data = new HashMap<>();
         String sql = "SELECT o.Id, o.TotalPrice, u.Id AS userId, u.FullName, u.Email " +
@@ -46,7 +44,6 @@ public class OrderDAO extends DBConnection {
         return data;
     }
 
-    // Kiểm tra trạng thái đơn hàng
     public String getOrderStatus(String orderCode) throws SQLException {
         String status = null;
         String sql = "SELECT Status FROM Orders WHERE OrderCode = ?";
@@ -62,7 +59,6 @@ public class OrderDAO extends DBConnection {
         return status;
     }
 
-    // Tạo đơn hàng mới và chi tiết đơn hàng
     public void createOrder(Integer userId, String orderCode, double total,
                             String status, String note, List<CartItem> cart) throws SQLException {
 
@@ -72,10 +68,8 @@ public class OrderDAO extends DBConnection {
 
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
-
             int orderId;
 
-            // Thêm Order
             try (PreparedStatement psOrder = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
                 psOrder.setInt(1, userId);
                 psOrder.setString(2, orderCode);
@@ -95,12 +89,6 @@ public class OrderDAO extends DBConnection {
 
             try (PreparedStatement psDetail = conn.prepareStatement(insertDetailSQL)) {
                 for (CartItem item : cart) {
-                    if (item.getProduct() == null) {
-                        throw new SQLException("CartItem không có Product hợp lệ.");
-                    }
-                    if (item.getProduct().getId() <= 0) {
-                        throw new SQLException("Product ID không hợp lệ trong CartItem.");
-                    }
                     psDetail.setInt(1, orderId);
                     psDetail.setInt(2, item.getProduct().getId());
                     psDetail.setInt(3, item.getQuantity());
@@ -110,8 +98,6 @@ public class OrderDAO extends DBConnection {
                 psDetail.executeBatch();
             }
             conn.commit();
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -137,16 +123,15 @@ public class OrderDAO extends DBConnection {
                 order.setPaymentMethod(rs.getString("PaymentMethod"));
                 order.setNote(rs.getString("Note"));
                 order.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                order.setUserFullName(rs.getString("userFullName")); // join từ bảng users
+                order.setUserFullName(rs.getString("userFullName"));
                 orders.add(order);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return orders;
     }
+
     public List<Map<String, String>> getOrderItems(String orderCode) throws SQLException {
         List<Map<String, String>> items = new ArrayList<>();
         String sql = "SELECT p.id AS productId, p.name AS productName, p.price, od.Quantity " +
@@ -161,7 +146,7 @@ public class OrderDAO extends DBConnection {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Map<String, String> item = new HashMap<>();
-                    item.put("productId", rs.getString("productId")); // ID sản phẩm
+                    item.put("productId", rs.getString("productId"));
                     item.put("productName", rs.getString("productName"));
                     item.put("price", rs.getString("price"));
                     item.put("quantity", rs.getString("Quantity"));
@@ -171,5 +156,38 @@ public class OrderDAO extends DBConnection {
             }
         }
         return items;
+    }
+
+    // =========================================================================
+    // CÁC HÀM MỚI BỔ SUNG ĐỂ XỬ LÝ HỦY ĐƠN VÀ ĐẾM SỐ LẦN HỦY
+    // =========================================================================
+
+    public boolean cancelOrder(String orderCode, int userId) {
+        String sql = "UPDATE orders SET Status = 'CANCELLED', UpdatedAt = NOW() WHERE OrderCode = ? AND UserId = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, orderCode);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int countCanceledOrdersInLastHour(int userId) {
+        String sql = "SELECT COUNT(*) FROM orders WHERE UserId = ? AND Status = 'CANCELLED' AND UpdatedAt >= NOW() - INTERVAL 1 HOUR";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
