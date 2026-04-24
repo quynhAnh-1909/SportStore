@@ -166,7 +166,7 @@
             </a>
             <a href="${root}/admin/banners"
                class="list-group-item list-group-item-action">
-               <i class="fas fa-image me-2"></i> Quản lý banners
+               <i class="fas fa-image me-2"></i> Quản lý banner
             </a>
 
             <div class="border-top my-3"></div>
