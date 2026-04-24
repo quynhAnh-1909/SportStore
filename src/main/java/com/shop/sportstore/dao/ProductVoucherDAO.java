@@ -1,5 +1,7 @@
 package com.shop.sportstore.dao;
 
+import com.shop.sportstore.model.Voucher;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,5 +54,42 @@ public class ProductVoucherDAO {
         }
         return  list ;
     }
+    public List<Voucher> getVouchersByProduct(int productId){
+        List<Voucher> list = new ArrayList<>();
 
+        String sql = """
+        SELECT v.*
+        FROM vouchers v
+        JOIN product_voucher pv ON v.id = pv.voucher_id
+        WHERE pv.product_id = ?
+    """;
+
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, productId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()){
+                Voucher v = new Voucher();
+
+                v.setId(rs.getInt("id"));
+                v.setCode(rs.getString("code"));
+                v.setDiscountType(rs.getString("discount_type"));
+                v.setDiscountValue(rs.getDouble("discount_value"));
+                v.setMaxDiscount(rs.getDouble("max_discount"));
+                v.setMinOrderValue(rs.getDouble("min_order_value"));
+                v.setQuantity(rs.getInt("quantity"));
+                v.setUsedCount(rs.getInt("used_count"));
+                v.setStatus(rs.getBoolean("status"));
+
+                list.add(v);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }
