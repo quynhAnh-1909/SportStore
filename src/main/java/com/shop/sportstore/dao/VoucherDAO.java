@@ -255,4 +255,42 @@ public class VoucherDAO {
             e.printStackTrace();
         }
     }
+    public List<Voucher> getByProductId(int productId) {
+
+        List<Voucher> list = new ArrayList<>();
+
+        try {
+
+            String sql = """
+            SELECT v.*
+            FROM vouchers v
+            JOIN product_voucher pv
+            ON v.id = pv.voucher_id
+            WHERE pv.product_id = ?
+        """;
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setInt(1, productId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Voucher v = new Voucher();
+
+                v.setId(rs.getInt("id"));
+                v.setCode(rs.getString("code"));
+
+                list.add(v);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }
