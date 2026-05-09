@@ -24,10 +24,14 @@ public class OrderDAO extends DBConnection {
 
     public Map<String, String> getOrderDetailForEmail(String orderCode) throws SQLException {
         Map<String, String> data = new HashMap<>();
-        String sql = "SELECT o.Id, o.TotalPrice, u.Id AS userId, u.FullName, u.Email " +
-                "FROM Orders o " +
-                "JOIN Users u ON o.UserId = u.Id " +
-                "WHERE o.OrderCode = ?";
+        String sql =
+                "SELECT o.Id, o.TotalPrice, " +
+                        "u.user_id AS userId, " +
+                        "u.full_name, " +
+                        "u.email " +
+                        "FROM orders o " +
+                        "JOIN users u ON o.UserId = u.user_id " +
+                        "WHERE o.OrderCode = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, orderCode);
@@ -35,8 +39,8 @@ public class OrderDAO extends DBConnection {
                 if (rs.next()) {
                     data.put("orderId", rs.getString("Id"));
                     data.put("userId", rs.getString("userId"));
-                    data.put("fullName", rs.getString("FullName"));
-                    data.put("email", rs.getString("Email"));
+                    data.put("fullName", rs.getString("full_name"));
+                    data.put("email", rs.getString("email"));
                     data.put("totalPrice", rs.getString("TotalPrice"));
                 }
             }
@@ -157,13 +161,15 @@ public class OrderDAO extends DBConnection {
         }
         return items;
     }
-
-    // =========================================================================
     // CÁC HÀM MỚI BỔ SUNG ĐỂ XỬ LÝ HỦY ĐƠN VÀ ĐẾM SỐ LẦN HỦY
-    // =========================================================================
-
     public boolean cancelOrder(String orderCode, int userId) {
-        String sql = "UPDATE orders SET Status = 'CANCELLED', UpdatedAt = NOW() WHERE OrderCode = ? AND UserId = ?";
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = 'CANCELLED', " +
+                        "CancelledAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE OrderCode = ? " +
+                        "AND UserId = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, orderCode);
@@ -189,5 +195,123 @@ public class OrderDAO extends DBConnection {
             e.printStackTrace();
         }
         return 0;
+    }
+    public List<Order> getOrdersByStatus(String status) {
+
+        List<Order> orders = new ArrayList<>();
+
+        String sql =
+                "SELECT o.*, u.full_name AS userFullName " +
+                        "FROM orders o " +
+                        "JOIN users u ON o.UserId = u.user_id " +
+                        "WHERE o.Status = ? " +
+                        "ORDER BY o.CreatedAt DESC";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, status);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Order order = new Order();
+
+                order.setId(rs.getInt("Id"));
+                order.setUserId(rs.getInt("UserId"));
+                order.setOrderCode(rs.getString("OrderCode"));
+                order.setTotalPrice(rs.getDouble("TotalPrice"));
+                order.setStatus(rs.getString("Status"));
+                order.setPaymentMethod(rs.getString("PaymentMethod"));
+                order.setNote(rs.getString("Note"));
+                order.setCreatedAt(rs.getTimestamp("CreatedAt"));
+
+                order.setUserFullName(
+                        rs.getString("userFullName")
+                );
+
+                orders.add(order);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return orders;
+    }
+    public boolean confirmOrder(int id) {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = 'CONFIRMED', " +
+                        "ConfirmedAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE Id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    public boolean shippingOrder(int id) {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = 'SHIPPING', " +
+                        "ShippingAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE Id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    public boolean completeOrder(int id) {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = 'COMPLETED', " +
+                        "CompletedAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE Id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }
