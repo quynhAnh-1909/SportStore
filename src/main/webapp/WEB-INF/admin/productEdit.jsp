@@ -51,28 +51,26 @@
                  value="${product.name}" required>
         </div>
 
-        <div class="row">
+            <div class="row">
 
-          <div class="col-md-4 mb-3">
-            <label>Giá</label>
-            <input type="number" name="price" class="form-control"
-                   value="${product.price.intValue()}" required>
-          </div>
+                <div class="col-md-6 mb-3">
+                    <label>Giá</label>
+                    <input type="number"
+                           name="price"
+                           class="form-control"
+                           value="${product.price.intValue()}"
+                           required>
+                </div>
 
-          <div class="col-md-4 mb-3">
-            <label>Đơn vị</label>
-            <input type="text" name="unit" class="form-control"
-                   value="${product.unit}">
-          </div>
+                <div class="col-md-6 mb-3">
+                    <label>Số lượng</label>
+                    <input type="number"
+                           name="stockQuantity"
+                           class="form-control"
+                           value="${product.stockQuantity}">
+                </div>
 
-          <div class="col-md-4 mb-3">
-            <label>Số lượng</label>
-            <input type="number" name="stockQuantity" class="form-control"
-                   value="${product.stockQuantity}">
-          </div>
-
-        </div>
-
+            </div>
         <!-- hidden image -->
         <input type="hidden" name="imageUrl" id="hiddenImageUrl"
                value="${product.imageUrl}">
@@ -84,7 +82,7 @@
           <div class="image-picker-grid">
             <c:forEach var="img" items="${imageList}">
               <div class="img-option"
-                   onclick="selectGalleryImage(this, '${root}/resources/${img}')">
+                   onclick="selectGalleryImage(this, '${img}')">
                 <img src="${root}/resources/${img}">
               </div>
             </c:forEach>
@@ -149,15 +147,20 @@
 </div>
 
 <script>
-  function selectGalleryImage(element, url) {
-    document.querySelectorAll('.img-option').forEach(el => el.classList.remove('active'));
-    element.classList.add('active');
+    function selectGalleryImage(element, fileName) {
 
-    document.getElementById('hiddenImageUrl').value = url;
-    document.getElementById('finalPreview').src = url;
+        document.querySelectorAll('.img-option')
+                .forEach(el => el.classList.remove('active'));
 
-    document.getElementById('fileInput').value = '';
-  }
+        element.classList.add('active');
+
+        document.getElementById('hiddenImageUrl').value = fileName;
+
+        document.getElementById('finalPreview').src =
+                '${root}/resources/' + fileName;
+
+        document.getElementById('fileInput').value = '';
+    }
 
   function previewNewFile(input) {
     if (input.files && input.files[0]) {

@@ -1,6 +1,7 @@
 package com.shop.sportstore.dao;
 
 import com.shop.sportstore.model.Product;
+import com.shop.sportstore.model.Voucher;
 import com.shop.sportstore.untils.DBConnection;
 
 import java.sql.*;
@@ -20,23 +21,42 @@ public class ProductDAO extends DBConnection {
         List<Product> list = new ArrayList<>();
 
         String sql = """
-            SELECT p.*, c.name AS categoryName
-            FROM products p
-            LEFT JOIN category c ON p.category_id = c.id
-            ORDER BY p.id DESC
-        """;
+        SELECT p.*, c.name AS categoryName
+        FROM products p
+        LEFT JOIN category c ON p.category_id = c.id
+        ORDER BY p.id DESC
+    """;
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
+
                 Product p = mapResultSetToProduct(rs);
-                p.setCategoryName(rs.getString("categoryName"));
+
+                p.setCategoryName(
+                        rs.getString("categoryName")
+                );
+
                 list.add(p);
             }
 
+            VoucherDAO voucherDAO =
+                    new VoucherDAO(conn);
+
+            for (Product p : list) {
+
+                List<Voucher> vouchers =
+                        voucherDAO.getByProductId(
+                                p.getId()
+                        );
+
+                p.setVouchers(vouchers);
+            }
+
         } catch (Exception e) {
+
             e.printStackTrace();
         }
 

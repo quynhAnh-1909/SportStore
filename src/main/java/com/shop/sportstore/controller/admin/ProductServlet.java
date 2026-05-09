@@ -237,40 +237,72 @@ public class ProductServlet extends HttpServlet {
     }
     // UPDATE PRODUCT
 
-    private void updateProduct(HttpServletRequest request, HttpServletResponse response)
+    private void updateProduct(HttpServletRequest request,
+                               HttpServletResponse response)
             throws IOException {
 
         try {
-            Connection  conn = DBConnection.getConnection();
+
+            Connection conn = DBConnection.getConnection();
             ProductDAO dao = new ProductDAO();
             ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
-
-            String [] voucherIds = request.getParameterValues("voucherIds");
+            String[] voucherIds = request.getParameterValues("voucherIds");
+            int productId = Integer.parseInt(request.getParameter("id"));
+            Product oldProduct = dao.getProductById(productId);
             Product p = new Product();
-            int productId =Integer.parseInt(request.getParameter("id"));
-            p.setId(Integer.parseInt(request.getParameter("id")));
+            p.setId(productId);
             p.setName(request.getParameter("name"));
             p.setPrice(Double.parseDouble(request.getParameter("price")));
             p.setStockQuantity(Integer.parseInt(request.getParameter("stockQuantity")));
-
             p.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             p.setUnit(request.getParameter("unit"));
-            dao.updateProduct(p);
-
-            pvDAO.deleteByProduct(productId);
-
-            if(voucherIds !=null){
-                for(String vid : voucherIds){
-                    pvDAO.insert(productId,Integer.parseInt(vid));
+            String imageUrl = request.getParameter("imageUrl");
+            Part filePart = request.getPart("imageFile");
+            String fileName = filePart.getSubmittedFileName();
+            String imageName;
+            if (fileName != null && !fileName.isEmpty()) {
+                imageName = System.currentTimeMillis()
+                                + "_"
+                                + fileName;
+                String uploadPath = getServletContext().getRealPath("/resources");
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+                filePart.write(uploadPath
+                                + File.separator
+                                + imageName
+                );
+                if (oldProduct.getImageUrl() != null && !oldProduct.getImageUrl().equals("no-image.png")) {
+                    File oldFile = new File(uploadPath
+                                            + File.separator
+                                            + oldProduct.getImageUrl());
+                    if (oldFile.exists()) {
+                        oldFile.delete();
+                    }
                 }
             }
+            else if (imageUrl != null && !imageUrl.isEmpty()) {
+                imageName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+            }
+            else {
+                imageName = oldProduct.getImageUrl();
+            }
+            p.setImageUrl(imageName);
+            dao.updateProduct(p);
+            pvDAO.deleteByProduct(productId);
+            if (voucherIds != null) {
+                for (String vid : voucherIds) {
+                    pvDAO.insert(productId, Integer.parseInt(vid));
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         response.sendRedirect(request.getContextPath() + "/admin/products");
     }
-
     //DELETE PRODUCT
 
 
