@@ -41,14 +41,14 @@ tasks.test {
 apply plugin: 'org.hidetake.ssh'
 
 
-    remotes {
-        server {
-            host = '192.168.58.130'
-            port = 22
-            user = 'quynh-anh'
-            password = 'Qanh19092005'
-        }
+remotes {
+    server {
+        host = '192.168.30.130'
+        port = 22
+        user = 'huynhtran'
+        password = '123456'
     }
+}
 
 
 ssh.settings {
