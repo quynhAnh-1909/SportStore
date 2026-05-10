@@ -63,48 +63,139 @@ public class OrderDAO extends DBConnection {
         return status;
     }
 
-    public void createOrder(Integer userId, String orderCode, double total,
-                            String status, String note, List<CartItem> cart) throws SQLException {
+    public void createOrder(
+            Integer userId,
+            String orderCode,
+            double total,
+            String paymentMethod,
+            String status,
+            String note,
+            Integer voucherId,
+            double discountAmount,
+            List<CartItem> cart
+    ) throws SQLException {
 
-        String insertOrderSQL = "INSERT INTO orders (UserId, OrderCode, TotalPrice, Status, Note, CreatedAt) " +
-                "VALUES (?, ?, ?, ?, ?, NOW())";
-        String insertDetailSQL = "INSERT INTO orderDetails (OrderId, ProductId, Quantity, Price) VALUES (?, ?, ?, ?)";
+        String insertOrderSQL =
+                "INSERT INTO orders (" +
+                        "UserId, " +
+                        "OrderCode, " +
+                        "TotalPrice, " +
+                        "PaymentMethod, " +
+                        "Status, " +
+                        "CreatedAt, " +
+                        "Note, " +
+                        "VoucherId, " +
+                        "DiscountAmount" +
+                        ") VALUES (?, ?, ?, ?, ?, NOW(), ?, ?, ?)";
 
-        try (Connection conn = getConnection()) {
+        String insertDetailSQL =
+                "INSERT INTO orderdetails (" +
+                        "OrderId, " +
+                        "ProductId, " +
+                        "Quantity, " +
+                        "Price" +
+                        ") VALUES (?, ?, ?, ?)";
+
+        Connection conn = null;
+
+        try {
+
+            conn = getConnection();
+
             conn.setAutoCommit(false);
+
             int orderId;
 
-            try (PreparedStatement psOrder = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
+            // INSERT ORDER
+
+            try (
+                    PreparedStatement psOrder =
+                            conn.prepareStatement(
+                                    insertOrderSQL,
+                                    Statement.RETURN_GENERATED_KEYS
+                            )
+            ) {
+
                 psOrder.setInt(1, userId);
                 psOrder.setString(2, orderCode);
                 psOrder.setDouble(3, total);
-                psOrder.setString(4, status);
-                psOrder.setString(5, note);
+                psOrder.setString(4, paymentMethod);
+                psOrder.setString(5, status);
+                psOrder.setString(6, note);
+
+                if (voucherId == null) {
+                    psOrder.setNull(7, Types.INTEGER);
+                } else {
+                    psOrder.setInt(7, voucherId);
+                }
+
+                psOrder.setDouble(8, discountAmount);
+
                 psOrder.executeUpdate();
 
-                try (ResultSet rsKeys = psOrder.getGeneratedKeys()) {
-                    if (rsKeys.next()) {
-                        orderId = rsKeys.getInt(1);
-                    } else {
-                        throw new SQLException("Không lấy được ID đơn hàng.");
-                    }
+                ResultSet rs = psOrder.getGeneratedKeys();
+
+                if (rs.next()) {
+
+                    orderId = rs.getInt(1);
+
+                } else {
+
+                    throw new SQLException(
+                            "Không lấy được Order ID"
+                    );
                 }
             }
 
-            try (PreparedStatement psDetail = conn.prepareStatement(insertDetailSQL)) {
+            // INSERT ORDER DETAILS
+
+            try (
+                    PreparedStatement psDetail =
+                            conn.prepareStatement(insertDetailSQL)
+            ) {
+
                 for (CartItem item : cart) {
+
                     psDetail.setInt(1, orderId);
-                    psDetail.setInt(2, item.getProduct().getId());
-                    psDetail.setInt(3, item.getQuantity());
-                    psDetail.setDouble(4, item.getProduct().getPrice());
+
+                    psDetail.setInt(
+                            2,
+                            item.getProduct().getId()
+                    );
+
+                    psDetail.setInt(
+                            3,
+                            item.getQuantity()
+                    );
+
+                    psDetail.setDouble(
+                            4,
+                            item.getProduct().getPrice()
+                    );
+
                     psDetail.addBatch();
                 }
+
                 psDetail.executeBatch();
             }
+
             conn.commit();
+
+        } catch (Exception e) {
+
+            if (conn != null) {
+                conn.rollback();
+            }
+
+            throw e;
+
+        } finally {
+
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
-
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.Id, o.UserId, o.OrderCode, o.TotalPrice, o.Status, o.PaymentMethod, o.Note, o.CreatedAt, " +

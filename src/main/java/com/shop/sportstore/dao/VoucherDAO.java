@@ -293,4 +293,54 @@ public class VoucherDAO {
 
         return list;
     }
+    // ================== LẤY VOUCHER HOẠT ĐỘNG ==================
+    public List<Voucher> findAllActive() {
+
+        List<Voucher> list = new ArrayList<>();
+
+        try {
+
+            String sql = """
+                SELECT *
+                FROM vouchers
+                WHERE status = true
+                AND NOW() BETWEEN start_date AND expiry_date
+                AND used_count < quantity
+                ORDER BY id DESC
+                """;
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Voucher v = new Voucher();
+
+                v.setId(rs.getInt("id"));
+                v.setCode(rs.getString("code"));
+                v.setDiscountType(rs.getString("discount_type"));
+                v.setDiscountValue(rs.getDouble("discount_value"));
+                v.setMinOrderValue(rs.getDouble("min_order_value"));
+                v.setMaxDiscount(rs.getDouble("max_discount"));
+                v.setQuantity(rs.getInt("quantity"));
+                v.setUsedCount(rs.getInt("used_count"));
+                v.setPaymentMethod(rs.getString("payment_method"));
+                v.setMinProductPrice(rs.getDouble("min_product_price"));
+                v.setCategoryId(rs.getInt("category_id"));
+                v.setStartDate(rs.getTimestamp("start_date"));
+                v.setExpiryDate(rs.getTimestamp("expiry_date"));
+                v.setStatus(rs.getBoolean("status"));
+
+                list.add(v);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }
