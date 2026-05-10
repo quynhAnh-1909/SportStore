@@ -13,6 +13,12 @@ public class Order {
     private String note;
     private String userFullName;
 
+    private Timestamp confirmedAt;
+    private Timestamp shippingAt;
+    private Timestamp completedAt;
+    private Timestamp cancelledAt;
+
+    private String cancelReason;
     // getters và setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -40,4 +46,12 @@ public class Order {
 
     public String getUserFullName() { return userFullName; }
     public void setUserFullName(String userFullName) { this.userFullName = userFullName; }
+
+    public Timestamp getConfirmedAt() {
+        return confirmedAt;
+    }
+
+    public void setConfirmedAt(Timestamp confirmedAt) {
+        this.confirmedAt = confirmedAt;
+    }
 }
