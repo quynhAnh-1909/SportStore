@@ -49,12 +49,6 @@
             text-align: center;
         }
 
-        /* ITEM */
-        .cart-item {
-            display: flex;
-            align-items: center;
-        }
-
         /* IMAGE */
         .product-img {
             width: 80px;
@@ -196,8 +190,6 @@
 
         }
 
-
-
     </style>
 
 </head>
@@ -238,7 +230,7 @@
 
                     <c:forEach var="item" items="${sessionScope.cart}">
 
-                        <div class="row align-items-center mt-3 cart-item text-center g-0"
+                        <div class="row align-items-center mt-3 text-center"
                              data-id="${item.product.id}">
 
                             <div class="col-md-1">
@@ -267,14 +259,17 @@
                                 <fmt:formatNumber value="${item.product.price * item.quantity}" />
                             </div>
 
-                            <div class="col-md-1">
+                            <div class="col-md-1 d-flex justify-content-center align-items-center">
                                 <button onclick="confirmDelete(${item.product.id})"
-                                        class="btn btn-danger">X</button>
+                                        class="btn btn-danger rounded px-3 py-2">
+                                    X
+                                </button>
                             </div>
 
                         </div>
 
                     </c:forEach>
+
 
                 </div>
 
