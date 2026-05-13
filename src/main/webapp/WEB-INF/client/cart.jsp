@@ -371,7 +371,7 @@
                                 </div>
                             </div>
 
-                            <div class="cart-total cart-col text-danger fw-bold">
+                            <div class="cart-total cart-col text-danger fw-bold item-total">
                                 <fmt:formatNumber value="${item.product.price * item.quantity}" />
                             </div>
 
@@ -458,10 +458,13 @@
 
             if (checkbox.checked) {
 
-                let price = Number(checkbox.dataset.price);
-                let qty = parseInt(item.querySelector('.qty-input').value);
+                let itemTotalText =
+                        item.querySelector('.item-total').innerText;
 
-                total += price * qty;
+                let itemTotal =
+                        Number(itemTotalText.replace(/[^\d]/g, ""));
+
+                total += itemTotal;
                 checkedCount++;
             }
         });
@@ -500,25 +503,33 @@
         let price = Number(item.querySelector('.item-check').dataset.price);
 
         plus.onclick = () => {
+
             let qty = parseInt(qtyBox.value) + 1;
 
             updateQuantity(id, qty);
+
             qtyBox.value = qty;
 
+            let itemTotal = qty * price;
+
             item.querySelector('.item-total').innerText =
-                (qty * price).toLocaleString('vi-VN');
+                    itemTotal.toLocaleString('vi-VN') + " VNĐ";
 
             updateTotal();
         }
 
         minus.onclick = () => {
+
             let qty = Math.max(1, parseInt(qtyBox.value) - 1);
 
             updateQuantity(id, qty);
+
             qtyBox.value = qty;
 
+            let itemTotal = qty * price;
+
             item.querySelector('.item-total').innerText =
-                (qty * price).toLocaleString('vi-VN');
+                    itemTotal.toLocaleString('vi-VN') + " VNĐ";
 
             updateTotal();
         }
