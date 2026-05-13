@@ -2,13 +2,17 @@ package com.shop.sportstore.controller.client;
 
 import com.shop.sportstore.dao.CategoryDAO;
 import com.shop.sportstore.dao.ProductDAO;
+import com.shop.sportstore.dao.ProductVoucherDAO;
 import com.shop.sportstore.model.Category;
 import com.shop.sportstore.model.Product;
+import com.shop.sportstore.model.Voucher;
+import com.shop.sportstore.untils.DBConnection;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.List;
 
 
@@ -57,7 +61,6 @@ public class ProductServlet extends HttpServlet {
             int offset = (page - 1) * LIMIT;
 
             List<Product> productList = productDAO.searchProducts(keyword, categoryId, offset, LIMIT);
-
             int totalProduct = productDAO.countProducts(keyword, categoryId);
             int totalPage = (int) Math.ceil((double) totalProduct / LIMIT);
 

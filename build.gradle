@@ -1,0 +1,99 @@
+plugins {
+    id 'java'
+    id 'war'
+    id "org.hidetake.ssh" version "2.11.2"
+}
+
+group = 'com.shop'
+version = '1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    implementation 'org.apache.tomcat:tomcat-jasper:10.1.52'
+    implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.1'
+    implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.mysql:mysql-connector-j:8.3.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.2'
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+// ================= SSH =================
+
+apply plugin: 'org.hidetake.ssh'
+
+
+remotes {
+    server {
+        host = '192.168.30.130'
+        port = 22
+        user = 'huynhtran'
+        password = '123456'
+    }
+}
+
+
+ssh.settings {
+    knownHosts = allowAnyHosts
+}
+
+// ================= TASK =================
+task uploadWar {
+    dependsOn build
+
+    doLast {
+        ssh.run {
+            session(remotes.server) {
+
+                execute 'mkdir -p /usr/deploy'
+
+                put from: file("build/libs/${project.name}-${version}.war"),
+                        into: "/usr/deploy/ROOT.war"
+            }
+        }
+    }
+}
+
+task restartDocker {
+    doLast {
+        ssh.run {
+            session(remotes.server) {
+
+                // Xóa container cũ
+                execute 'docker rm -f tomcat10 || true'
+
+                // Chạy container mới
+                execute '''
+docker run -d \
+--name tomcat10 \
+--network sport-network \
+-v /usr/deploy:/usr/local/tomcat/webapps \
+-p 80:8080 \
+tomcat:10.1
+'''
+            }
+        }
+    }
+}
+
+task deploy {
+    dependsOn uploadWar, restartDocker
+}

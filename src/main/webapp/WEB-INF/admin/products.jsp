@@ -58,7 +58,7 @@
                     <th class="text-start">Tên sản phẩm</th>
                     <th>Giá</th>
                     <th>Tồn</th>
-                    <th>Đơn vị</th>
+                    <th>Mã Giảm</th>
                     <th>Danh mục</th>
                     <th style="width: 220px;">Thao tác</th>
                 </tr>
@@ -114,8 +114,34 @@
                             </c:choose>
                         </td>
 
-                        <!-- UNIT -->
-                        <td>${item.unit}</td>
+                        <!-- voucher-->
+                        <td>
+
+                            <c:choose>
+
+                                <c:when test="${not empty item.vouchers}">
+
+                                    <c:forEach var="v" items="${item.vouchers}">
+
+                <span class="badge bg-warning text-dark me-1">
+                        ${v.code}
+                </span>
+
+                                    </c:forEach>
+
+                                </c:when>
+
+                                <c:otherwise>
+
+            <span class="text-muted">
+                Không có
+            </span>
+
+                                </c:otherwise>
+
+                            </c:choose>
+
+                        </td>
 
                         <!-- CATEGORY -->
                         <td>

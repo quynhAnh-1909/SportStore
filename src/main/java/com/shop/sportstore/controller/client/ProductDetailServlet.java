@@ -1,7 +1,11 @@
 package com.shop.sportstore.controller.client;
 
 import com.shop.sportstore.dao.ProductDAO;
+import com.shop.sportstore.dao.ProductVoucherDAO;
+import com.shop.sportstore.dao.VoucherDAO;
 import com.shop.sportstore.model.Product;
+import com.shop.sportstore.model.Voucher;
+import com.shop.sportstore.untils.DBConnection;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.List;
 
 @WebServlet("/productDetail")
@@ -43,7 +48,10 @@ public class ProductDetailServlet extends HttpServlet {
                 forwardError(request, response, "Không tìm thấy sản phẩm");
                 return;
             }
-
+            Connection conn = DBConnection.getConnection();
+            ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
+            List<Voucher> vouchers = pvDAO.getVouchersByProduct(id);
+            product.setVouchers(vouchers);
             request.setAttribute("product", product);
 
             List<Product> relatedProducts = productDAO.getAll();

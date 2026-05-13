@@ -55,7 +55,6 @@
 <body class="p-5">
 <div class="container">
 
-    <!-- Thông tin cá nhân -->
     <div class="card card-profile">
         <h2 class="text-center">Thông tin cá nhân</h2>
         <div class="row align-items-center">
@@ -87,7 +86,6 @@
         </div>
     </div>
 
-    <!-- Lịch sử mua hàng -->
     <div class="card card-profile">
         <h2 class="text-center">Lịch sử mua hàng</h2>
         <table class="table table-striped table-bordered mt-3">
