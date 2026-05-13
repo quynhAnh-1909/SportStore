@@ -180,14 +180,28 @@
             background: #eee;
         }
 
-        .item-check {
-            width: 16px;
-            height: 16px;
+        .item-check,
+        #checkAll {
+            width: 18px;
+            height: 18px;
             cursor: pointer;
+            accent-color: #a855f7;
         }
         .cart-container {
             border-radius: 12px;
 
+        }
+
+        .cart-row {
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+        }
+
+        .product-image {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
         }
 
     </style>
@@ -220,7 +234,9 @@
                 <div class="card p-3">
 
                     <div class="row fw-bold text-white bg-danger p-2 rounded text-center align-items-center">
-                        <div class="col-md-1"></div>
+                        <div class="col-md-1 text-center">
+                            <input type="checkbox" id="checkAll">
+                        </div>
                         <div class="col-md-4 text-start">Sản phẩm</div>
                         <div class="col-md-2">Đơn giá</div>
                         <div class="col-md-2">Số lượng</div>
@@ -437,7 +453,34 @@
         cb.addEventListener('change', updateTotal);
     });
 
-    window.onload = updateTotal;
+    const checkAll = document.getElementById("checkAll");
+    const itemChecks = document.querySelectorAll(".item-check");
+
+    checkAll.addEventListener("change", function () {
+
+        itemChecks.forEach(cb => {
+            cb.checked = this.checked;
+        });
+
+        updateTotal();
+    });
+
+    itemChecks.forEach(cb => {
+
+        cb.addEventListener("change", function () {
+
+            checkAll.checked =
+                    [...itemChecks].every(item => item.checked);
+
+            updateTotal();
+        });
+
+    });
+
+    window.onload = () => {
+        updateTotal();
+        checkAll.checked = true;
+    };
 
 </script>
 
