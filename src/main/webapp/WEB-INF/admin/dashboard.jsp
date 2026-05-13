@@ -1,136 +1,358 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <title>SPORT SHOP ADMIN</title>
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
     <!-- Font Awesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
+
         :root{
             --main-red:#d81f19;
-            --dark-red:#b71c17;
-            --light-bg:#f7f3f3;
+            --dark-red:#9f1713;
+            --light-bg:#f4f6f9;
+            --white:#ffffff;
+            --black:#111827;
+            --border:#e5e7eb;
         }
 
-        html, body{
-            width:100%;
-            /*height:100%;*/
+        /*RESET*/
+
+        *{
             margin:0;
             padding:0;
-            overflow-x:hidden;
-            background:var(--light-bg);
-            font-family:'Segoe UI', sans-serif;
+            box-sizing:border-box;
         }
+
         body{
-            overflow-y:auto;
+            font-family:'Segoe UI', sans-serif;
+            background:var(--light-bg);
+            overflow-x:hidden;
+            color:#111;
         }
+
         #wrapper{
             display:flex;
             width:100%;
-            height:100vh;
-            overflow-x:hidden;
         }
+
+        /* =========================
+            SIDEBAR
+        ========================= */
 
         #sidebar-wrapper{
-            width:260px;
-            min-height:100vh;
-            background:linear-gradient(180deg,var(--main-red),var(--dark-red));
+            width:320px;
+            height:100vh;
+            background:linear-gradient(180deg,#d81f19,#7f1010);
+
             position:fixed;
-            left:0;
             top:0;
+            left:0;
+
+            overflow-y:auto;
+            overflow-x:hidden;
+
+            box-shadow:5px 0 20px rgba(0,0,0,0.15);
+            z-index:1000;
         }
+
+        /* LOGO */
 
         .sidebar-heading{
-            padding:25px;
+            padding:30px 20px;
             text-align:center;
-            color:white;
-            font-size:22px;
-            font-weight:bold;
-            border-bottom:1px solid rgba(255,255,255,0.2);
+            border-bottom:1px solid rgba(255,255,255,0.15);
+            background:rgba(0,0,0,0.15);
         }
 
-        .list-group-item{
-            background:transparent;
+        .sidebar-heading h4{
             color:white;
-            border:none;
-            padding:18px 25px;
-            font-size:18px;
-            font-weight:500;
+            font-size:24px;
+            font-weight:800;
+            letter-spacing:1px;
+            margin:0;
+        }
+
+        .sidebar-heading i{
+            color:#ffd54f;
+            margin-right:10px;
+            font-size:26px;
+        }
+
+        /* MENU */
+
+        .list-group{
+            padding:20px 14px;
+        }
+
+        .menu-item{
+            display:flex;
+            align-items:center;
+            color:white;
+            text-decoration:none;
+            padding:16px 18px;
+            border-radius:14px;
+            margin-bottom:10px;
             transition:0.3s;
+            font-size:16px;
+            font-weight:600;
+            white-space:nowrap;
+            border:1px solid transparent;
         }
 
-        .list-group-item:hover{
-            background:rgba(255,255,255,0.15);
-            padding-left:35px;
+        .menu-item:hover{
+            background:rgba(255,255,255,0.12);
+            border:1px solid rgba(255,255,255,0.2);
+            color:white;
+            transform:translateX(5px);
         }
+
+        .menu-item i{
+            width:24px;
+            font-size:16px;
+        }
+
+        /* SUB MENU */
+
+        .sub-menu-item{
+            display:flex;
+            align-items:center;
+            color:#f5f5f5;
+            text-decoration:none;
+            padding:13px 18px 13px 58px;
+            border-radius:12px;
+            margin:6px 0;
+            font-size:14px;
+            background:rgba(255,255,255,0.06);
+            border:1px solid rgba(255,255,255,0.08);
+            transition:0.3s;
+            white-space:nowrap;
+        }
+
+        .sub-menu-item:hover{
+            background:rgba(255,255,255,0.15);
+            color:white;
+            transform:translateX(5px);
+        }
+
+        .sub-menu-item i{
+            width:22px;
+        }
+
+        /* =========================
+            PAGE CONTENT
+        ========================= */
 
         #page-content-wrapper{
-            margin-left:260px;
-            width:calc(100% - 260px);
-            height:100vh;
-            overflow-y:auto;
+            margin-left:320px;
+            width:calc(100% - 320px);
+            min-height:100vh;
+            overflow-x:hidden;
         }
+        /* =========================
+            NAVBAR
+        ========================= */
 
         .admin-navbar{
             background:white;
             padding:18px 30px;
-            box-shadow:0 2px 10px rgba(0,0,0,0.08);
+            box-shadow:0 2px 12px rgba(0,0,0,0.06);
+            position:sticky;
+            top:0;
+            z-index:999;
         }
+
+        /* =========================
+            MAIN CONTENT
+        ========================= */
 
         #mainContent{
             padding:30px;
         }
-        #sidebar-wrapper{
-            height:100vh;
-            overflow-y:auto;
-        }
+
         .dashboard-title{
-            font-size:42px;
-            font-weight:bold;
+            font-size:38px;
+            font-weight:800;
             color:var(--main-red);
-            margin-bottom:25px;
+            margin-bottom:30px;
         }
 
-        .card{
-            border:none;
-            border-radius:20px;
-            box-shadow:0 4px 15px rgba(0,0,0,0.08);
-            border-top:5px solid var(--main-red);
-        }
+        /* =========================
+            CARD
+        ========================= */
 
-        .card-body{
-            text-align:center;
+        .dashboard-card{
+            background:white;
+            border-radius:22px;
             padding:30px;
+            box-shadow:0 4px 20px rgba(0,0,0,0.06);
+            border:1px solid var(--border);
+            border-top:5px solid var(--main-red);
+            transition:0.3s;
         }
 
-        .card h5{
+        .dashboard-card:hover{
+            transform:translateY(-5px);
+        }
+
+        .dashboard-card h5{
             color:var(--main-red);
-            font-size:26px;
+            font-size:22px;
             font-weight:700;
         }
 
-        .card h2{
-            font-size:38px;
-            font-weight:bold;
+        .dashboard-card h2{
+            font-size:42px;
             margin-top:15px;
+            font-weight:bold;
+            color:#111;
         }
+
+        /* =========================
+            BOX
+        ========================= */
 
         .dashboard-box{
             background:white;
-            border-radius:15px;
+            border-radius:20px;
             padding:25px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
-            margin-top: 25px;
+            margin-top:25px;
+            box-shadow:0 4px 18px rgba(0,0,0,0.06);
+            border:1px solid var(--border);
+        }
+
+        .dashboard-box h4{
+            font-weight:700;
+            margin-bottom:20px;
+        }
+
+        /* =========================
+            TABLE
+        ========================= */
+
+        .table{
+            width:100%;
+            margin-bottom:0;
+            border-collapse:separate;
+            border-spacing:0;
+            overflow:hidden;
+            border-radius:16px;
+            border:1px solid #dcdcdc;
+        }
+
+        /* HEADER ĐEN CHỮ TRẮNG */
+
+        .table thead tr{
+            background:#111827 !important;
+        }
+
+        .table th{
+            color:white !important;
+            font-size:15px;
+            font-weight:700;
+            padding:16px 18px !important;
+            border:none !important;
+            white-space:nowrap;
+        }
+
+        /* BODY */
+
+        .table td{
+            padding:16px 18px !important;
+            background:white;
+            color:#111 !important;
+            border-top:1px solid #ececec !important;
+            vertical-align:middle;
+        }
+
+        /* HOVER */
+
+        .table tbody tr{
+            transition:0.25s;
+        }
+
+        .table tbody tr:hover{
+            background:#f9fafb;
+        }
+
+        /* =========================
+            BADGE
+        ========================= */
+
+        .badge-status{
+            padding:8px 14px;
+            border-radius:30px;
+            font-size:13px;
+            font-weight:600;
+        }
+
+        /* =========================
+            BUTTON
+        ========================= */
+
+        .btn{
+            border-radius:10px;
+            font-weight:600;
+        }
+
+        /* =========================
+            FORM
+        ========================= */
+
+        .form-control,
+        .form-select{
+            border-radius:12px;
+            padding:10px 14px;
+            border:1px solid #ddd;
+            box-shadow:none !important;
+        }
+
+        .form-control:focus,
+        .form-select:focus{
+            border-color:var(--main-red);
+        }
+
+        /* =========================
+            PAGINATION
+        ========================= */
+
+        .pagination .page-link{
+            border:none;
+            margin:0 4px;
+            border-radius:10px;
+            color:var(--main-red);
+            font-weight:600;
+        }
+
+        .pagination .active .page-link{
+            background:var(--main-red);
+            color:white;
+        }
+
+        /* =========================
+            SCROLLBAR
+        ========================= */
+
+        ::-webkit-scrollbar{
+            width:7px;
+        }
+
+        ::-webkit-scrollbar-thumb{
+            background:#ccc;
+            border-radius:20px;
         }
     </style>
 </head>
@@ -139,139 +361,327 @@
 
 <div id="wrapper">
 
-    <!-- SIDEBAR -->
+
+
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
     <div id="sidebar-wrapper">
+
         <div class="sidebar-heading">
-            <h5 class="fw-bold"><i class="fas fa-store text-success"></i> SPORT SHOP ADMIN</h5>
+            <h4>
+                <i class="fas fa-store text-warning"></i>
+                SPORT STORE ADMIN
+            </h4>
         </div>
-        <div class="list-group list-group-flush pt-3">
-            <a href="${root}/admin/dashboard"
-               class="list-group-item list-group-item-action"> <i class="fas fa-chart-line me-2"></i> Tổng quan </a>
-            <a href="${root}/admin/orders"
-               class="list-group-item list-group-item-action"> <i class="fas fa-shopping-cart me-2"></i> Quản lý đơn
-                hàng </a>
-            <a href="${root}/admin/products"
-               class="list-group-item list-group-item-action"> <i class="fas fa-box me-2"></i> Quản lý sản phẩm </a>
-            <a href="${root}/admin/categories"
-               class="list-group-item list-group-item-action"> <i class="fas fa-layer-group me-2"></i> Quản lý danh mục
-            </a>
-            <a href="${root}/admin/vouchers"
-               class="list-group-item list-group-item-action">
-                <i class="fas fa-ticket-alt me-2"></i> Quản lý voucher
+
+        <div class="list-group">
+
+            <a href="${root}/admin/dashboard" class="menu-item">
+                <i class="fas fa-chart-line"></i>
+                Tổng quan
             </a>
 
-            <a href="${root}/admin/customers"
-               class="list-group-item list-group-item-action">
-                <i class="fas fa-users me-2"></i> Quản lý khách hàng
-            </a>
-            <a href="${root}/admin/banners"
-               class="list-group-item list-group-item-action">
-               <i class="fas fa-image me-2"></i> Quản lý banner
+            <!-- ORDER MENU -->
+            <!-- ORDER MENU -->
+            <a class="menu-item d-flex justify-content-between align-items-center"
+               data-bs-toggle="collapse"
+               href="#orderMenu"
+               role="button">
+
+    <span>
+        <i class="fas fa-shopping-cart"></i>
+        Quản lý đơn hàng
+    </span>
+
+                <i class="fas fa-chevron-down small"></i>
             </a>
 
-            <div class="border-top my-3"></div>
+            <!-- SUB MENU -->
+            <div class="collapse" id="orderMenu">
+
+                <!-- CHỜ XÁC NHẬN -->
+                <a href="${root}/admin/orders?status=pending"
+                   class="sub-menu-item">
+                    <i class="fas fa-clock text-warning"></i>
+                    Chờ xác nhận
+                </a>
+
+                <!-- CHỜ LẤY HÀNG -->
+                <a href="${root}/admin/orders?status=pickup"
+                   class="sub-menu-item">
+                    <i class="fas fa-box text-info"></i>
+                    Chờ lấy hàng
+                </a>
+
+                <!-- ĐANG GIAO -->
+                <a href="${root}/admin/orders?status=shipping"
+                   class="sub-menu-item">
+                    <i class="fas fa-truck text-primary"></i>
+                    Đang giao
+                </a>
+
+                <!-- ĐÃ GIAO -->
+                <a href="${root}/admin/orders?status=completed"
+                   class="sub-menu-item">
+                    <i class="fas fa-check-circle text-success"></i>
+                    Đã giao
+                </a>
+
+                <!-- YÊU CẦU HOÀN TIỀN -->
+                <a href="${root}/admin/orders?status=refund_request"
+                   class="sub-menu-item">
+                    <i class="fas fa-money-bill-wave text-danger"></i>
+                    Yêu cầu hoàn tiền
+                </a>
+
+                <!-- ĐÃ HOÀN TIỀN -->
+                <a href="${root}/admin/orders?status=refunded"
+                   class="sub-menu-item">
+                    <i class="fas fa-undo text-secondary"></i>
+                    Đã hoàn tiền
+                </a>
+
+                <!-- ĐÃ HỦY -->
+                <a href="${root}/admin/orders?status=cancelled"
+                   class="sub-menu-item">
+                    <i class="fas fa-times-circle text-dark"></i>
+                    Đã hủy
+                </a>
+
+            </div>
+            <a href="${root}/admin/products" class="menu-item">
+                <i class="fas fa-box"></i>
+                Quản lý sản phẩm
+            </a>
+
+            <a href="${root}/admin/categories" class="menu-item">
+                <i class="fas fa-layer-group"></i>
+                Quản lý danh mục
+            </a>
+
+            <a href="${root}/admin/vouchers" class="menu-item">
+                <i class="fas fa-ticket-alt"></i>
+                Quản lý voucher
+            </a>
+
+            <a href="${root}/admin/customers" class="menu-item">
+                <i class="fas fa-users"></i>
+                Quản lý khách hàng
+            </a>
+
+            <a href="${root}/admin/banners" class="menu-item">
+                <i class="fas fa-image"></i>
+                Quản lý banner
+            </a>
+
+            <hr class="text-white">
 
             <a href="${root}/products"
-               class="list-group-item list-group-item-action text-info"> <i class="fas fa-external-link-alt me-2"></i>
-                Xem trang khách </a>
+               class="menu-item text-warning">
+                <i class="fas fa-external-link-alt"></i>
+                Xem trang khách
+            </a>
+
         </div>
+
     </div>
 
+    <!-- =========================
+         PAGE CONTENT
+    ========================== -->
 
     <div id="page-content-wrapper">
 
         <!-- NAVBAR -->
-        <nav class="navbar admin-navbar px-4 py-2 d-flex justify-content-between">
-            <button class="btn btn-outline-secondary btn-sm" id="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
 
-            <div class="ms-auto">
-                <span class="me-3">Xin chào <strong>${sessionScope.user.fullName}</strong></span>
-                <a href="${root}/logout" class="btn btn-sm btn-outline-danger">Đăng xuất</a>
+        <nav class="navbar admin-navbar">
+
+            <div>
+                <button class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
+
+            <div class="ms-auto d-flex align-items-center">
+
+                <span class="me-3">
+                    Xin chào
+                    <strong>${sessionScope.user.fullName}</strong>
+                </span>
+
+                <a href="${root}/logout"
+                   class="btn btn-outline-danger btn-sm">
+                    Đăng xuất
+                </a>
+
+            </div>
+
         </nav>
 
-        <!-- MAIN CONTENT -->
-        <div class="container-fluid p-4" id="mainContent">
+        <!-- CONTENT -->
+
+        <div id="mainContent">
 
             <c:choose>
+
                 <c:when test="${not empty contentPage}">
                     <jsp:include page="${contentPage}"/>
                 </c:when>
+
                 <c:otherwise>
-                    <h3 class="dashboard-title">Dashboard</h3>
+
+                    <h2 class="dashboard-title">
+                        Dashboard Admin
+                    </h2>
+
+                    <!-- STATISTIC -->
 
                     <div class="row g-4">
 
                         <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5>Tổng sản phẩm</h5>
-                                    <h2>${productCount}</h2>
-                                </div>
+                            <div class="dashboard-card">
+
+                                <h5>
+                                    <i class="fas fa-box text-danger"></i>
+                                    Tổng sản phẩm
+                                </h5>
+
+                                <h2>${productCount}</h2>
+
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5>Tổng đơn hàng</h5>
-                                    <h2>${orderCount}</h2>
-                                </div>
+                            <div class="dashboard-card">
+
+                                <h5>
+                                    <i class="fas fa-shopping-cart text-danger"></i>
+                                    Tổng đơn hàng
+                                </h5>
+
+                                <h2>${orderCount}</h2>
+
                             </div>
                         </div>
 
                         <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5>Doanh thu</h5>
-                                    <h2>${revenue}₫</h2>
-                                </div>
+                            <div class="dashboard-card">
+
+                                <h5>
+                                    <i class="fas fa-money-bill-wave text-danger"></i>
+                                    Doanh thu
+                                </h5>
+
+                                <h2>${revenue}₫</h2>
+
                             </div>
                         </div>
 
                     </div>
 
+                    <!-- TABLE + NOTIFICATION -->
+
                     <div class="row">
+
                         <div class="col-md-8">
+
                             <div class="dashboard-box">
-                                <h4 class="text-danger">🔥 Top sản phẩm bán chạy</h4>
-                                <table class="table mt-3">
+
+                                <h4 class="text-danger">
+                                    🔥 Top sản phẩm bán chạy
+                                </h4>
+
+                                <table class="table table-hover">
+
+                                    <thead>
                                     <tr>
                                         <th>Sản phẩm</th>
                                         <th>Đã bán</th>
+                                        <th>Trạng thái</th>
                                     </tr>
+                                    </thead>
+
+                                    <tbody>
+
                                     <tr>
                                         <td>Yonex Astrox 88D</td>
-                                        <td></td>
+                                        <td>120</td>
+                                        <td>
+                                            <span class="badge bg-success badge-status">
+                                                Best Seller
+                                            </span>
+                                        </td>
                                     </tr>
+
                                     <tr>
                                         <td>Adidas Predator Ball</td>
-                                        <td></td>
+                                        <td>98</td>
+                                        <td>
+                                            <span class="badge bg-primary badge-status">
+                                                Hot
+                                            </span>
+                                        </td>
                                     </tr>
+
                                     <tr>
                                         <td>Nike Air Zoom</td>
-                                        <td></td>
+                                        <td>85</td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark badge-status">
+                                                Trending
+                                            </span>
+                                        </td>
                                     </tr>
+
+                                    </tbody>
+
                                 </table>
+
                             </div>
+
                         </div>
 
                         <div class="col-md-4">
+
                             <div class="dashboard-box">
-                                <h4 class="text-success">🔔 Thông báo</h4>
-                                <p>🟡 Có đơn mới</p>
-                                <p>📦 Sản phẩm đang hoạt động</p>
+
+                                <h4 class="text-success">
+                                    🔔 Thông báo
+                                </h4>
+
+                                <p>🟡 Có đơn hàng mới cần xác nhận</p>
+                                <p>📦 12 sản phẩm đang hoạt động</p>
+                                <p>💰 Doanh thu hôm nay tăng 15%</p>
+                                <p>🚚 5 đơn đang giao hàng</p>
+
                             </div>
+
                         </div>
+
                     </div>
 
+                    <!-- REVENUE -->
+
                     <div class="dashboard-box">
-                        <h4 class="text-success">📈 Doanh thu theo tháng</h4>
-                        <div style="height:200px;"></div>
+
+                        <h4 class="text-success">
+                            📈 Doanh thu theo tháng
+                        </h4>
+
+                        <div class="d-flex justify-content-center align-items-center"
+                             style="height:220px; color:#999;">
+
+                            Biểu đồ doanh thu sẽ hiển thị tại đây
+
+                        </div>
+
                     </div>
+
                 </c:otherwise>
+
             </c:choose>
 
         </div>
@@ -280,15 +690,9 @@
 
 </div>
 
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Toggle Sidebar -->
-<script>
-    document.getElementById("menu-toggle").addEventListener("click", function () {
-        document.getElementById("wrapper").classList.toggle("toggled");
-    });
-</script>
 
 </body>
 </html>
