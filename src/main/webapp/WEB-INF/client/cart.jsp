@@ -489,9 +489,10 @@
             body: "action=update&productId=" + productId + "&quantity=" + quantity
         })
             .then(res => res.text())
-            .then(() => {
-                updateCartCount();
-            });
+                .then(() => {
+                    updateCartCount();
+                    updateTotal();
+                });
     }
 
     document.querySelectorAll('.cart-item').forEach(item => {
