@@ -232,313 +232,372 @@
 <!-- STYLE -->
 <style>
 
-    body {
-        background: #f5f7fb;
+    body{
+        background:#f4f6f9;
     }
 
-    .voucher-wrapper {
-        background: white;
-        border-radius: 18px;
-        padding: 24px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border: 1px solid #dee2e6;
+    /* =========================
+        WRAPPER
+    ========================= */
+
+    .voucher-wrapper{
+        background:#fff;
+        border-radius:18px;
+        padding:22px;
+        border:1px solid #e5e7eb;
+        box-shadow:0 3px 15px rgba(0,0,0,0.05);
     }
 
-    /* HEADER */
+    /* =========================
+        HEADER
+    ========================= */
 
-    .voucher-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
+    .voucher-header{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
     }
 
-    .title {
-        font-weight: 700;
-        color: #dc3545;
-        margin-bottom: 4px;
+    .title{
+        font-size:28px;
+        font-weight:800;
+        color:#dc3545;
+        margin:0;
     }
 
-    .subtitle {
-        color: #777;
-        margin: 0;
-        font-size: 14px;
+    .subtitle{
+        margin-top:4px;
+        font-size:14px;
+        color:#6b7280;
     }
 
-    .btn-add {
-        background: #dc3545;
-        color: white;
-        padding: 10px 18px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: 0.2s;
-        border: 1px solid #dc3545;
+    /* =========================
+        BUTTON
+    ========================= */
+
+    .btn-add{
+        background:#dc3545;
+        color:white;
+        text-decoration:none;
+        padding:10px 18px;
+        border-radius:12px;
+        font-weight:600;
+        transition:0.25s;
+        white-space:nowrap;
     }
 
-    .btn-add:hover {
-        background: #bb2d3b;
-        color: white;
+    .btn-add:hover{
+        background:#bb2d3b;
+        color:white;
+        transform:translateY(-2px);
     }
 
-    /* SEARCH */
+    /* =========================
+        SEARCH
+    ========================= */
 
-    .search-box {
-        margin-bottom: 20px;
+    .search-box{
+        margin-bottom:18px;
     }
 
-    .search-input {
-        border-radius: 10px;
-        padding: 12px;
-        border: 1px solid #ced4da;
+    .search-input{
+        height:45px;
+        border-radius:12px;
+        border:1px solid #d1d5db;
+        padding:0 16px;
+        font-size:14px;
+        box-shadow:none !important;
     }
 
-    /* TABLE */
-
-    .voucher-table {
-        width: 100%;
-        border-collapse: collapse;
-        overflow: hidden;
-        border-radius: 14px;
-        border: 2px solid #dee2e6;
-        background: white;
+    .search-input:focus{
+        border-color:#dc3545;
     }
 
-    /* HEADER TABLE */
+    /* =========================
+        TABLE RESPONSIVE
+    ========================= */
 
-    .voucher-table thead th {
-        background: #212529;
-        color: white;
-        padding: 14px 12px;
-        font-size: 14px;
-        text-align: center;
-        border: 1px solid #495057;
-        white-space: nowrap;
+    .table-responsive{
+        width:100%;
+        overflow-x:auto;
+        border-radius:16px;
     }
 
-    /* BODY */
+    /* =========================
+        TABLE
+    ========================= */
 
-    .voucher-table tbody td {
-        padding: 16px 12px;
-        border: 1px solid #dee2e6;
-        vertical-align: middle;
-        background: white;
+    .voucher-table{
+        width:100%;
+        min-width:1000px;
+        border-collapse:separate;
+        border-spacing:0;
+        overflow:hidden;
+        border-radius:16px;
+        margin-bottom:0;
+        border:1px solid #e5e7eb;
+        background:white;
     }
 
-    .voucher-table tbody tr {
-        transition: 0.2s;
+    /* =========================
+        HEADER
+    ========================= */
+
+    .voucher-table thead th{
+        background:#111827;
+        color:white;
+        padding:14px 10px;
+        font-size:13px;
+        font-weight:700;
+        text-align:center;
+        white-space:nowrap;
+        border:none;
     }
 
-    .voucher-table tbody tr:hover td {
-        background: #f8f9fa;
+    /* =========================
+        BODY
+    ========================= */
+
+    .voucher-table tbody td{
+        padding:14px 10px;
+        border-top:1px solid #ececec;
+        vertical-align:middle;
+        font-size:13px;
+        color:#111827;
+        background:white;
     }
-    /* MÃ */
+
+    .voucher-table tbody tr:hover td{
+        background:#f9fafb;
+    }
+
+    /* =========================
+        COLUMN WIDTH
+    ========================= */
+
     .voucher-table th:nth-child(1),
-    .voucher-table td:nth-child(1) {
-        width: 10%;
-        min-width: 120px;
-        text-align: center;
+    .voucher-table td:nth-child(1){
+        width:12%;
+        text-align:center;
     }
 
-    /* GIẢM GIÁ */
     .voucher-table th:nth-child(2),
-    .voucher-table td:nth-child(2) {
-        width: 13%;
-        min-width: 150px;
-        text-align: center;
+    .voucher-table td:nth-child(2){
+        width:14%;
+        text-align:center;
     }
 
-    /* ĐIỀU KIỆN  */
     .voucher-table th:nth-child(3),
-    .voucher-table td:nth-child(3) {
-        width: 30%;
-        min-width: 320px;
+    .voucher-table td:nth-child(3){
+        width:28%;
     }
 
-    /* SỬ DỤNG */
     .voucher-table th:nth-child(4),
-    .voucher-table td:nth-child(4) {
-        width: 10%;
-        min-width: 120px;
-        text-align: center;
+    .voucher-table td:nth-child(4){
+        width:10%;
+        text-align:center;
     }
 
-    /* THỜI GIAN */
     .voucher-table th:nth-child(5),
-    .voucher-table td:nth-child(5) {
-        width: 18%;
-        min-width: 220px;
+    .voucher-table td:nth-child(5){
+        width:20%;
     }
 
-    /* STATUS */
     .voucher-table th:nth-child(6),
-    .voucher-table td:nth-child(6) {
-        width: 9%;
-        min-width: 120px;
-        text-align: center;
+    .voucher-table td:nth-child(6){
+        width:8%;
+        text-align:center;
     }
 
-    /* ACTION */
     .voucher-table th:nth-child(7),
-    .voucher-table td:nth-child(7) {
-        width: 10%;
-        min-width: 120px;
-        text-align: center;
+    .voucher-table td:nth-child(7){
+        width:8%;
+        text-align:center;
     }
 
-    /* CODE */
+    /* =========================
+        CODE
+    ========================= */
 
-    .voucher-code {
-        font-weight: 700;
-        color: #0d6efd;
-        font-size: 15px;
-        word-break: break-word;
+    .voucher-code{
+        font-size:14px;
+        font-weight:700;
+        color:#0d6efd;
+        word-break:break-word;
     }
 
-    /* BADGE */
+    /* =========================
+        BADGE
+    ========================= */
 
-    .badge-custom {
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 13px;
+    .badge-custom{
+        padding:6px 10px;
+        border-radius:8px;
+        font-size:12px;
+        font-weight:600;
     }
 
-    /* CONDITION */
+    /* =========================
+        CONDITION
+    ========================= */
 
-    .condition-cell {
-        line-height: 1.8;
-        font-size: 14px;
+    .condition-cell{
+        line-height:1.6;
+        font-size:13px;
     }
 
-    .condition-cell div {
-        margin-bottom: 4px;
+    .condition-cell div{
+        margin-bottom:4px;
     }
 
-    /* USAGE */
+    /* =========================
+        USAGE
+    ========================= */
 
-    .usage-box {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        font-weight: 700;
+    .usage-box{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:6px;
+        font-weight:700;
     }
 
-    .used {
-        background: #ffc107;
-        padding: 6px 10px;
-        border-radius: 8px;
-        border: 1px solid #e0a800;
+    .used{
+        background:#fff3cd;
+        border:1px solid #ffe69c;
+        padding:5px 8px;
+        border-radius:8px;
     }
 
-    .quantity {
-        background: #0d6efd;
-        color: white;
-        padding: 6px 10px;
-        border-radius: 8px;
-        border: 1px solid #0a58ca;
+    .quantity{
+        background:#0d6efd;
+        color:white;
+        padding:5px 8px;
+        border-radius:8px;
     }
 
-    /* DATE */
+    /* =========================
+        DATE
+    ========================= */
 
-    .date-box {
-        min-width: 180px;
+    .date-box{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
     }
 
-    .date-item span {
-        display: block;
-        font-size: 13px;
-        margin-bottom: 5px;
-        font-weight: 600;
+    .date-item span{
+        display:block;
+        margin-bottom:4px;
+        font-size:12px;
+        font-weight:600;
     }
 
-    .date-item input {
-        width: 100%;
-        border: 1px solid #ced4da;
-        border-radius: 8px;
-        padding: 6px 8px;
-        background: #f8f9fa;
-        font-size: 13px;
+    .date-item input{
+        width:100%;
+        height:34px;
+        border-radius:8px;
+        border:1px solid #d1d5db;
+        background:#f9fafb;
+        padding:0 10px;
+        font-size:12px;
     }
 
-    /* STATUS */
+    /* =========================
+        STATUS
+    ========================= */
 
-    .status {
-        padding: 7px 14px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-        display: inline-block;
-        border: 1px solid transparent;
+    .status{
+        display:inline-block;
+        padding:6px 12px;
+        border-radius:20px;
+        font-size:12px;
+        font-weight:700;
     }
 
-    .status.active {
-        background: #d1e7dd;
-        color: #0f5132;
-        border-color: #badbcc;
+    .status.active{
+        background:#d1e7dd;
+        color:#0f5132;
     }
 
-    .status.inactive {
-        background: #e2e3e5;
-        color: #41464b;
-        border-color: #c6c7c8;
+    .status.inactive{
+        background:#e5e7eb;
+        color:#374151;
     }
 
-    /* ACTION */
+    /* =========================
+        ACTION
+    ========================= */
 
-    .action-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
+    .action-buttons{
+        display:flex;
+        justify-content:center;
+        gap:6px;
     }
 
-    .btn-action {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        transition: 0.2s;
-        font-size: 16px;
-        border: 1px solid transparent;
+    .btn-action{
+        width:34px;
+        height:34px;
+        border-radius:10px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        text-decoration:none;
+        color:white;
+        font-size:14px;
+        transition:0.2s;
     }
 
-    .btn-edit {
-        background: #0d6efd;
-        color: white;
-        border-color: #0a58ca;
+    .btn-edit{
+        background:#0d6efd;
     }
 
-    .btn-delete {
-        background: #dc3545;
-        color: white;
-        border-color: #b02a37;
+    .btn-delete{
+        background:#dc3545;
     }
 
-    .btn-action:hover {
-        transform: scale(1.05);
-        color: white;
+    .btn-action:hover{
+        transform:scale(1.08);
+        color:white;
     }
 
-    /* ROW STATE */
+    /* =========================
+        ROW STATE
+    ========================= */
 
-    .voucher-full td {
-        border-left: 4px solid #dc3545 !important;
+    .voucher-full td{
+        border-left:3px solid #dc3545 !important;
     }
 
-    .voucher-disabled td {
-        background: #f1f3f5;
-        opacity: 0.85;
+    .voucher-disabled td{
+        background:#f3f4f6 !important;
+        opacity:0.85;
     }
 
-    /* EMPTY */
+    /* =========================
+        EMPTY
+    ========================= */
 
-    .empty-box {
-        text-align: center;
-        padding: 40px;
-        color: #777;
+    .empty-box{
+        text-align:center;
+        padding:40px;
+        color:#6b7280;
+    }
+
+    /* =========================
+        SCROLLBAR
+    ========================= */
+
+    .table-responsive::-webkit-scrollbar{
+        height:8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb{
+        background:#c7c7c7;
+        border-radius:20px;
     }
 
 </style>
