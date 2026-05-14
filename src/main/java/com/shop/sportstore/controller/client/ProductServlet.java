@@ -60,7 +60,31 @@ public class ProductServlet extends HttpServlet {
 
             int offset = (page - 1) * LIMIT;
 
-            List<Product> productList = productDAO.searchProducts(keyword, categoryId, offset, LIMIT);
+            // BEST SELLER
+            List<Product> bestSellerProducts =
+                    productDAO.getBestSellerProducts(4);
+
+            // BÓNG ĐÁ
+            List<Product> footballProducts =
+                    productDAO.getProductsByCategory(4, 4);
+
+            // BÓNG RỔ
+            List<Product> basketballProducts =
+                    productDAO.getProductsByCategory(5, 4);
+
+            // CẦU LÔNG
+            List<Product> badmintonProducts =
+                    productDAO.getProductsByCategory(14, 4);
+
+            List<Product> productList =
+                    productDAO.searchProducts(
+                            keyword,
+                            categoryId,
+                            offset,
+                            LIMIT
+                    );
+
+//            List<Product> productList = productDAO.searchProducts(keyword, categoryId, offset, LIMIT);
             int totalProduct = productDAO.countProducts(keyword, categoryId);
             int totalPage = (int) Math.ceil((double) totalProduct / LIMIT);
 
@@ -73,6 +97,31 @@ public class ProductServlet extends HttpServlet {
             if (categoryList == null) categoryList = List.of();
 
             request.setAttribute("products", productList);
+
+            request.setAttribute(
+                    "bestSellerProducts",
+                    bestSellerProducts
+            );
+
+            request.setAttribute(
+                    "footballProducts",
+                    footballProducts
+            );
+
+            request.setAttribute(
+                    "basketballProducts",
+                    basketballProducts
+            );
+
+            request.setAttribute(
+                    "badmintonProducts",
+                    badmintonProducts
+            );
+
+            request.setAttribute(
+                    "totalPage",
+                    totalPage
+            );
 
             request.getRequestDispatcher("/products.jsp")
                     .forward(request, response);
