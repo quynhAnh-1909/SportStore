@@ -98,6 +98,8 @@
         a.product-link:hover {
             color: #198754;
         }
+
+
     </style>
 
 </head>
@@ -280,57 +282,7 @@
             });
     }
 
-    function loadCartDropdown() {
 
-        fetch("${root}/cart?action=get")
-            .then(res => res.json())
-            .then(data => {
-
-                const container = document.getElementById("cart-items");
-
-                if (!container) return;
-
-                if (data.length === 0) {
-                    container.innerHTML = "<div>Giỏ hàng trống</div>";
-                    return;
-                }
-
-                let html = "";
-
-                data.forEach(item => {
-
-                    html += `
-                    <div class="cart-item d-flex align-items-center gap-2 mb-2">
-
-                        <img src="/resources/${item.image}"
-                             width="50"
-                             height="50"
-                             style="object-fit:cover">
-
-                        <div>
-                            <div class="cart-item-name">
-                                ${item.name}
-                            </div>
-
-                            <div class="cart-item-price">
-                                ${item.price} x ${item.quantity}
-                            </div>
-                        </div>
-
-                    </div>
-                `;
-                });
-                container.innerHTML = html;
-                console.log(data);
-            });
-
-    }
-
-    const cartWrapper = document.querySelector(".cart-wrapper");
-
-    if (cartWrapper) {
-        cartWrapper.addEventListener("mouseenter", loadCartDropdown);
-    }
 </script>
 </body>
 </html>

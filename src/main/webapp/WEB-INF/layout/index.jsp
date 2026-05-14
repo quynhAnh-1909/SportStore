@@ -392,6 +392,13 @@
         height: 55px !important;
         object-fit: contain !important;
     }
+
+    .cart-item-image{
+        width:50px;
+        height:50px;
+        object-fit:cover;
+        border-radius:8px;
+    }
 </style>
 
 <!-- AUTH -->
@@ -513,48 +520,64 @@
 
     function loadCartDropdown() {
 
-        fetch("${root}/cart?action=get")
-            .then(res => res.json())
-            .then(data => {
+        fetch(ROOT + "/cart?action=get")
+                .then(res => res.json())
+                .then(data => {
 
-                const container = document.getElementById("cart-items");
+                    const container =
+                            document.getElementById("cart-items");
 
-                if (!container) return;
+                    if (!container) return;
 
-                if (data.length === 0) {
-                    container.innerHTML = "<div>Giỏ hàng trống</div>";
-                    return;
-                }
+                    if (data.length === 0) {
 
-                let html = "";
+                        container.innerHTML =
+                                "<div>Giỏ hàng trống</div>";
 
-                data.forEach(item => {
-                    html += `
-                    <div class="cart-item">
-                        <img src="${root}/resources/${item.image}">
-                        <div>
-                            <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">
-                                ${item.price} x ${item.quantity}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                        return;
+                    }
+
+                    let html = "";
+
+                    data.forEach(item => {
+
+                        html +=
+                                '<div class="cart-item">' +
+
+                                '<img src="/resources/' + item.image + '" ' +
+                                'class="cart-item-image">' +
+
+                                '<div>' +
+
+                                '<div class="cart-item-name">' +
+                                item.name +
+                                '</div>' +
+
+                                '<div class="cart-item-price">' +
+                                item.price + ' x ' + item.quantity +
+                                '</div>' +
+
+                                '</div>' +
+
+                                '</div>';
+                    });
+
+                    container.innerHTML = html;
                 });
-
-                container.innerHTML = html;
-            });
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        const cart = document.querySelector(".cart-wrapper");
+
+        const cart =
+                document.querySelector(".cart-wrapper");
 
         if (cart) {
-            cart.addEventListener("mouseenter", loadCartDropdown);
+            cart.addEventListener(
+                    "mouseenter",
+                    loadCartDropdown
+            );
         }
     });
-
-    const root = "${pageContext.request.contextPath}";
 
     const input =
             document.getElementById("searchInput");
@@ -574,7 +597,7 @@
         }
 
         fetch(
-                root + "/searchSuggestion?keyword=" + keyword
+                ROOT + "/searchSuggestion?keyword=" + keyword
         )
                 .then(res => res.text())
                 .then(data => {
@@ -592,7 +615,7 @@
     function goToProduct(id) {
 
         window.location.href =
-                root + "/productDetail?id=" + id;
+                ROOT + "/productDetail?id=" + id;
     }
 
     document.addEventListener("click", function (e) {
@@ -603,5 +626,6 @@
             suggestions.style.display = "none";
         }
     });
+
 
 </script>
