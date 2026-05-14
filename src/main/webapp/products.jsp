@@ -99,7 +99,6 @@
             color: #198754;
         }
 
-
     </style>
 
 </head>
@@ -111,75 +110,367 @@
 
 <div class="container mt-4">
 
-    <!-- TITLE -->
-    <h2 class="text-center text-success fw-bold mb-4">
-        SẢN PHẨM BÁN CHẠY
-    </h2>
+    <c:if test="${empty param.categoryId}">
 
-    <!-- LIST -->
-    <c:choose>
+        <!-- BEST SELLER -->
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
 
-        <c:when test="${empty products}">
-            <div class="alert alert-warning text-center">
-                Không có sản phẩm
-            </div>
-        </c:when>
+            <h3 class="fw-bold text-success m-0">
+                SẢN PHẨM BÁN CHẠY
+            </h3>
 
-        <c:otherwise>
-            <div class="row g-4">
+            <a href="${root}/products"
+               class="btn btn-outline-success btn-sm">
+                Xem thêm
+            </a>
 
-                <c:forEach var="p" items="${products}">
-                    <div class="col-md-3">
+        </div>
 
-                        <div class="card product-card h-100">
+        <div class="row g-4">
 
-                            <!-- CLICK IMAGE -->
-                            <a href="${root}/productDetail?id=${p.id}">
-                                <div class="product-img-area">
-                                    <img src="${root}/resources/${p.imageUrl}"
-                                         class="product-img">
-                                </div>
+            <c:forEach items="${bestSellerProducts}" var="p">
+
+                <div class="col-md-3">
+
+                    <div class="card product-card h-100">
+
+                        <a href="${root}/productDetail?id=${p.id}">
+                            <div class="product-img-area">
+                                <img src="${root}/resources/${p.imageUrl}"
+                                     class="product-img">
+                            </div>
+                        </a>
+
+                        <div class="card-body text-center">
+
+                            <a href="${root}/productDetail?id=${p.id}"
+                               class="product-link">
+
+                                <div>${p.name}</div>
+
                             </a>
 
-                            <div class="card-body text-center">
+                            <div class="price">
 
-                                <!-- CLICK NAME -->
-                                <a href="${root}/productDetail?id=${p.id}"
-                                   class="product-link">
-                                    <div>${p.name}</div>
+                                <fmt:formatNumber
+                                        value="${p.price}"
+                                        type="number"
+                                        groupingUsed="true"/>
+
+                                VNĐ
+
+                            </div>
+
+                            <button type="button"
+                                    onclick="addToCart(this, ${p.id})"
+                                    class="btn btn-success btn-sm mt-2 w-100">
+
+                                🛒 Thêm vào giỏ hàng
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </c:forEach>
+
+        </div>
+
+
+        <!-- FOOTBALL -->
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+
+            <h3 class="fw-bold text-success m-0">
+                SẢN PHẨM BÓNG ĐÁ
+            </h3>
+
+            <a href="${root}/products?categoryId=4"
+               class="btn btn-outline-success btn-sm">
+
+                Xem thêm
+
+            </a>
+
+        </div>
+
+        <div class="row g-4">
+
+            <c:forEach items="${footballProducts}" var="p">
+
+                <div class="col-md-3">
+
+                    <div class="card product-card h-100">
+
+                        <a href="${root}/productDetail?id=${p.id}">
+                            <div class="product-img-area">
+                                <img src="${root}/resources/${p.imageUrl}"
+                                     class="product-img">
+                            </div>
+                        </a>
+
+                        <div class="card-body text-center">
+
+                            <a href="${root}/productDetail?id=${p.id}"
+                               class="product-link">
+
+                                <div>${p.name}</div>
+
+                            </a>
+
+                            <div class="price">
+
+                                <fmt:formatNumber
+                                        value="${p.price}"
+                                        type="number"
+                                        groupingUsed="true"/>
+
+                                VNĐ
+
+                            </div>
+
+                            <button type="button"
+                                    onclick="addToCart(this, ${p.id})"
+                                    class="btn btn-success btn-sm mt-2 w-100">
+
+                                🛒 Thêm vào giỏ hàng
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </c:forEach>
+
+        </div>
+
+
+        <!-- BADMINTON -->
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+
+            <h3 class="fw-bold text-success m-0">
+                SẢN PHẨM CẦU LÔNG
+            </h3>
+
+            <a href="${root}/products?categoryId=14"
+               class="btn btn-outline-success btn-sm">
+
+                Xem thêm
+
+            </a>
+
+        </div>
+
+        <div class="row g-4">
+
+            <c:forEach items="${badmintonProducts}" var="p">
+
+                <div class="col-md-3">
+
+                    <div class="card product-card h-100">
+
+                        <a href="${root}/productDetail?id=${p.id}">
+                            <div class="product-img-area">
+                                <img src="${root}/resources/${p.imageUrl}"
+                                     class="product-img">
+                            </div>
+                        </a>
+
+                        <div class="card-body text-center">
+
+                            <a href="${root}/productDetail?id=${p.id}"
+                               class="product-link">
+
+                                <div>${p.name}</div>
+
+                            </a>
+
+                            <div class="price">
+
+                                <fmt:formatNumber
+                                        value="${p.price}"
+                                        type="number"
+                                        groupingUsed="true"/>
+
+                                VNĐ
+
+                            </div>
+
+                            <button type="button"
+                                    onclick="addToCart(this, ${p.id})"
+                                    class="btn btn-success btn-sm mt-2 w-100">
+
+                                🛒 Thêm vào giỏ hàng
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </c:forEach>
+
+        </div>
+
+    </c:if>
+
+    <c:if test="${not empty param.categoryId}">
+
+        <h2 class="text-center text-success fw-bold mb-4 mt-5">
+            DANH SÁCH SẢN PHẨM
+        </h2>
+
+        <c:choose>
+
+            <c:when test="${empty products}">
+
+                <div class="alert alert-warning text-center">
+                    Không có sản phẩm
+                </div>
+
+            </c:when>
+
+            <c:otherwise>
+
+                <div class="row g-4">
+
+                    <c:forEach var="p" items="${products}">
+
+                        <div class="col-md-3">
+
+                            <div class="card product-card h-100">
+
+                                <a href="${root}/productDetail?id=${p.id}">
+
+                                    <div class="product-img-area">
+
+                                        <img src="${root}/resources/${p.imageUrl}"
+                                             class="product-img">
+
+                                    </div>
+
                                 </a>
 
+                                <div class="card-body text-center">
 
-                                <div class="price">
-                                    <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> VNĐ
-                                </div>                                <!-- ADD TO CART -->
-                                <button type="button"
-                                        onclick="addToCart(this, ${p.id})"
-                                        class="btn btn-success btn-sm mt-2 w-100">
-                                    🛒 Thêm vào giỏ hàng
-                                </button>
+                                    <a href="${root}/productDetail?id=${p.id}"
+                                       class="product-link">
+
+                                        <div>${p.name}</div>
+
+                                    </a>
+
+                                    <div class="price">
+
+                                        <fmt:formatNumber
+                                                value="${p.price}"
+                                                type="number"
+                                                groupingUsed="true"/>
+
+                                        VNĐ
+
+                                    </div>
+
+                                    <button type="button"
+                                            onclick="addToCart(this, ${p.id})"
+                                            class="btn btn-success btn-sm mt-2 w-100">
+
+                                        🛒 Thêm vào giỏ hàng
+
+                                    </button>
+
+                                </div>
 
                             </div>
 
                         </div>
 
-                    </div>
-                </c:forEach>
+                    </c:forEach>
 
-            </div>
-        </c:otherwise>
+                </div>
 
-    </c:choose>
+            </c:otherwise>
 
-    <!-- PAGINATION -->
-    <div class="text-center mt-4">
-        <c:forEach begin="1" end="${totalPage}" var="i">
-            <a class="btn btn-sm ${i==pageIndex?'btn-success':'btn-outline-success'}"
-               href="${root}/products?page=${i}&keyword=${param.keyword}&categoryId=${param.categoryId}">
-                    ${i}
-            </a>
-        </c:forEach>
-    </div>
+        </c:choose>
+
+    </c:if>
+
+<%--    <!-- TITLE -->--%>
+<%--    <h2 class="text-center text-success fw-bold mb-4">--%>
+<%--        SẢN PHẨM BÁN CHẠY--%>
+<%--    </h2>--%>
+
+<%--    <!-- LIST -->--%>
+<%--    <c:choose>--%>
+
+<%--        <c:when test="${empty products}">--%>
+<%--            <div class="alert alert-warning text-center">--%>
+<%--                Không có sản phẩm--%>
+<%--            </div>--%>
+<%--        </c:when>--%>
+
+<%--        <c:otherwise>--%>
+<%--            <div class="row g-4">--%>
+
+<%--                <c:forEach var="p" items="${products}">--%>
+<%--                    <div class="col-md-3">--%>
+
+<%--                        <div class="card product-card h-100">--%>
+
+<%--                            <!-- CLICK IMAGE -->--%>
+<%--                            <a href="${root}/productDetail?id=${p.id}">--%>
+<%--                                <div class="product-img-area">--%>
+<%--                                    <img src="${root}/resources/${p.imageUrl}"--%>
+<%--                                         class="product-img">--%>
+<%--                                </div>--%>
+<%--                            </a>--%>
+
+<%--                            <div class="card-body text-center">--%>
+
+<%--                                <!-- CLICK NAME -->--%>
+<%--                                <a href="${root}/productDetail?id=${p.id}"--%>
+<%--                                   class="product-link">--%>
+<%--                                    <div>${p.name}</div>--%>
+<%--                                </a>--%>
+
+
+<%--                                <div class="price">--%>
+<%--                                    <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> VNĐ--%>
+<%--                                </div>                                <!-- ADD TO CART -->--%>
+<%--                                <button type="button"--%>
+<%--                                        onclick="addToCart(this, ${p.id})"--%>
+<%--                                        class="btn btn-success btn-sm mt-2 w-100">--%>
+<%--                                    🛒 Thêm vào giỏ hàng--%>
+<%--                                </button>--%>
+
+<%--                            </div>--%>
+
+<%--                        </div>--%>
+
+<%--                    </div>--%>
+<%--                </c:forEach>--%>
+
+<%--            </div>--%>
+<%--        </c:otherwise>--%>
+
+<%--    </c:choose>--%>
+
+<%--    <!-- PAGINATION -->--%>
+<%--    <div class="text-center mt-4">--%>
+<%--        <c:forEach begin="1" end="${totalPage}" var="i">--%>
+<%--            <a class="btn btn-sm ${i==pageIndex?'btn-success':'btn-outline-success'}"--%>
+<%--               href="${root}/products?page=${i}&keyword=${param.keyword}&categoryId=${param.categoryId}">--%>
+<%--                    ${i}--%>
+<%--            </a>--%>
+<%--        </c:forEach>--%>
+<%--    </div>--%>
 
 </div>
 
