@@ -292,6 +292,106 @@
         display: block;
     }
 
+    .search-bar {
+        position: relative;
+    }
+
+    .search-suggestions {
+        position: absolute;
+        top: 110%;
+        left: 0;
+        width: 100%;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        display: none;
+        z-index: 9999;
+        overflow: hidden;
+    }
+
+    .suggestion-item {
+        padding: 12px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        color: black;
+    }
+
+    .suggestion-item:hover {
+        background: #f5f5f5;
+    }
+
+    .search-suggestions {
+        position: absolute;
+        top: 110%;
+        left: 0;
+        width: 100%;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        z-index: 9999;
+        display: none;
+        overflow: hidden;
+    }
+
+    .suggestion-item {
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+
+        padding: 12px;
+
+        cursor: pointer;
+
+        border-bottom: 1px solid #eee;
+
+        transition: 0.2s;
+
+        overflow: hidden;
+    }
+
+    .suggestion-item:hover {
+        background: #f5f5f5;
+    }
+
+    .suggestion-img {
+        width: 55px !important;
+        height: 55px !important;
+
+        min-width: 55px;
+        min-height: 55px;
+
+        object-fit: contain !important;
+
+        border-radius: 8px;
+
+        background: #fafafa;
+
+        display: block;
+
+        flex-shrink: 0;
+    }
+
+    .suggestion-info {
+        flex: 1;
+    }
+
+    .suggestion-name {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .suggestion-price {
+        color: #d81f19;
+        font-weight: bold;
+        margin-top: 4px;
+        font-size: 13px;
+    }
+    .search-suggestions img {
+        width: 55px !important;
+        height: 55px !important;
+        object-fit: contain !important;
+    }
 </style>
 
 <!-- AUTH -->
@@ -311,8 +411,23 @@
         </div>
 
         <!--SEARCH  -->
-        <form class="search-bar" action="${root}/products" method="get">
-            <input type="text" name="keyword" placeholder=" Tìm kiếm sản phẩm..." />
+        <form class="search-bar"
+              action="${root}/products"
+              method="get">
+
+            <input
+                    type="text"
+                    id="searchInput"
+                    name="keyword"
+                    placeholder="Tìm kiếm sản phẩm..."
+                    autocomplete="off"
+            >
+
+            <button type="submit">🔍</button>
+
+            <div id="searchSuggestions"
+                 class="search-suggestions"></div>
+
         </form>
 
         <div class="nav-links">
@@ -436,6 +551,56 @@
 
         if (cart) {
             cart.addEventListener("mouseenter", loadCartDropdown);
+        }
+    });
+
+    const root = "${pageContext.request.contextPath}";
+
+    const input =
+            document.getElementById("searchInput");
+
+    const suggestions =
+            document.getElementById("searchSuggestions");
+
+    input.addEventListener("keyup", function () {
+
+        const keyword = this.value.trim();
+
+        if (keyword.length === 0) {
+
+            suggestions.style.display = "none";
+
+            return;
+        }
+
+        fetch(
+                root + "/searchSuggestion?keyword=" + keyword
+        )
+                .then(res => res.text())
+                .then(data => {
+
+                    suggestions.innerHTML = data;
+
+                    if (data.trim() !== "") {
+                        suggestions.style.display = "block";
+                    } else {
+                        suggestions.style.display = "none";
+                    }
+                });
+    });
+
+    function goToProduct(id) {
+
+        window.location.href =
+                root + "/productDetail?id=" + id;
+    }
+
+    document.addEventListener("click", function (e) {
+
+        if (!document.querySelector(".search-bar")
+                .contains(e.target)) {
+
+            suggestions.style.display = "none";
         }
     });
 
