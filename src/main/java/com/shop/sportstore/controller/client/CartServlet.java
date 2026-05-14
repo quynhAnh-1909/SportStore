@@ -48,7 +48,9 @@ public class CartServlet extends HttpServlet {
                 json.append("{")
                         .append("\"id\":").append(item.getProduct().getId()).append(",")
                         .append("\"name\":\"").append(item.getProduct().getName()).append("\",")
-                        .append("\"image\":\"").append(context + "/" + item.getProduct().getImageUrl()).append("\",")
+                        .append("\"image\":\"")
+                        .append(item.getProduct().getImageUrl())
+                        .append("\",")
                         .append("\"price\":").append(item.getProduct().getPrice()).append(",")
                         .append("\"quantity\":").append(item.getQuantity())
                         .append("}");
@@ -109,8 +111,7 @@ public class CartServlet extends HttpServlet {
 
             for (CartItem item : cart) {
                 if (item.getProduct().getId() == productId) {
-                    int quantity = Integer.parseInt(request.getParameter("quantity"));
-                    item.setQuantity(item.getQuantity() + quantity);
+                    item.setQuantity(item.getQuantity() + 1);
                     found = true;
                     break;
                 }

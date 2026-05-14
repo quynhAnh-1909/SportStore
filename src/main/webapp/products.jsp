@@ -186,6 +186,8 @@
 <jsp:include page="footer.jsp"/>
 <script>
 
+    const ROOT = "${pageContext.request.contextPath}";
+
     const urlParams = new URLSearchParams(window.location.search);
 
     if (urlParams.get("showLogin") === "true") {
@@ -296,25 +298,39 @@
                 let html = "";
 
                 data.forEach(item => {
+
                     html += `
-                    <div class="cart-item">
-                        <img src="${root}/resources/${item.image}">
+                    <div class="cart-item d-flex align-items-center gap-2 mb-2">
+
+                        <img src="/resources/${item.image}"
+                             width="50"
+                             height="50"
+                             style="object-fit:cover">
+
                         <div>
-                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-name">
+                                ${item.name}
+                            </div>
+
                             <div class="cart-item-price">
                                 ${item.price} x ${item.quantity}
                             </div>
                         </div>
+
                     </div>
                 `;
                 });
-
                 container.innerHTML = html;
+                console.log(data);
             });
+
     }
 
-    document.querySelector(".cart-wrapper")
-        .addEventListener("mouseenter", loadCartDropdown);
+    const cartWrapper = document.querySelector(".cart-wrapper");
+
+    if (cartWrapper) {
+        cartWrapper.addEventListener("mouseenter", loadCartDropdown);
+    }
 </script>
 </body>
 </html>
