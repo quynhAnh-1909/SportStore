@@ -441,6 +441,98 @@
 
     </div>
 
+    <!-- REVIEW -->
+    <div class="detail-card mt-4">
+
+        <div class="section-title">
+            ĐÁNH GIÁ SẢN PHẨM
+        </div>
+
+        <!-- FORM -->
+        <form id="reviewForm" class="mt-3">
+
+            <input type="hidden"
+                   name="productId"
+                   value="${product.id}">
+
+            <input type="hidden"
+                   name="currentUrl"
+                   value="${pageContext.request.requestURI}?id=${product.id}">
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Số sao
+                </label>
+
+                <select name="rating"
+                        id="rating"
+                        class="form-select"
+                        required>
+
+                    <option value="">Chọn đánh giá</option>
+                    <option value="5">★★★★★ - 5 Sao</option>
+                    <option value="4">★★★★☆ - 4 Sao</option>
+                    <option value="3">★★★☆☆ - 3 Sao</option>
+                    <option value="2">★★☆☆☆ - 2 Sao</option>
+                    <option value="1">★☆☆☆☆ - 1 Sao</option>
+
+                </select>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Bình luận
+                </label>
+
+                <textarea name="comment"
+                          id="comment"
+                          class="form-control"
+                          rows="4"
+                          placeholder="Nhập đánh giá của bạn..."
+                          required></textarea>
+
+            </div>
+
+            <button class="btn btn-danger">
+                Gửi đánh giá
+            </button>
+
+        </form>
+
+        <!-- REVIEW LIST -->
+        <div class="mt-4" id="reviewList">
+
+            <c:forEach var="r" items="${reviews}">
+
+                <div class="border-top pt-3 pb-3">
+
+                    <div class="fw-bold">
+                            ${r.fullName}
+                    </div>
+
+                    <div class="text-warning">
+                            ${r.rating} ★
+                    </div>
+
+                    <div class="mt-2">
+                            ${r.comment}
+                    </div>
+
+                    <small class="text-muted">
+                            ${r.createdAt}
+                    </small>
+
+                </div>
+
+            </c:forEach>
+
+        </div>
+
+    </div>
+
     <!-- GỢI Ý SẢN PHẨM -->
     <div class="mt-4">
 
@@ -624,6 +716,66 @@
 
         expanded = !expanded;
     }
+
+    document.getElementById("reviewForm")
+            .addEventListener("submit", function (e) {
+
+                e.preventDefault();
+
+                const rating =
+                        document.getElementById("rating").value;
+
+                const comment =
+                        document.getElementById("comment").value;
+
+                const productId =
+                        document.querySelector(
+                                'input[name="productId"]'
+                        ).value;
+
+                fetch("${root}/review", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                                "application/x-www-form-urlencoded"
+                    },
+
+                    body:
+                            "productId=" + productId
+                            + "&rating=" + rating
+                            + "&comment=" + encodeURIComponent(comment)
+                })
+
+                        .then(res => {
+
+                            if (res.status === 401) {
+
+                                window.location.href =
+                                        "${root}/products";
+
+                                return null;
+                            }
+
+                            return res.text();
+                        })
+
+                        .then(data => {
+
+                            if (!data) return;
+
+                            document.getElementById("reviewList")
+                                    .insertAdjacentHTML(
+                                            "afterbegin",
+                                            data
+                                    );
+
+                            document.getElementById("comment").value = "";
+
+                        });
+
+            });
 </script>
 
 </body>
