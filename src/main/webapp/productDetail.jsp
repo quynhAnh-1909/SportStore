@@ -15,6 +15,8 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body {
             background: #f4f6f9;
@@ -294,6 +296,43 @@
             display: none;
         }
 
+        .share {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .share:hover {
+            transform: translateY(-3px);
+        }
+
+        /* FACEBOOK */
+        .share .bi-facebook {
+            color: #1877f2;
+        }
+
+        /* INSTAGRAM */
+        .share .bi-instagram {
+            color: #e1306c;
+        }
+
+        /* MESSENGER */
+        .share .bi-messenger {
+            color: #0099ff;
+        }
+
+        .share:hover {
+            background: #eee;
+        }
+
     </style>
 
 </head>
@@ -320,10 +359,27 @@
                 </div>
                 <!-- SHARE -->
                 <div class="share-box mt-3">
+
                     <span>Chia sẻ:</span>
-                    <a href="#" class="share">f</a>
-                    <a href="#" class="share">💬</a>
-                    <a href="#" class="share">P</a>
+
+                    <a href="javascript:void(0)"
+                       class="share"
+                       onclick="shareFacebook()">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+
+                    <a href="javascript:void(0)"
+                       class="share instagram"
+                       onclick="shareInstagram()">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+
+                    <a href="javascript:void(0)"
+                       class="share messenger"
+                       onclick="shareMessenger()">
+                        <i class="bi bi-messenger"></i>
+                    </a>
+
                 </div>
             </div>
 
@@ -776,6 +832,30 @@
                         });
 
             });
+
+    function shareFacebook() {
+
+        const url = encodeURIComponent(window.location.href);
+
+        window.open(
+                `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+                "_blank"
+        );
+    }
+
+    async function shareInstagram() {
+
+        await navigator.clipboard.writeText(window.location.href);
+
+        alert("Đã copy link sản phẩm!");
+    }
+
+    async function shareMessenger() {
+
+        await navigator.clipboard.writeText(window.location.href);
+
+        alert("Đã copy link để gửi Messenger!");
+    }
 </script>
 
 </body>
