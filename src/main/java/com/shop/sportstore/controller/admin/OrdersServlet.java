@@ -75,5 +75,4 @@ public class OrdersServlet extends HttpServlet {
                 "/WEB-INF/admin/dashboard.jsp"
         ).forward(request, response);
     }
-
 }
