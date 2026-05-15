@@ -15,6 +15,8 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body {
             background: #f4f6f9;
@@ -294,6 +296,43 @@
             display: none;
         }
 
+        .share {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .share:hover {
+            transform: translateY(-3px);
+        }
+
+        /* FACEBOOK */
+        .share .bi-facebook {
+            color: #1877f2;
+        }
+
+        /* INSTAGRAM */
+        .share .bi-instagram {
+            color: #e1306c;
+        }
+
+        /* MESSENGER */
+        .share .bi-messenger {
+            color: #0099ff;
+        }
+
+        .share:hover {
+            background: #eee;
+        }
+
     </style>
 
 </head>
@@ -320,10 +359,27 @@
                 </div>
                 <!-- SHARE -->
                 <div class="share-box mt-3">
+
                     <span>Chia sẻ:</span>
-                    <a href="#" class="share">f</a>
-                    <a href="#" class="share">💬</a>
-                    <a href="#" class="share">P</a>
+
+                    <a href="javascript:void(0)"
+                       class="share"
+                       onclick="shareFacebook()">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+
+                    <a href="javascript:void(0)"
+                       class="share instagram"
+                       onclick="shareInstagram()">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+
+                    <a href="javascript:void(0)"
+                       class="share messenger"
+                       onclick="shareMessenger()">
+                        <i class="bi bi-messenger"></i>
+                    </a>
+
                 </div>
             </div>
 
@@ -437,6 +493,98 @@
 
         <div class="mt-3">
             ${product.description}
+        </div>
+
+    </div>
+
+    <!-- REVIEW -->
+    <div class="detail-card mt-4">
+
+        <div class="section-title">
+            ĐÁNH GIÁ SẢN PHẨM
+        </div>
+
+        <!-- FORM -->
+        <form id="reviewForm" class="mt-3">
+
+            <input type="hidden"
+                   name="productId"
+                   value="${product.id}">
+
+            <input type="hidden"
+                   name="currentUrl"
+                   value="${pageContext.request.requestURI}?id=${product.id}">
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Số sao
+                </label>
+
+                <select name="rating"
+                        id="rating"
+                        class="form-select"
+                        required>
+
+                    <option value="">Chọn đánh giá</option>
+                    <option value="5">★★★★★ - 5 Sao</option>
+                    <option value="4">★★★★☆ - 4 Sao</option>
+                    <option value="3">★★★☆☆ - 3 Sao</option>
+                    <option value="2">★★☆☆☆ - 2 Sao</option>
+                    <option value="1">★☆☆☆☆ - 1 Sao</option>
+
+                </select>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Bình luận
+                </label>
+
+                <textarea name="comment"
+                          id="comment"
+                          class="form-control"
+                          rows="4"
+                          placeholder="Nhập đánh giá của bạn..."
+                          required></textarea>
+
+            </div>
+
+            <button class="btn btn-danger">
+                Gửi đánh giá
+            </button>
+
+        </form>
+
+        <!-- REVIEW LIST -->
+        <div class="mt-4" id="reviewList">
+
+            <c:forEach var="r" items="${reviews}">
+
+                <div class="border-top pt-3 pb-3">
+
+                    <div class="fw-bold">
+                            ${r.fullName}
+                    </div>
+
+                    <div class="text-warning">
+                            ${r.rating} ★
+                    </div>
+
+                    <div class="mt-2">
+                            ${r.comment}
+                    </div>
+
+                    <small class="text-muted">
+                            ${r.createdAt}
+                    </small>
+
+                </div>
+
+            </c:forEach>
+
         </div>
 
     </div>
@@ -623,6 +771,90 @@
         }
 
         expanded = !expanded;
+    }
+
+    document.getElementById("reviewForm")
+            .addEventListener("submit", function (e) {
+
+                e.preventDefault();
+
+                const rating =
+                        document.getElementById("rating").value;
+
+                const comment =
+                        document.getElementById("comment").value;
+
+                const productId =
+                        document.querySelector(
+                                'input[name="productId"]'
+                        ).value;
+
+                fetch("${root}/review", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                                "application/x-www-form-urlencoded"
+                    },
+
+                    body:
+                            "productId=" + productId
+                            + "&rating=" + rating
+                            + "&comment=" + encodeURIComponent(comment)
+                })
+
+                        .then(res => {
+
+                            if (res.status === 401) {
+
+                                window.location.href =
+                                        "${root}/products";
+
+                                return null;
+                            }
+
+                            return res.text();
+                        })
+
+                        .then(data => {
+
+                            if (!data) return;
+
+                            document.getElementById("reviewList")
+                                    .insertAdjacentHTML(
+                                            "afterbegin",
+                                            data
+                                    );
+
+                            document.getElementById("comment").value = "";
+
+                        });
+
+            });
+
+    function shareFacebook() {
+
+        const url = encodeURIComponent(window.location.href);
+
+        window.open(
+                `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+                "_blank"
+        );
+    }
+
+    async function shareInstagram() {
+
+        await navigator.clipboard.writeText(window.location.href);
+
+        alert("Đã copy link sản phẩm!");
+    }
+
+    async function shareMessenger() {
+
+        await navigator.clipboard.writeText(window.location.href);
+
+        alert("Đã copy link để gửi Messenger!");
     }
 </script>
 

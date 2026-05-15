@@ -49,21 +49,6 @@
             text-align: center;
         }
 
-        /* ITEM */
-        .cart-item {
-            display: flex;
-            align-items: center;
-        }
-
-        /* IMAGE */
-        .product-img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            margin-right: 10px;
-
-        }
-
         .product-name {
             font-size: 14px;
             line-height: 1.4;
@@ -186,17 +171,129 @@
             background: #eee;
         }
 
-        .item-check {
-            width: 16px;
-            height: 16px;
+        .item-check,
+        #checkAll {
+            width: 18px;
+            height: 18px;
             cursor: pointer;
+            accent-color: #a855f7;
         }
         .cart-container {
             border-radius: 12px;
 
         }
 
+        .cart-item {
+            min-height: 110px;
+        }
 
+        .product-image {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        .delete-btn {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-item {
+            flex-wrap: nowrap !important;
+        }
+
+        .cart-col {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .product-col {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .delete-col {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-col {
+            justify-content: flex-start !important;
+        }
+
+        .cart-col {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-col {
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-item {
+            flex-wrap: nowrap !important;
+        }
+
+        .cart-item {
+            width: 100%;
+            min-height: 110px;
+            padding: 0 10px;
+        }
+
+        .cart-check {
+            width: 6%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .cart-product {
+            width: 34%;
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-price {
+            width: 18%;
+            display: flex;
+            justify-content: center;
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        .cart-qty {
+            width: 18%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .cart-total {
+            width: 16%;
+            display: flex;
+            justify-content: center;
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        .cart-delete {
+            width: 8%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .delete-btn {
+            width: 42px;
+            height: 42px;
+        }
 
     </style>
 
@@ -223,12 +320,14 @@
         <div class="row">
 
             <!-- LEFT -->
-            <div class="col-md-8">
+            <div class="col-md-9">
 
                 <div class="card p-3">
 
                     <div class="row fw-bold text-white bg-danger p-2 rounded text-center align-items-center">
-                        <div class="col-md-1"></div>
+                        <div class="col-md-1 text-center">
+                            <input type="checkbox" id="checkAll">
+                        </div>
                         <div class="col-md-4 text-start">Sản phẩm</div>
                         <div class="col-md-2">Đơn giá</div>
                         <div class="col-md-2">Số lượng</div>
@@ -238,50 +337,62 @@
 
                     <c:forEach var="item" items="${sessionScope.cart}">
 
-                        <div class="row align-items-center mt-3 cart-item text-center g-0"
+                        <div class="d-flex mt-3 text-center cart-item align-items-center border-bottom"
                              data-id="${item.product.id}">
 
-                            <div class="col-md-1">
+                            <div class="cart-check cart-col">
                                 <input type="checkbox" class="item-check"
                                        data-price="${item.product.price}" checked>
                             </div>
 
-                            <div class="col-md-4 d-flex align-items-center">
-                                <img src="${root}/resources/${item.product.imageUrl}" width="70">
-                                <div class="ms-2">${item.product.name}</div>
+                            <div class="cart-product product-col">
+                                <img src="${root}/resources/${item.product.imageUrl}"
+                                     class="product-image">
+
+                                <div class="ms-3 product-name">
+                                        ${item.product.name}
+                                </div>
                             </div>
 
-                            <div class="col-md-2 text-danger fw-bold">
+                            <div class="cart-price cart-col text-danger fw-bold">
                                 <fmt:formatNumber value="${item.product.price}" /> VNĐ
                             </div>
 
-                            <div class="col-md-2 text-center">
+                            <div class="cart-qty cart-col">
                                 <div class="qty-control">
                                     <button type="button" class="qty-btn minus">-</button>
-                                    <input type="text" value="${item.quantity}" class="qty-input" readonly>
+
+                                    <input type="text"
+                                           value="${item.quantity}"
+                                           class="qty-input"
+                                           readonly>
+
                                     <button type="button" class="qty-btn plus">+</button>
                                 </div>
                             </div>
 
-                            <div class="col-md-2 text-danger fw-bold item-total">
+                            <div class="cart-total cart-col text-danger fw-bold item-total">
                                 <fmt:formatNumber value="${item.product.price * item.quantity}" />
                             </div>
 
-                            <div class="col-md-1">
+                            <div class="cart-delete delete-col">
                                 <button onclick="confirmDelete(${item.product.id})"
-                                        class="btn btn-danger">X</button>
+                                        class="btn btn-danger delete-btn">
+                                    X
+                                </button>
                             </div>
 
                         </div>
 
                     </c:forEach>
 
+
                 </div>
 
             </div>
 
             <!-- RIGHT -->
-            <div class="col-md-4">
+            <div class="col-md-3">
 
                 <div class="card p-3">
 
@@ -337,23 +448,34 @@
 
     // ===== TOTAL =====
     function updateTotal() {
+
         let total = 0;
+        let checkedCount = 0;
 
         document.querySelectorAll('.cart-item').forEach(item => {
+
             let checkbox = item.querySelector('.item-check');
 
             if (checkbox.checked) {
-                let price = Number(checkbox.dataset.price);
-                let qty = parseInt(item.querySelector('.qty-input').value);
-                total += price * qty;
+
+                let itemTotalText =
+                        item.querySelector('.item-total').innerText;
+
+                let itemTotal =
+                        Number(itemTotalText.replace(/[^\d]/g, ""));
+
+                total += itemTotal;
+                checkedCount++;
             }
         });
 
+        let shipping = checkedCount > 0 ? 30000 : 0;
+
         document.getElementById("totalPrice").innerText =
-            total.toLocaleString('vi-VN') + " VNĐ";
+                total.toLocaleString('vi-VN') + " VNĐ";
 
         document.getElementById("finalTotal").innerText =
-            (total + 30000).toLocaleString('vi-VN') + " VNĐ";
+                (total + shipping).toLocaleString('vi-VN') + " VNĐ";
     }
 
     // ===== UPDATE QTY =====
@@ -367,9 +489,10 @@
             body: "action=update&productId=" + productId + "&quantity=" + quantity
         })
             .then(res => res.text())
-            .then(() => {
-                updateCartCount();
-            });
+                .then(() => {
+                    updateCartCount();
+                    updateTotal();
+                });
     }
 
     document.querySelectorAll('.cart-item').forEach(item => {
@@ -381,25 +504,33 @@
         let price = Number(item.querySelector('.item-check').dataset.price);
 
         plus.onclick = () => {
+
             let qty = parseInt(qtyBox.value) + 1;
 
             updateQuantity(id, qty);
+
             qtyBox.value = qty;
 
+            let itemTotal = qty * price;
+
             item.querySelector('.item-total').innerText =
-                (qty * price).toLocaleString('vi-VN');
+                    itemTotal.toLocaleString('vi-VN') + " VNĐ";
 
             updateTotal();
         }
 
         minus.onclick = () => {
+
             let qty = Math.max(1, parseInt(qtyBox.value) - 1);
 
             updateQuantity(id, qty);
+
             qtyBox.value = qty;
 
+            let itemTotal = qty * price;
+
             item.querySelector('.item-total').innerText =
-                (qty * price).toLocaleString('vi-VN');
+                    itemTotal.toLocaleString('vi-VN') + " VNĐ";
 
             updateTotal();
         }
@@ -442,7 +573,34 @@
         cb.addEventListener('change', updateTotal);
     });
 
-    window.onload = updateTotal;
+    const checkAll = document.getElementById("checkAll");
+    const itemChecks = document.querySelectorAll(".item-check");
+
+    checkAll.addEventListener("change", function () {
+
+        itemChecks.forEach(cb => {
+            cb.checked = this.checked;
+        });
+
+        updateTotal();
+    });
+
+    itemChecks.forEach(cb => {
+
+        cb.addEventListener("change", function () {
+
+            checkAll.checked =
+                    [...itemChecks].every(item => item.checked);
+
+            updateTotal();
+        });
+
+    });
+
+    window.onload = () => {
+        updateTotal();
+        checkAll.checked = true;
+    };
 
 </script>
 
