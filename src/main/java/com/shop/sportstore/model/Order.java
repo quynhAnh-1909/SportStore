@@ -1,59 +1,35 @@
 package com.shop.sportstore.model;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Order {
 
     private int id;
     private int userId;
-
     private String orderCode;
-
     private double totalPrice;
-
     private String status;
-
     private String paymentMethod;
-
     private Timestamp createdAt;
-
+    private Timestamp updatedAt;
     private String note;
-
     private String userFullName;
-
-    /* =========================
-        TIME STATUS
-    ========================= */
-
     private Timestamp confirmedAt;
-
     private Timestamp shippingAt;
-
     private Timestamp completedAt;
-
     private Timestamp cancelledAt;
-
-    private Timestamp refundedAt;
-
-    /* =========================
-        REFUND / CANCEL
-    ========================= */
-
     private String cancelReason;
+    private String address;
 
-    private String refundReason;
 
-    private String transactionCode;
+    private String receiverName;
+    private String receiverPhone;
+    private double shippingFee;
+    private boolean paid;
+    private List<OrderDetail> orderDetails;
 
-    /* =========================
-        REVIEW
-    ========================= */
 
-    private Integer rating;
-
-    /* =========================
-        GETTER SETTER
-    ========================= */
 
     public int getId() {
         return id;
@@ -61,6 +37,14 @@ public class Order {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public int getUserId() {
@@ -111,6 +95,14 @@ public class Order {
         this.createdAt = createdAt;
     }
 
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public String getNote() {
         return note;
     }
@@ -150,21 +142,12 @@ public class Order {
     public void setCompletedAt(Timestamp completedAt) {
         this.completedAt = completedAt;
     }
-
     public Timestamp getCancelledAt() {
         return cancelledAt;
     }
 
     public void setCancelledAt(Timestamp cancelledAt) {
         this.cancelledAt = cancelledAt;
-    }
-
-    public Timestamp getRefundedAt() {
-        return refundedAt;
-    }
-
-    public void setRefundedAt(Timestamp refundedAt) {
-        this.refundedAt = refundedAt;
     }
 
     public String getCancelReason() {
@@ -175,27 +158,45 @@ public class Order {
         this.cancelReason = cancelReason;
     }
 
-    public String getRefundReason() {
-        return refundReason;
+
+
+    public String getReceiverName() {
+        return receiverName;
     }
 
-    public void setRefundReason(String refundReason) {
-        this.refundReason = refundReason;
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
     }
 
-    public String getTransactionCode() {
-        return transactionCode;
+    public String getReceiverPhone() {
+        return receiverPhone;
     }
 
-    public void setTransactionCode(String transactionCode) {
-        this.transactionCode = transactionCode;
+    public void setReceiverPhone(String receiverPhone) {
+        this.receiverPhone = receiverPhone;
     }
 
-    public Integer getRating() {
-        return rating;
+    public double getShippingFee() {
+        return shippingFee;
     }
 
-    public void setRating(Integer rating) {
-        this.rating = rating;
+    public void setShippingFee(double shippingFee) {
+        this.shippingFee = shippingFee;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
+    }
+
+    public List<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
     }
 }

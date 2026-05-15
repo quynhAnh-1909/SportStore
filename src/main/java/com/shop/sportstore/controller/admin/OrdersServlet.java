@@ -75,44 +75,5 @@ public class OrdersServlet extends HttpServlet {
                 "/WEB-INF/admin/dashboard.jsp"
         ).forward(request, response);
     }
-    private void handleConfirm(HttpServletRequest request) {
 
-        int id = Integer.parseInt(
-                request.getParameter("id")
-        );
-
-        orderDAO.confirmOrder(id);
-    }
-
-    private void handleCancel(HttpServletRequest request) {
-
-        int id = Integer.parseInt(
-                request.getParameter("id")
-        );
-
-        orderDAO.adminCancelOrder(id);
-    }
-
-    private void handleShipping(HttpServletRequest request) {
-
-        int id = Integer.parseInt(
-                request.getParameter("id")
-        );
-
-        orderDAO.shippingOrder(id);
-    }
-
-    private void handleComplete(HttpServletRequest request) {
-
-        int id = Integer.parseInt(
-                request.getParameter("id")
-        );
-
-        orderDAO.completeOrder(id);
-    }
-
-    private void handleConfirmAll() {
-
-        orderDAO.confirmAllPendingOrders();
-    }
 }
