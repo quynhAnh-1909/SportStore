@@ -26,12 +26,9 @@ public class OrdersServlet extends HttpServlet {
                          HttpServletResponse response)
             throws ServletException, IOException {
 
-        // lấy status từ URL
         String status = request.getParameter("status");
 
         List<Order> orders;
-
-        // nếu không có status -> lấy tất cả
         if (status == null || status.isEmpty()) {
 
             orders = orderDAO.getAllOrders();
