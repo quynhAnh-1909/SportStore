@@ -37,8 +37,6 @@ public class OrdersServlet extends HttpServlet {
             orders = orderDAO.getAllOrders();
 
         } else {
-
-            // mapping status sidebar -> DB
             switch (status.toLowerCase()) {
 
                 case "pending":
