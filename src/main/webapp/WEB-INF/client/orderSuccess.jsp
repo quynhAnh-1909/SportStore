@@ -2,207 +2,101 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<c:set var="root"
-       value="${pageContext.request.contextPath}" />
+<c:set var="root" value="${pageContext.request.contextPath}" />
 
 <jsp:include page="/WEB-INF/layout/index.jsp" />
 
 <div class="container py-5">
-
     <div class="success-wrapper">
+        <div class="success-icon">✔</div>
 
-        <!-- ICON -->
-
-        <div class="success-icon">
-            ✔
-        </div>
-
-        <!-- TITLE -->
-
-        <h1 class="success-title">
-            Đặt hàng thành công!
-        </h1>
-
+        <h1 class="success-title">Đặt hàng thành công!</h1>
         <p class="success-subtitle">
-            Cảm ơn bạn đã mua sắm tại
-            <strong>SportStore</strong>
+            Cảm ơn bạn đã mua sắm tại <strong>SportStore</strong>
         </p>
 
-        <!-- ORDER INFO -->
-
         <div class="info-card">
-
             <div class="info-header">
-
                 <div>
-                    <span class="label">
-                        Mã đơn hàng
-                    </span>
-
-                    <h3 class="order-code">
-                        ${sessionScope.lastOrderCode}
-                    </h3>
+                    <span class="label">Mã đơn hàng</span>
+                    <h3 class="order-code">${order.orderCode}</h3>
                 </div>
-
                 <div class="total-box">
-
-                    <span class="label">
-                        Tổng thanh toán
-                    </span>
-
+                    <span class="label">Tổng thanh toán</span>
                     <h3 class="total-price">
-
-                        <fmt:formatNumber
-                                value="${sessionScope.lastTotal}"
-                                type="number"/>
-
-                        ₫
+                        <fmt:formatNumber value="${order.totalPrice}" type="number"/> ₫
                     </h3>
-
                 </div>
-
             </div>
 
-            <!-- TABLE -->
-
-            <div class="table-responsive mt-4">
-
-                <table class="table custom-table">
-
-                    <thead>
-
-                    <tr>
-
-                        <th>
-                            Sản phẩm
-                        </th>
-
-                        <th>
-                            Giá
-                        </th>
-
-                        <th>
-                            Số lượng
-                        </th>
-
-                        <th>
-                            Thành tiền
-                        </th>
-
-                    </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                    <c:forEach var="item"
-                               items="${sessionScope.lastOrderItems}">
-
+            <div class="order-details mt-4">
+                <h4 class="fw-bold mb-3">Sản phẩm đã đặt</h4>
+                <div class="table-responsive">
+                    <table class="table custom-table">
+                        <thead>
                         <tr>
-
-                            <!-- PRODUCT -->
-
-                            <td>
-
-                                <div class="product-box">
-
-                                    <img src="${root}/resources/${item.product.imageUrl}"
-                                         class="product-img">
-
-                                    <div>
-
-                                        <div class="product-name">
-                                                ${item.product.name}
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </td>
-
-                            <!-- PRICE -->
-
-                            <td class="fw-semibold">
-
-                                <fmt:formatNumber
-                                        value="${item.product.price}"
-                                        type="number"/>
-
-                                ₫
-
-                            </td>
-
-                            <!-- QTY -->
-
-                            <td>
-
-                                <span class="qty-badge">
-                                        ${item.quantity}
-                                </span>
-
-                            </td>
-
-                            <!-- SUBTOTAL -->
-
-                            <td class="text-danger fw-bold">
-
-                                <fmt:formatNumber
-                                        value="${item.product.price * item.quantity}"
-                                        type="number"/>
-
-                                ₫
-
-                            </td>
-
+                            <th>Sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th class="text-end">Đơn giá</th>
+                            <th class="text-end">Thành tiền</th>
                         </tr>
-
-                    </c:forEach>
-
-                    </tbody>
-
-                </table>
-
+                        </thead>
+                        <tbody>
+                        <c:forEach var="item" items="${items}">
+                            <tr>
+                                <td>
+                                    <div class="product-box">
+                                        <div class="product-name">${item.productName}</div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="qty-badge">${item.quantity}</span>
+                                </td>
+                                <td class="text-end fw-semibold">
+                                    <fmt:formatNumber value="${item.price}" type="number" /> ₫
+                                </td>
+                                <td class="text-end text-danger fw-bold">
+                                    <fmt:formatNumber value="${item.subtotal}" type="number" /> ₫
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                        <tfoot class="border-top">
+                        <tr>
+                            <th colspan="3" class="text-end py-3">Tổng giá trị sản phẩm:</th>
+                            <th class="text-end py-3 text-danger fs-5">
+                                <fmt:formatNumber value="${order.totalPrice}" type="number" /> ₫
+                            </th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
-
-            <!-- NOTE -->
 
             <div class="order-note">
-
                 Đơn hàng của bạn đã được ghi nhận.
-                Bạn có thể theo dõi trạng thái đơn hàng
-                trong lịch sử mua hàng.
-
+                Bạn sẽ nhận được email xác nhận sớm nhất.
+                Bạn có thể theo dõi trạng thái đơn hàng trong lịch sử mua hàng.
             </div>
-
         </div>
-
-        <!-- BUTTON -->
 
         <div class="button-group">
-
-            <a href="${root}/"
-               class="btn-shop">
-
-                Tiếp tục mua sắm
-
-            </a>
-
-            <a href="${root}/orderHistory"
-               class="btn-history">
-
-                Xem lịch sử đơn hàng
-
-            </a>
-
+            <a href="${root}/" class="btn-shop">Tiếp tục mua sắm</a>
+            <a href="${root}/order-history" class="btn-history">Xem lịch sử đơn hàng</a>
         </div>
-
     </div>
-
 </div>
 
 <jsp:include page="/footer.jsp" />
 
+<style>
+
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+</style>
 <style>
 
     body {
@@ -220,7 +114,6 @@
         color: #1f2937;
     }
 
-    /* WRAPPER */
 
     .success-wrapper {
 
@@ -292,7 +185,6 @@
         border-radius: 50%;
     }
 
-    /* ICON */
 
     .success-icon {
 
@@ -359,7 +251,7 @@
         }
     }
 
-    /* TITLE */
+
 
     .success-title {
 
@@ -396,7 +288,6 @@
         color: #2563eb;
     }
 
-    /* CARD */
 
     .info-card {
 
@@ -413,7 +304,7 @@
                 0 10px 30px rgba(0,0,0,0.04);
     }
 
-    /* HEADER */
+
 
     .info-header {
 
@@ -487,7 +378,7 @@
         font-size: 30px;
     }
 
-    /* TABLE */
+
 
     .custom-table {
 
@@ -546,7 +437,7 @@
         transform: scale(1.005);
     }
 
-    /* PRODUCT */
+
 
     .product-box {
 
@@ -589,7 +480,7 @@
         line-height: 1.5;
     }
 
-    /* PRICE */
+
 
     .fw-semibold {
 
@@ -598,7 +489,7 @@
         color: #1e293b;
     }
 
-    /* QTY */
+
 
     .qty-badge {
 
@@ -627,7 +518,7 @@
                 0 5px 15px rgba(37,99,235,0.25);
     }
 
-    /* NOTE */
+
 
     .order-note {
 
@@ -656,7 +547,7 @@
         font-weight: 500;
     }
 
-    /* BUTTON */
+
 
     .button-group {
 
@@ -742,7 +633,6 @@
         color: white;
     }
 
-    /* MOBILE */
 
     @media(max-width:768px) {
 

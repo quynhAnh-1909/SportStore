@@ -256,14 +256,14 @@
             object-fit: cover;
         }
 
-        /* VOUCHER */
+
 
         #voucherSelect {
 
             font-weight: 600;
         }
 
-        /* CHECKBOX ĐỊA CHỈ */
+
 
         .default-address-box {
 
@@ -297,7 +297,6 @@
             transform: translateY(-1px);
         }
 
-        /* CHECKBOX CUSTOM */
 
         .default-address-box input[type="checkbox"] {
 
