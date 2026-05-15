@@ -147,7 +147,7 @@ public class OrderDAO extends DBConnection {
                 }
             }
 
-            // INSERT ORDER DETAILS
+
 
             try (
                     PreparedStatement psDetail =
@@ -252,11 +252,11 @@ public class OrderDAO extends DBConnection {
         }
         return items;
     }
-    // CÁC HÀM MỚI BỔ SUNG ĐỂ XỬ LÝ HỦY ĐƠN VÀ ĐẾM SỐ LẦN HỦY
+
     public boolean cancelOrder(String orderCode, int userId) {
         String sql =
                 "UPDATE orders " +
-                        "SET Status = 'CANCELLED', " +
+                        "SET Status = 'cancelled', " +
                         "CancelledAt = NOW(), " +
                         "UpdatedAt = NOW() " +
                         "WHERE OrderCode = ? " +
@@ -337,7 +337,7 @@ public class OrderDAO extends DBConnection {
 
         String sql =
                 "UPDATE orders " +
-                        "SET Status = 'CONFIRMED', " +
+                        "SET Status = 'pickup', " +
                         "ConfirmedAt = NOW(), " +
                         "UpdatedAt = NOW() " +
                         "WHERE Id = ?";
@@ -361,7 +361,7 @@ public class OrderDAO extends DBConnection {
 
         String sql =
                 "UPDATE orders " +
-                        "SET Status = 'SHIPPING', " +
+                        "SET Status = 'shipping', " +
                         "ShippingAt = NOW(), " +
                         "UpdatedAt = NOW() " +
                         "WHERE Id = ?";
@@ -385,7 +385,7 @@ public class OrderDAO extends DBConnection {
 
         String sql =
                 "UPDATE orders " +
-                        "SET Status = 'COMPLETED', " +
+                        "SET Status = 'completed', " +
                         "CompletedAt = NOW(), " +
                         "UpdatedAt = NOW() " +
                         "WHERE Id = ?";
@@ -396,6 +396,52 @@ public class OrderDAO extends DBConnection {
         ) {
 
             ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    public boolean adminCancelOrder(int id) {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = 'cancelled', " +
+                        "CancelledAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE Id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    public boolean confirmAllPendingOrders() {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = 'pickup', " +
+                        "ConfirmedAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE Status = 'PENDING'";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
 
             return ps.executeUpdate() > 0;
 
