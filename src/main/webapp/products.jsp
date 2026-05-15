@@ -402,75 +402,75 @@
 
     </c:if>
 
-<%--    <!-- TITLE -->--%>
-<%--    <h2 class="text-center text-success fw-bold mb-4">--%>
-<%--        SẢN PHẨM BÁN CHẠY--%>
-<%--    </h2>--%>
+    <%--    <!-- TITLE -->--%>
+    <%--    <h2 class="text-center text-success fw-bold mb-4">--%>
+    <%--        SẢN PHẨM BÁN CHẠY--%>
+    <%--    </h2>--%>
 
-<%--    <!-- LIST -->--%>
-<%--    <c:choose>--%>
+    <%--    <!-- LIST -->--%>
+    <%--    <c:choose>--%>
 
-<%--        <c:when test="${empty products}">--%>
-<%--            <div class="alert alert-warning text-center">--%>
-<%--                Không có sản phẩm--%>
-<%--            </div>--%>
-<%--        </c:when>--%>
+    <%--        <c:when test="${empty products}">--%>
+    <%--            <div class="alert alert-warning text-center">--%>
+    <%--                Không có sản phẩm--%>
+    <%--            </div>--%>
+    <%--        </c:when>--%>
 
-<%--        <c:otherwise>--%>
-<%--            <div class="row g-4">--%>
+    <%--        <c:otherwise>--%>
+    <%--            <div class="row g-4">--%>
 
-<%--                <c:forEach var="p" items="${products}">--%>
-<%--                    <div class="col-md-3">--%>
+    <%--                <c:forEach var="p" items="${products}">--%>
+    <%--                    <div class="col-md-3">--%>
 
-<%--                        <div class="card product-card h-100">--%>
+    <%--                        <div class="card product-card h-100">--%>
 
-<%--                            <!-- CLICK IMAGE -->--%>
-<%--                            <a href="${root}/productDetail?id=${p.id}">--%>
-<%--                                <div class="product-img-area">--%>
-<%--                                    <img src="${root}/resources/${p.imageUrl}"--%>
-<%--                                         class="product-img">--%>
-<%--                                </div>--%>
-<%--                            </a>--%>
+    <%--                            <!-- CLICK IMAGE -->--%>
+    <%--                            <a href="${root}/productDetail?id=${p.id}">--%>
+    <%--                                <div class="product-img-area">--%>
+    <%--                                    <img src="${root}/resources/${p.imageUrl}"--%>
+    <%--                                         class="product-img">--%>
+    <%--                                </div>--%>
+    <%--                            </a>--%>
 
-<%--                            <div class="card-body text-center">--%>
+    <%--                            <div class="card-body text-center">--%>
 
-<%--                                <!-- CLICK NAME -->--%>
-<%--                                <a href="${root}/productDetail?id=${p.id}"--%>
-<%--                                   class="product-link">--%>
-<%--                                    <div>${p.name}</div>--%>
-<%--                                </a>--%>
+    <%--                                <!-- CLICK NAME -->--%>
+    <%--                                <a href="${root}/productDetail?id=${p.id}"--%>
+    <%--                                   class="product-link">--%>
+    <%--                                    <div>${p.name}</div>--%>
+    <%--                                </a>--%>
 
 
-<%--                                <div class="price">--%>
-<%--                                    <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> VNĐ--%>
-<%--                                </div>                                <!-- ADD TO CART -->--%>
-<%--                                <button type="button"--%>
-<%--                                        onclick="addToCart(this, ${p.id})"--%>
-<%--                                        class="btn btn-success btn-sm mt-2 w-100">--%>
-<%--                                    🛒 Thêm vào giỏ hàng--%>
-<%--                                </button>--%>
+    <%--                                <div class="price">--%>
+    <%--                                    <fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> VNĐ--%>
+    <%--                                </div>                                <!-- ADD TO CART -->--%>
+    <%--                                <button type="button"--%>
+    <%--                                        onclick="addToCart(this, ${p.id})"--%>
+    <%--                                        class="btn btn-success btn-sm mt-2 w-100">--%>
+    <%--                                    🛒 Thêm vào giỏ hàng--%>
+    <%--                                </button>--%>
 
-<%--                            </div>--%>
+    <%--                            </div>--%>
 
-<%--                        </div>--%>
+    <%--                        </div>--%>
 
-<%--                    </div>--%>
-<%--                </c:forEach>--%>
+    <%--                    </div>--%>
+    <%--                </c:forEach>--%>
 
-<%--            </div>--%>
-<%--        </c:otherwise>--%>
+    <%--            </div>--%>
+    <%--        </c:otherwise>--%>
 
-<%--    </c:choose>--%>
+    <%--    </c:choose>--%>
 
-<%--    <!-- PAGINATION -->--%>
-<%--    <div class="text-center mt-4">--%>
-<%--        <c:forEach begin="1" end="${totalPage}" var="i">--%>
-<%--            <a class="btn btn-sm ${i==pageIndex?'btn-success':'btn-outline-success'}"--%>
-<%--               href="${root}/products?page=${i}&keyword=${param.keyword}&categoryId=${param.categoryId}">--%>
-<%--                    ${i}--%>
-<%--            </a>--%>
-<%--        </c:forEach>--%>
-<%--    </div>--%>
+    <%--    <!-- PAGINATION -->--%>
+    <%--    <div class="text-center mt-4">--%>
+    <%--        <c:forEach begin="1" end="${totalPage}" var="i">--%>
+    <%--            <a class="btn btn-sm ${i==pageIndex?'btn-success':'btn-outline-success'}"--%>
+    <%--               href="${root}/products?page=${i}&keyword=${param.keyword}&categoryId=${param.categoryId}">--%>
+    <%--                    ${i}--%>
+    <%--            </a>--%>
+    <%--        </c:forEach>--%>
+    <%--    </div>--%>
 
 </div>
 
@@ -496,10 +496,10 @@
             },
             body: "action=add&productId=" + productId
         })
-            .then(() => {
-                animateToCart(btn);
-                updateCartCount();
-            });
+                .then(() => {
+                    animateToCart(btn);
+                    updateCartCount();
+                });
     }
 
     /* ================= ANIMATION ================= */
@@ -551,26 +551,26 @@
             },
             body: "action=count"
         })
-            .then(res => res.text())
-            .then(count => {
+                .then(res => res.text())
+                .then(count => {
 
-                const badge = document.querySelector(".cart-badge");
+                    const badge = document.querySelector(".cart-badge");
 
-                if (!badge) return; // tránh lỗi null
+                    if (!badge) return; // tránh lỗi null
 
-                badge.innerText = count;
+                    badge.innerText = count;
 
-                if (count > 0) {
-                    badge.style.display = "block";
-                } else {
-                    badge.style.display = "none";
-                }
+                    if (count > 0) {
+                        badge.style.display = "block";
+                    } else {
+                        badge.style.display = "none";
+                    }
 
-                // animation badge
-                badge.classList.remove("animate");
-                void badge.offsetWidth;
-                badge.classList.add("animate");
-            });
+                    // animation badge
+                    badge.classList.remove("animate");
+                    void badge.offsetWidth;
+                    badge.classList.add("animate");
+                });
     }
 
 

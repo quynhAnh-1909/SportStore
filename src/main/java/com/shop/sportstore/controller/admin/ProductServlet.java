@@ -262,21 +262,21 @@ public class ProductServlet extends HttpServlet {
             String imageName;
             if (fileName != null && !fileName.isEmpty()) {
                 imageName = System.currentTimeMillis()
-                                + "_"
-                                + fileName;
+                        + "_"
+                        + fileName;
                 String uploadPath = getServletContext().getRealPath("/resources");
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) {
                     uploadDir.mkdirs();
                 }
                 filePart.write(uploadPath
-                                + File.separator
-                                + imageName
+                        + File.separator
+                        + imageName
                 );
                 if (oldProduct.getImageUrl() != null && !oldProduct.getImageUrl().equals("no-image.png")) {
                     File oldFile = new File(uploadPath
-                                            + File.separator
-                                            + oldProduct.getImageUrl());
+                            + File.separator
+                            + oldProduct.getImageUrl());
                     if (oldFile.exists()) {
                         oldFile.delete();
                     }

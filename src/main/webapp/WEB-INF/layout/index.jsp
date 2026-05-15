@@ -413,7 +413,7 @@
                 <img src="${root}/resources/sport_store.jpg">
             </a>
 
-                <span class="logo-text">SportStore</span>
+            <span class="logo-text">SportStore</span>
 
         </div>
 
