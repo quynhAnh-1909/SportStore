@@ -64,7 +64,6 @@ public class OrdersServlet extends HttpServlet {
 
             orders = orderDAO.getOrdersByStatus(status);
         }
-
         request.setAttribute("orders", orders);
 
         request.setAttribute(
