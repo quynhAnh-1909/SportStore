@@ -70,7 +70,6 @@ public class OrdersServlet extends HttpServlet {
                 "contentPage",
                 "/WEB-INF/admin/order.jsp"
         );
-
         request.getRequestDispatcher(
                 "/WEB-INF/admin/dashboard.jsp"
         ).forward(request, response);
