@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'war'
-    id "org.hidetake.ssh" version "2.11.2"
+    id 'org.hidetake.ssh' version '2.11.2'
 }
 
 group = 'com.shop'
@@ -19,16 +19,25 @@ repositories {
 
 dependencies {
 
+    // Servlet + JSP
     compileOnly 'jakarta.servlet:jakarta.servlet-api:6.0.0'
     implementation 'org.apache.tomcat:tomcat-jasper:10.1.52'
+
+    // JSTL
     implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.1'
     implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1'
+
+    // Gson
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    // MySQL
     implementation 'com.mysql:mysql-connector-j:8.3.0'
 
+    // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
+    // Test
     testImplementation 'org.junit.jupiter:junit-jupiter:5.13.2'
 }
 
@@ -40,22 +49,22 @@ tasks.test {
 
 apply plugin: 'org.hidetake.ssh'
 
-
 remotes {
     server {
-        host = '192.168.30.130'
+        host = '192.168.58.130'
         port = 22
-        user = 'huynhtran'
-        password = '123456'
+        user = 'quynh-anh'
+        password = 'Qanh19092005'
     }
 }
 
-
 ssh.settings {
     knownHosts = allowAnyHosts
+    timeoutSec = 60
 }
 
 // ================= TASK =================
+
 task uploadWar {
     dependsOn build
 
@@ -77,23 +86,22 @@ task restartDocker {
         ssh.run {
             session(remotes.server) {
 
-                // Xóa container cũ
                 execute 'docker rm -f tomcat10 || true'
 
-                // Chạy container mới
-                execute '''
+                execute """
 docker run -d \
 --name tomcat10 \
 --network sport-network \
 -v /usr/deploy:/usr/local/tomcat/webapps \
 -p 80:8080 \
 tomcat:10.1
-'''
+"""
             }
         }
     }
 }
 
 task deploy {
-    dependsOn uploadWar, restartDocker
+    dependsOn uploadWar
+    finalizedBy restartDocker
 }

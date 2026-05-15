@@ -2,8 +2,10 @@ package com.shop.sportstore.controller.client;
 
 import com.shop.sportstore.dao.ProductDAO;
 import com.shop.sportstore.dao.ProductVoucherDAO;
+import com.shop.sportstore.dao.ReviewDAO;
 import com.shop.sportstore.dao.VoucherDAO;
 import com.shop.sportstore.model.Product;
+import com.shop.sportstore.model.Review;
 import com.shop.sportstore.model.Voucher;
 import com.shop.sportstore.untils.DBConnection;
 import jakarta.servlet.ServletException;
@@ -62,6 +64,13 @@ public class ProductDetailServlet extends HttpServlet {
 
             request.setAttribute("relatedProducts", relatedProducts);
 
+            ReviewDAO reviewDAO = new ReviewDAO();
+
+            List<Review> reviews =
+                    reviewDAO.getReviewsByProduct(id);
+
+            request.setAttribute("reviews", reviews);
+
 
 //            request.setAttribute("showAll", showAll);
             request.getRequestDispatcher("/productDetail.jsp")
@@ -88,4 +97,3 @@ public class ProductDetailServlet extends HttpServlet {
     }
 
 }
-

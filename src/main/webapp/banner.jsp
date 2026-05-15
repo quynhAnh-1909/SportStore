@@ -73,10 +73,6 @@
             </div>
         </div>
 
-        <!-- MENU NGANG -->
-        <a href="${root}/products?category=Pickleball" class="menu-item">
-            Pickleball chính hãng
-        </a>
 
     </div>
 </div>

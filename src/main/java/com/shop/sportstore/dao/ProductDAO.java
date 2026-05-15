@@ -140,6 +140,45 @@ public class ProductDAO extends DBConnection {
         return list;
     }
 
+
+    public List<Product> searchSuggestions(String keyword) {
+
+        List<Product> list = new ArrayList<>();
+
+        String sql =
+                "SELECT * FROM products " +
+                        "WHERE name LIKE ? " +
+                        "LIMIT 5";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps =
+                        conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, "%" + keyword + "%");
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Product p = new Product();
+
+                p.setId(rs.getInt("id"));
+                p.setName(rs.getString("name"));
+                p.setImageUrl(rs.getString("image_url"));
+                p.setPrice(rs.getDouble("price"));
+
+                list.add(p);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
     public void insertProduct(Product p) throws SQLException {
 
         String sql = """
@@ -328,6 +367,66 @@ public class ProductDAO extends DBConnection {
                         rs.getString("image_url")
                 );
                 list.add(p);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    public List<Product> getProductsByCategory(int categoryId, int limit) {
+
+        List<Product> list = new ArrayList<>();
+
+        String sql = """
+        SELECT * FROM products
+        WHERE category_id = ?
+        LIMIT ?
+    """;
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, categoryId);
+            ps.setInt(2, limit);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapResultSetToProduct(rs));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<Product> getBestSellerProducts(int limit) {
+
+        List<Product> list = new ArrayList<>();
+
+        String sql = """
+        SELECT * FROM products
+        ORDER BY id DESC
+        LIMIT ?
+    """;
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, limit);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapResultSetToProduct(rs));
             }
 
         } catch (Exception e) {
