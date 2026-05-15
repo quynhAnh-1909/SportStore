@@ -83,9 +83,6 @@ public class ProductServlet extends HttpServlet {
         }
     }
 
-    // LIST PRODUCT
-
-
     private void listProducts(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -100,9 +97,6 @@ public class ProductServlet extends HttpServlet {
         request.setAttribute("contentPage", "/WEB-INF/admin/products.jsp");
         request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
     }
-
-    //SHOW CREATE
-
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -126,8 +120,6 @@ public class ProductServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp")
                 .forward(request, response);
     }
-
-    //INSERT PRODUCT
 
 
     private void insertProduct(HttpServletRequest request, HttpServletResponse response)
