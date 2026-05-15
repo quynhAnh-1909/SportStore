@@ -39,7 +39,6 @@ public class OrderSuccessServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         request.getRequestDispatcher("/WEB-INF/client/orderSuccess.jsp").forward(request, response);
     }
 }
