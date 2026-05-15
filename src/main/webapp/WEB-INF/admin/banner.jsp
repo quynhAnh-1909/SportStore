@@ -1,71 +1,51 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<c:set var="root" value="${pageContext.request.contextPath}"/>
+
+<c:set var="root" value="${pageContext.request.contextPath}" />
 
 <div class="container-fluid pt-4 px-4">
-<div class="container-fluid">
 
     <div class="bg-light rounded p-4 shadow-sm">
-    <h3 class="dashboard-title">Quản lý Banner</h3>
 
         <!-- HEADER -->
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h4 class="mb-0 text-success fw-bold">
-                <i class="fas fa-images me-2"></i> Quản lý Banner
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h4 class="fw-bold text-success mb-0">
+                <i class="fas fa-images me-2"></i>
+                Quản lý Banner
             </h4>
 
-            <a href="${root}/admin/banners/add"
+            <a href="${root}/admin/banners?action=add"
                class="btn btn-success rounded-pill px-4 shadow-sm">
-                <i class="fas fa-plus me-1"></i> Thêm banner
-            </a>
-        </div>
-    <!-- ADD BUTTON -->
-    <div class="mb-3">
-        <a href="${root}/admin/banners/add" class="btn btn-danger">
-            <i class="fas fa-plus me-2"></i> Thêm banner
-        </a>
-    </div>
 
-    <!-- TABLE -->
-    <div class="dashboard-box">
-        <table class="table table-hover align-middle">
-            <thead class="table-danger">
-            <tr>
-                <th>ID</th>
-                <th>Hình ảnh</th>
-                <th>Tiêu đề</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
-            </tr>
-            </thead>
+                <i class="fas fa-plus me-1"></i>
+                Thêm banner
+
+            </a>
+
+        </div>
+
         <!-- TABLE -->
         <div class="table-responsive">
+
             <table class="table table-bordered table-hover align-middle text-center">
 
                 <thead class="table-dark">
                 <tr>
                     <th style="width: 80px;">ID</th>
-                    <th style="width: 140px;">Hình ảnh</th>
+                    <th style="width: 160px;">Hình ảnh</th>
                     <th class="text-start">Tiêu đề</th>
                     <th>Trạng thái</th>
-                    <th style="width: 180px;">Thao tác</th>
+                    <th style="width: 220px;">Thao tác</th>
                 </tr>
                 </thead>
 
-            <tbody>
-            <c:forEach var="b" items="${banners}">
-                <tr>
-                    <td>${b.id}</td>
                 <tbody>
 
                 <c:forEach var="b" items="${banners}">
+
                     <tr>
 
-                    <!-- IMAGE -->
-                    <td>
-                        <img src="${root}/uploads/${b.image}"
-                             style="width:120px;height:60px;object-fit:cover;border-radius:8px;">
-                    </td>
                         <!-- ID -->
                         <td class="fw-bold text-muted">
                                 ${b.id}
@@ -73,111 +53,140 @@
 
                         <!-- IMAGE -->
                         <td>
+
                             <img src="${root}/uploads/${b.image}"
                                  class="rounded shadow-sm"
-                                 style="width:100px;height:60px;object-fit:cover;border:1px solid #dee2e6;">
+                                 style="width:120px;height:65px;object-fit:cover;">
+
                         </td>
 
-                    <!-- TITLE -->
-                    <td>${b.title}</td>
                         <!-- TITLE -->
                         <td class="text-start fw-semibold">
                                 ${b.title}
                         </td>
 
-                    <!-- STATUS -->
-                    <td>
-                        <c:choose>
-                            <c:when test="${b.status}">
-                                <span class="badge bg-success">Hiển thị</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="badge bg-secondary">Ẩn</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </td>
+                        <!-- STATUS -->
+                        <td>
 
-                    <!-- ACTION -->
-                    <td>
-                        <a href="${root}/admin/banners/edit?id=${b.id}"
-                           class="btn btn-sm btn-warning">
-                            <i class="fas fa-edit"></i>
-                        </a>
+                            <c:choose>
+
+                                <c:when test="${b.status}">
+                                    <span class="badge bg-success px-3 py-2">
+                                        Hiển thị
+                                    </span>
+                                </c:when>
+
+                                <c:otherwise>
+                                    <span class="badge bg-secondary px-3 py-2">
+                                        Ẩn
+                                    </span>
+                                </c:otherwise>
+
+                            </c:choose>
+
+                        </td>
+
                         <!-- ACTION -->
                         <td>
+
                             <div class="btn-group">
 
-                                <a href="${root}/admin/banners/edit?id=${b.id}"
+                                <!-- EDIT -->
+                                <a href="${root}/admin/banners?action=edit&id=${b.id}"
                                    class="btn btn-sm btn-outline-primary">
+
                                     <i class="fas fa-edit"></i>
+
                                 </a>
 
-                        <a href="${root}/admin/banners/delete?id=${b.id}"
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('Xóa banner này?')">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                                <a href="${root}/admin/banners/delete?id=${b.id}"
+                                <!-- DELETE -->
+                                <a href="${root}/admin/banners?action=delete&id=${b.id}"
                                    class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('Xóa banner này?')">
+                                   onclick="return confirmDelete(event,this.href)">
+
                                     <i class="fas fa-trash"></i>
+
                                 </a>
 
-                        <!-- toggle status -->
-                        <a href="${root}/admin/banners/toggle?id=${b.id}"
-                           class="btn btn-sm btn-info">
-                            <i class="fas fa-sync"></i>
-                        </a>
-                    </td>
-                </tr>
-            </c:forEach>
-                                <a href="${root}/admin/banners/toggle?id=${b.id}"
+                                <!-- TOGGLE -->
+                                <a href="${root}/admin/banners?action=toggle&id=${b.id}"
                                    class="btn btn-sm btn-outline-info">
+
                                     <i class="fas fa-sync"></i>
+
                                 </a>
 
                             </div>
+
                         </td>
 
                     </tr>
+
                 </c:forEach>
 
-                <!-- EMPTY -->
-                <c:if test="${empty banners}">
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-4">
-                            <i class="fas fa-image fa-2x mb-2"></i><br>
-                            Chưa có banner nào
-                        </td>
-                    </tr>
-                </c:if>
-
                 </tbody>
+
             </table>
+
         </div>
-            <!-- EMPTY -->
-            <c:if test="${empty banners}">
-                <tr>
-                    <td colspan="5" class="text-center text-muted">
-                        Chưa có banner nào
-                    </td>
-                </tr>
-            </c:if>
-            </tbody>
-        </table>
-    </div>
+
+        <!-- EMPTY -->
+        <c:if test="${empty banners}">
+
+            <div class="text-center p-5">
+
+                <i class="fas fa-images fa-3x text-muted mb-3"></i>
+
+                <p class="text-muted">
+                    Chưa có banner nào
+                </p>
+
+            </div>
+
+        </c:if>
 
     </div>
+
 </div>
 
-
-<!-- STYLE -->
 <style>
+
     table tbody tr:hover {
-        background-color: rgba(0, 123, 255, 0.05);
+        background-color: rgba(0,123,255,0.05);
     }
 
     td, th {
         vertical-align: middle !important;
     }
+
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    function confirmDelete(event, url) {
+
+        event.preventDefault();
+
+        Swal.fire({
+            title: 'Bạn chắc chắn?',
+            text: 'Banner sẽ bị xóa!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+
+        });
+
+        return false;
+    }
+
+</script>

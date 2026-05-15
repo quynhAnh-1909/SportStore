@@ -46,7 +46,6 @@ public class Order {
     public void setAddress(String address) {
         this.address = address;
     }
-
     public int getUserId() {
         return userId;
     }
@@ -142,7 +141,6 @@ public class Order {
     public void setCompletedAt(Timestamp completedAt) {
         this.completedAt = completedAt;
     }
-
     public Timestamp getCancelledAt() {
         return cancelledAt;
     }

@@ -140,6 +140,7 @@ public class ProductDAO extends DBConnection {
         return list;
     }
 
+
     public List<Product> searchSuggestions(String keyword) {
 
         List<Product> list = new ArrayList<>();
@@ -374,7 +375,6 @@ public class ProductDAO extends DBConnection {
 
         return list;
     }
-
     public List<Product> getProductsByCategory(int categoryId, int limit) {
 
         List<Product> list = new ArrayList<>();

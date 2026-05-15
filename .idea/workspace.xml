@@ -1,0 +1,847 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="SportStore" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="10cda3dc-66e4-4c2b-9646-794b16c52f33" name="Changes" comment="fix ket noi db">
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderSuccessServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderSuccessServlet.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExportToHTMLSettings">
+    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/../SportStore\exportToHTML" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/Sport_Store">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$/Sport_Store">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="SportStore" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="package-info" />
+        <option value="Jsp File" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <excluded-from-favorite>
+      <branch-storage>
+        <map>
+          <entry type="REMOTE">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="origin/main" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </excluded-from-favorite>
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="23130015_VoLeQuynhAnh" />
+              </list>
+            </value>
+          </entry>
+          <entry type="REMOTE">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="origin/23130015-VoLeQuynhAnh" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {}
+}</component>
+  <component name="GitHubPullRequestState">{
+  &quot;prStates&quot;: [
+    {
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDORnZCJM7Z5DNu&quot;,
+        &quot;number&quot;: 29
+      },
+      &quot;lastSeen&quot;: 1778352425509
+    }
+  ]
+}</component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="main" />
+      </list>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/quynhAnh-1909/SportStore.git&quot;,
+    &quot;accountId&quot;: &quot;3df5bdc8-cb45-41df-b684-70d27d624451&quot;
+  },
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
+    },
+    &quot;owner&quot;: &quot;quynhAnh-1909&quot;,
+    &quot;repository&quot;: &quot;SportStore&quot;
+  }
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="3B4zXzUnt9Hs1cw4JvsO5MsCygV" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "Gradle.Build SportStore.executor": "Run",
+    "Gradle.D:/IdeaProjects/SportStore [build].executor": "Run",
+    "Gradle.SportStore [build].executor": "Run",
+    "Gradle.SportStore [uploadWar].executor": "Run",
+    "Gradle.Sport_Store [build].executor": "Run",
+    "Gradle.Sport_Store [clean].executor": "Run",
+    "Gradle.Sport_Store [dependencies].executor": "Run",
+    "Gradle.Sport_Store.executor": "Run",
+    "Gradle.Tests in 'Sport_Store'.executor": "Run",
+    "Maven.SportStore.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Notification.DisplayName-DoNotAsk-Execution": "External process execution failed",
+    "Notification.DoNotAsk-Execution": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Shell Script.mvnw.executor": "Run",
+    "TomEE Server.SportStore.executor": "Run",
+    "TomEE Server.TomEE 10.1.52.executor": "Run",
+    "Tomcat Server.Tomcat 10.1.52.executor": "Run",
+    "Tomcat Server.Unnamed.executor": "Debug",
+    "git-widget-placeholder": "#40 on 23130015-VOLEQUYNHANH",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/IdeaProjects/SportStore",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.26509723",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "ChangesTree.GroupingKeys": [
+      "directory",
+      "module",
+      "repository"
+    ],
+    "DatabaseDriversLRU": [
+      "mysql",
+      "sqlserver"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.shop.sportstore.model" />
+      <recent name="com.shop.sportstore.dao" />
+      <recent name="com.shop.sportstore.controller.client" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Quynh Anh\IdeaProjects\SportStore\src\main\java\com\shop\sportstore\controller\admin" />
+      <recent name="C:\Users\Quynh Anh\IdeaProjects\SportStore\src\main\webapp\WEB-INF\admin" />
+      <recent name="C:\Users\Quynh Anh\IdeaProjects\SportStore\src\main\webapp" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\IdeaProjects\SportStore" />
+      <recent name="D:\IdeaProjects\SportStore\target" />
+      <recent name="C:\Users\Quynh Anh\IdeaProjects\SportStore\src\main\webapp\WEB-INF\layout" />
+      <recent name="C:\Users\Quynh Anh\IdeaProjects\SportStore\src\main\webapp" />
+      <recent name="C:\Users\Quynh Anh\IdeaProjects\SportStore\src\main\webapp\WEB-INF\client" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.shop.sportstore.controller" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="excludedTypes">
+      <set>
+        <option value="TomeeConfiguration" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Gradle.SportStore [uploadWar]">
+    <configuration name="SportStore [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="build" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="SportStore [uploadWar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="uploadWar" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="Sport_Store" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--build-cache" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="Tomcat 10.1.52" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.52" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
+      <option name="UPDATING_POLICY" value="restart-server" />
+      <deployment>
+        <artifact name="Gradle : com.shop : SportStore-1.0-SNAPSHOT.war (exploded)">
+          <settings>
+            <option name="CONTEXT_PATH" value="/Gradle___com_shop___SportStore_1_0_SNAPSHOT_war__exploded_" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="643112a5-3a40-4a62-b922-2d300066fd03" />
+      </server-settings>
+      <predefined_log_file enabled="true" id="Tomcat" />
+      <predefined_log_file enabled="true" id="Tomcat Catalina" />
+      <predefined_log_file id="Tomcat Manager" />
+      <predefined_log_file id="Tomcat Host Manager" />
+      <predefined_log_file id="Tomcat Localhost Access" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="50238" />
+      </RunnerSettings>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method v="2">
+        <option name="Make" enabled="true" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+      </method>
+    </configuration>
+    <configuration name="Docker Image" type="docker-deploy" factoryName="docker-image" singleton="false" server-name="Docker">
+      <deployment type="docker-image">
+        <settings>
+          <option name="containerName" value="" />
+        </settings>
+      </deployment>
+      <method v="2">
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="Gradle : com.shop : SportStore-1.0-SNAPSHOT.war" />
+        </option>
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="Gradle : com.shop : SportStore-1.0-SNAPSHOT.war (exploded)" />
+        </option>
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Docker.Docker Image" />
+      <item itemvalue="Gradle.Sport_Store" />
+      <item itemvalue="Gradle.SportStore [uploadWar]" />
+      <item itemvalue="Gradle.SportStore [build]" />
+      <item itemvalue="Tomcat Server.Tomcat 10.1.52" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.SportStore [uploadWar]" />
+        <item itemvalue="Gradle.SportStore [build]" />
+        <item itemvalue="Gradle.SportStore [build]" />
+        <item itemvalue="Gradle.SportStore [uploadWar]" />
+        <item itemvalue="Gradle.SportStore [uploadWar]" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.31033.145" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.31033.145" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="ShelveChangesManager">
+    <option name="groupingKeys">
+      <option value="module" />
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="10cda3dc-66e4-4c2b-9646-794b16c52f33" name="Changes" comment="" />
+      <created>1773763178881</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1773763178881</updated>
+      <workItem from="1773763183075" duration="292000" />
+      <workItem from="1773799725566" duration="90000" />
+      <workItem from="1773803039145" duration="4747000" />
+      <workItem from="1773851066001" duration="4230000" />
+      <workItem from="1773855349690" duration="1624000" />
+      <workItem from="1773856996257" duration="435000" />
+      <workItem from="1773857447231" duration="7282000" />
+      <workItem from="1773881213390" duration="4439000" />
+      <workItem from="1773936637190" duration="235000" />
+      <workItem from="1773936898633" duration="522000" />
+      <workItem from="1773937447839" duration="462000" />
+      <workItem from="1773995670199" duration="29653000" />
+      <workItem from="1774043630806" duration="93000" />
+      <workItem from="1774043744155" duration="190000" />
+      <workItem from="1774044057680" duration="2998000" />
+      <workItem from="1774059294370" duration="6392000" />
+      <workItem from="1774067353704" duration="201000" />
+      <workItem from="1774070703924" duration="24180000" />
+      <workItem from="1774200054916" duration="10915000" />
+      <workItem from="1774252398204" duration="17160000" />
+      <workItem from="1774371054215" duration="1102000" />
+      <workItem from="1774588759436" duration="1929000" />
+      <workItem from="1774660305149" duration="3613000" />
+      <workItem from="1774664724445" duration="373000" />
+      <workItem from="1774665131936" duration="616000" />
+      <workItem from="1774665773251" duration="7802000" />
+      <workItem from="1774885934940" duration="2982000" />
+      <workItem from="1774890071369" duration="129000" />
+      <workItem from="1774890258409" duration="4708000" />
+      <workItem from="1774940143430" duration="2631000" />
+      <workItem from="1775310072756" duration="8687000" />
+      <workItem from="1775323786526" duration="1700000" />
+      <workItem from="1775409015454" duration="305000" />
+      <workItem from="1775410667186" duration="4276000" />
+      <workItem from="1775583755888" duration="2219000" />
+      <workItem from="1775879719133" duration="11091000" />
+      <workItem from="1775894412985" duration="21701000" />
+      <workItem from="1775974159913" duration="2559000" />
+      <workItem from="1776135236206" duration="446000" />
+      <workItem from="1776135732565" duration="2602000" />
+      <workItem from="1776145981582" duration="622000" />
+      <workItem from="1776485279562" duration="17000" />
+      <workItem from="1776485320932" duration="50000" />
+      <workItem from="1777026453483" duration="563000" />
+      <workItem from="1777027038114" duration="301000" />
+      <workItem from="1777027354802" duration="883000" />
+      <workItem from="1777028344841" duration="298000" />
+      <workItem from="1777028663468" duration="7829000" />
+      <workItem from="1777044555377" duration="6892000" />
+      <workItem from="1777051505719" duration="1111000" />
+      <workItem from="1777052640857" duration="570000" />
+      <workItem from="1777053235976" duration="152000" />
+      <workItem from="1777101217184" duration="7119000" />
+      <workItem from="1777124513560" duration="3819000" />
+      <workItem from="1777128511892" duration="2834000" />
+      <workItem from="1777222800539" duration="2535000" />
+      <workItem from="1777296204186" duration="1275000" />
+      <workItem from="1777348399699" duration="1163000" />
+      <workItem from="1777647351369" duration="12000" />
+      <workItem from="1777657649363" duration="4647000" />
+      <workItem from="1777827060054" duration="14000" />
+      <workItem from="1778153198446" duration="1449000" />
+      <workItem from="1778166694133" duration="10815000" />
+      <workItem from="1778182737747" duration="21000" />
+      <workItem from="1778338895327" duration="9159000" />
+      <workItem from="1778351808162" duration="1170000" />
+      <workItem from="1778824198649" duration="3519000" />
+    </task>
+    <task id="LOCAL-00001" summary="FIX giao dien gio hang">
+      <option name="closed" value="true" />
+      <created>1774210753445</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1774210753445</updated>
+    </task>
+    <task id="LOCAL-00002" summary="FIX giao dien kiem tra don hang">
+      <option name="closed" value="true" />
+      <created>1774210885252</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1774210885252</updated>
+    </task>
+    <task id="LOCAL-00003" summary="FIX giao dien dat hang thanh cong">
+      <option name="closed" value="true" />
+      <created>1774210928158</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1774210928158</updated>
+    </task>
+    <task id="LOCAL-00004" summary="FIX giao dien chi tiet san pham">
+      <option name="closed" value="true" />
+      <created>1774210987675</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1774210987675</updated>
+    </task>
+    <task id="LOCAL-00005" summary="ADD quanly don hang cua admin">
+      <option name="closed" value="true" />
+      <created>1774280449444</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1774280449444</updated>
+    </task>
+    <task id="LOCAL-00006" summary="ADD quanly don hang cua admin">
+      <option name="closed" value="true" />
+      <created>1774589682318</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1774589682318</updated>
+    </task>
+    <task id="LOCAL-00007" summary="ADD quản lý voucher(admin) và xóa code thừa ở các class">
+      <option name="closed" value="true" />
+      <created>1775325102275</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1775325102276</updated>
+    </task>
+    <task id="LOCAL-00008" summary="ADD quản lý banners (admin) dùng để thay đổi banner">
+      <option name="closed" value="true" />
+      <created>1775585930668</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1775585930668</updated>
+    </task>
+    <task id="LOCAL-00009" summary="ADD thêm voucher cho sản phẩm lúc chỉnh sửa sản phẩm (productEdit.jsp)">
+      <option name="closed" value="true" />
+      <created>1775897364196</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1775897364197</updated>
+    </task>
+    <task id="LOCAL-00010" summary="FIX hiện voucher của sản phẩm  ở trang quản lý sản phẩm (product.jsp)">
+      <option name="closed" value="true" />
+      <created>1775930851350</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1775930851350</updated>
+    </task>
+    <task id="LOCAL-00011" summary="FIX lỗi sửa sản phẩm bị mất ảnh do chưa kiểm tra dữ liệu đầu vào, dẫn đến parse sai kiểu dữ liệu">
+      <option name="closed" value="true" />
+      <created>1775931101318</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1775931101318</updated>
+    </task>
+    <task id="LOCAL-00012" summary="ADD trang banner.jsp xử lý thay đổi banner">
+      <option name="closed" value="true" />
+      <created>1775935609301</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1775935609301</updated>
+    </task>
+    <task id="LOCAL-00013" summary="FIX giao diện trang banner.jsp chp đồng bộ">
+      <option name="closed" value="true" />
+      <created>1775937762735</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1775937762735</updated>
+    </task>
+    <task id="LOCAL-00014" summary="FIX giao diện trang banner.jsp chp đồng bộ">
+      <option name="closed" value="true" />
+      <created>1775938100426</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1775938100426</updated>
+    </task>
+    <task id="LOCAL-00015" summary="FIX giao diện trang banner.jsp cho đồng bộ">
+      <option name="closed" value="true" />
+      <created>1775975082863</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1775975082865</updated>
+    </task>
+    <task id="LOCAL-00016" summary="ADD  hiển thị voucher của sản phẩm đó ở phần xem chi tiết sản phẩm">
+      <option name="closed" value="true" />
+      <created>1777045203533</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1777045203533</updated>
+    </task>
+    <task id="LOCAL-00017" summary="FIX sửa sản phẩm lỗi load ảnh và hiện mã giảm của sản phẩm đó khi admin thêm vào&#10;DELETE mục ĐƠN VỊ thay thành Mã Giảm ở trang product và productEdit">
+      <option name="closed" value="true" />
+      <created>1778343167284</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1778343167284</updated>
+    </task>
+    <task id="LOCAL-00018" summary="fix ket noi db">
+      <option name="closed" value="true" />
+      <created>1778825879444</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1778825879445</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="17372522-c9be-4328-a63e-8de2836240b9" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/23130015-VoLeQuynhAnh" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="23130015-VOLEQUYNHANH" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="main" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="HEAD" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="23130015_VoLeQuynhAnh" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="23130015-VoLeQuynhAnh" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="*" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="17372522-c9be-4328-a63e-8de2836240b9">
+          <value>
+            <State />
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/main" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="user">
+                    <value>
+                      <list>
+                        <option value="*" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="FIX giao dien gio hang" />
+    <MESSAGE value="FIX giao dien kiem tra don hang" />
+    <MESSAGE value="FIX giao dien dat hang thanh cong" />
+    <MESSAGE value="FIX giao dien chi tiet san pham" />
+    <MESSAGE value="ADD quanly don hang cua admin" />
+    <MESSAGE value="ADD quản lý voucher(admin) và xóa code thừa ở các class" />
+    <MESSAGE value="ADD quản lý banners (admin) dùng để thay đổi banner" />
+    <MESSAGE value="ADD thêm voucher cho sản phẩm lúc chỉnh sửa sản phẩm (productEdit.jsp)" />
+    <MESSAGE value="FIX hiện voucher của sản phẩm  ở trang quản lý sản phẩm (product.jsp)" />
+    <MESSAGE value="FIX lỗi sửa sản phẩm bị mất ảnh do chưa kiểm tra dữ liệu đầu vào, dẫn đến parse sai kiểu dữ liệu" />
+    <MESSAGE value="ADD trang banner.jsp xử lý thay đổi banner" />
+    <MESSAGE value="FIX giao diện trang banner.jsp chp đồng bộ" />
+    <MESSAGE value="FIX giao diện trang banner.jsp cho đồng bộ" />
+    <MESSAGE value="ADD  hiển thị voucher của sản phẩm đó ở phần xem chi tiết sản phẩm" />
+    <MESSAGE value="FIX sửa sản phẩm lỗi load ảnh và hiện mã giảm của sản phẩm đó khi admin thêm vào&#10;DELETE mục ĐƠN VỊ thay thành Mã Giảm ở trang product và productEdit" />
+    <MESSAGE value="fix ket noi db" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix ket noi db" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/webapp/footer.jsp</url>
+          <line>3</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/shop/sportstore/model/CateporyParent.java</url>
+          <line>11</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/BannerServlet.java</url>
+          <line>28</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/SportStore$Sport_Store__build_.ic" NAME="Sport_Store [build] Coverage Results" MODIFIED="1776489695194" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />
+  </component>
+</project>

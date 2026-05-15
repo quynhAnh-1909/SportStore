@@ -20,18 +20,18 @@
 
         <c:if test="${not empty orders}">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle text-center mb-0">
+                <table class="table compact-table table-bordered table-hover align-middle text-center mb-0">
                     <thead class="table-dark">
                     <tr>
-                        <th>#</th>
-                        <th>Mã đơn</th>
-                        <th>Khách hàng</th>
-                        <th>Ngày tạo</th>
-                        <th>Tổng tiền</th>
-                        <th>Thanh toán</th>
-                        <th>Trạng thái</th>
-                        <th>Ghi chú</th>
-                        <th>Hành động</th>
+                        <th style="width: 50px;">#</th>
+                        <th style="width: 120px;">Mã đơn</th>
+                        <th style="width: 150px;">Khách hàng</th>
+                        <th style="width: 140px;">Ngày tạo</th>
+                        <th style="width: 120px;">Tổng tiền</th>
+                        <th style="width: 110px;">Thanh toán</th>
+                        <th style="width: 120px;">Trạng thái</th>
+                        <th style="width: 150px;">Ghi chú</th>
+                        <th style="width: 170px;">Hành động</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -68,13 +68,118 @@
                                     </c:otherwise>
                                 </c:choose>
                             </td>
-                            <td>${order.note}</td>
-                            <td>
-                                <a href="${root}/admin/orders/details?orderCode=${order.orderCode}" class="btn btn-sm btn-outline-info">
-                                    <i class="fas fa-eye"></i> Xem
-                                </a>
+                            <td class="text-truncate" style="max-width:150px;">
+                                    ${order.note}
                             </td>
-                        </tr>
+                            <td>
+
+                                <div class="d-flex flex-column gap-1">
+
+                                    <!-- HÀNG NÚT TRẠNG THÁI -->
+                                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+
+                                        <!-- PENDING -->
+                                        <c:if test="${order.status eq 'PENDING'}">
+
+                                            <!-- XÁC NHẬN -->
+                                            <form action="${root}/admin/orders"
+                                                  method="post"
+                                                  class="d-inline">
+
+                                                <input type="hidden"
+                                                       name="action"
+                                                       value="confirm">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="${order.id}">
+
+                                                <button class="btn btn-sm btn-success">
+                                                    Xác nhận
+                                                </button>
+
+                                            </form>
+
+                                            <!-- HỦY -->
+                                            <form action="${root}/admin/orders"
+                                                  method="post"
+                                                  class="d-inline">
+
+                                                <input type="hidden"
+                                                       name="action"
+                                                       value="cancel">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="${order.id}">
+
+                                                <button class="btn btn-sm btn-danger">
+                                                    Hủy
+                                                </button>
+
+                                            </form>
+
+                                        </c:if>
+
+                                        <!-- CONFIRMED -->
+                                        <c:if test="${order.status eq 'CONFIRMED'}">
+
+                                            <form action="${root}/admin/orders"
+                                                  method="post"
+                                                  class="d-inline">
+
+                                                <input type="hidden"
+                                                       name="action"
+                                                       value="shipping">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="${order.id}">
+
+                                                <button class="btn btn-sm btn-primary">
+                                                    Giao ĐVVC
+                                                </button>
+
+                                            </form>
+
+                                        </c:if>
+
+                                        <!-- SHIPPING -->
+                                        <c:if test="${order.status eq 'SHIPPING'}">
+
+                                            <form action="${root}/admin/orders"
+                                                  method="post"
+                                                  class="d-inline">
+
+                                                <input type="hidden"
+                                                       name="action"
+                                                       value="complete">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="${order.id}">
+
+                                                <button class="btn btn-sm btn-success">
+                                                    Hoàn thành
+                                                </button>
+
+                                            </form>
+
+                                        </c:if>
+
+                                    </div>
+
+                                    <!-- XEM CHI TIẾT -->
+                                    <div>
+                                        <a href="${root}/admin/orders/details?orderCode=${order.orderCode}"
+                                           class="btn btn-sm btn-outline-info w-100">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+
+                                </div>
+
+                            </td>
                     </c:forEach>
                     </tbody>
                 </table>
@@ -87,5 +192,25 @@
     .table-hover tbody tr:hover {
         background-color: rgba(0,0,0,0.05);
         transition: background 0.3s;
+    }
+    .compact-table{
+        table-layout: fixed;
+        font-size: 13px;
+    }
+
+    .compact-table th,
+    .compact-table td{
+        padding: 8px !important;
+        vertical-align: middle;
+        word-wrap: break-word;
+    }
+
+    .compact-table .btn{
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .compact-table .badge{
+        font-size: 11px;
     }
 </style>
