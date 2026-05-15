@@ -9,25 +9,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10cda3dc-66e4-4c2b-9646-794b16c52f33" name="Changes" comment="FIX sửa sản phẩm lỗi load ảnh và hiện mã giảm của sản phẩm đó khi admin thêm vào&#10;DELETE mục ĐƠN VỊ thay thành Mã Giảm ở trang product và productEdit">
-      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/checksums/sha1-checksums.bin" afterDir="false" />
+    <list default="true" id="10cda3dc-66e4-4c2b-9646-794b16c52f33" name="Changes" comment="fix ket noi db">
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/BannerServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/BannerServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/OrdersServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/OrdersServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/CancelOderServlet.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/CancelOrderServlet" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/CancelOrderServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/CancelOrderServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/model/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/model/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/untils/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/untils/DBConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderSuccessServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderSuccessServlet.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -568,7 +558,7 @@
       <workItem from="1778182737747" duration="21000" />
       <workItem from="1778338895327" duration="9159000" />
       <workItem from="1778351808162" duration="1170000" />
-      <workItem from="1778824198649" duration="1483000" />
+      <workItem from="1778824198649" duration="3519000" />
     </task>
     <task id="LOCAL-00001" summary="FIX giao dien gio hang">
       <option name="closed" value="true" />
@@ -706,7 +696,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778343167284</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="fix ket noi db">
+      <option name="closed" value="true" />
+      <created>1778825879444</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1778825879445</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -819,7 +817,8 @@
     <MESSAGE value="FIX giao diện trang banner.jsp cho đồng bộ" />
     <MESSAGE value="ADD  hiển thị voucher của sản phẩm đó ở phần xem chi tiết sản phẩm" />
     <MESSAGE value="FIX sửa sản phẩm lỗi load ảnh và hiện mã giảm của sản phẩm đó khi admin thêm vào&#10;DELETE mục ĐƠN VỊ thay thành Mã Giảm ở trang product và productEdit" />
-    <option name="LAST_COMMIT_MESSAGE" value="FIX sửa sản phẩm lỗi load ảnh và hiện mã giảm của sản phẩm đó khi admin thêm vào&#10;DELETE mục ĐƠN VỊ thay thành Mã Giảm ở trang product và productEdit" />
+    <MESSAGE value="fix ket noi db" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix ket noi db" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -25,6 +25,7 @@ public class OrderSuccessServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }
+
         try {
             OrderDAO orderDAO = new OrderDAO();
 
@@ -38,6 +39,7 @@ public class OrderSuccessServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         request.getRequestDispatcher("/WEB-INF/client/orderSuccess.jsp").forward(request, response);
     }
 }
