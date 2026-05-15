@@ -25,7 +25,6 @@ public class OrderSuccessServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }
-
         try {
             OrderDAO orderDAO = new OrderDAO();
 
