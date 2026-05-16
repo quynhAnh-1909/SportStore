@@ -300,16 +300,17 @@ public class OrderDAO extends DBConnection {
         return orders;
     }
     public Order getOrderById(int id) {
-        String sql = "SELECT od.*, p.name, p.image_url \n" +
-                "FROM orderdetails od \n" +
-                "JOIN products p ON od.ProductId = p.id \n" +
-                "WHERE od.OrderId = ?";
+
+        String sql = "SELECT * FROM orders WHERE Id = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
                 Order o = new Order();
+
                 o.setId(rs.getInt("Id"));
                 o.setUserId(rs.getInt("UserId"));
                 o.setOrderCode(rs.getString("OrderCode"));
@@ -338,6 +339,7 @@ public class OrderDAO extends DBConnection {
                 return o;
             }
         } catch (Exception e) {
+            System.out.println("❌ Lỗi tại getOrderById: " + e.getMessage());
             e.printStackTrace();
         }
         return null;

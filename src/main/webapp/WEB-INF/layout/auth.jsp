@@ -94,6 +94,13 @@
         border: 1px solid #ddd;
         border-radius: 6px;
         margin-top: 5px;
+        position: relative;
+        z-index: 1001;
+        background-color: white !important;
+    }
+
+    .auth-box {
+        z-index: 1000;
     }
 
     .error {
@@ -142,7 +149,7 @@
     }
 </style>
 
-<!-- AUTH MODAL -->
+
 <div class="overlay" id="authOverlay">
     <div class="auth-box">
 

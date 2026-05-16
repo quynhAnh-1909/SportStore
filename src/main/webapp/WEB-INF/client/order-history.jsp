@@ -1,358 +1,187 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-
-<c:set var="root" value="${pageContext.request.contextPath}" />
-<jsp:include page="/WEB-INF/layout/index.jsp" />
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 
 <!DOCTYPE html>
-<html lang="vi">
-
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Chi tiết đơn hàng #${order.id}</title>
+    <title>Lịch sử đơn hàng</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body{
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            padding: 30px;
-            color: #333;
-        }
-        .container{
-            max-width: 1200px;
-            margin: auto;
-        }
+        body { background-color: #f8f9fa; }
 
+        .text-danger-custom { color: #d81f19 !important; }
+        .btn-danger-custom {
+            background-color: #d81f19 !important;
+            border-color: #d81f19 !important;
+            color: #ffffff !important;
+        }
+        .btn-danger-custom:hover {
+            background-color: #b31410 !important;
+            border-color: #b31410 !important;
+        }
+        .table-danger-custom {
+            background-color: #fce8e6 !important;
+            color: #a81c18 !important;
+        }
+        .bg-danger-subtle-custom { background-color: #fce8e6 !important; }
+        .border-danger-custom { border-color: #f5c2c0 !important; }
 
-        .breadcrumb {
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        .breadcrumb a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .breadcrumb span {
-            margin: 0 5px;
-            color: #888;
-        }
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-        .page-title{
-            font-size: 32px;
-            font-weight: bold;
-            color: #222;
-        }
-
-
-        .top-grid {
-            display: grid;
-            grid-template-columns: 3fr 2fr;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-
-        .info-card {
-            background: white;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-            height: 100%;
-        }
-        .box-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .text-success { color: #28a745; }
-        .text-warning { color: #d39e00; }
-
-        .info-row {
-            margin-bottom: 12px;
-            font-size: 15px;
-        }
-        .info-row strong {
-            display: inline-block;
-            width: 120px;
-            color: #555;
-        }
-
-
-        .note-box {
-            margin-top: 20px;
-            padding: 15px;
-            background: #fff5f5;
-            border-left: 4px solid #dc3545;
-            border-radius: 8px;
-        }
-        .note-box strong { color: #dc3545; font-size: 14px;}
-        .note-box p { margin-top: 5px; font-size: 14px; font-style: italic; color: #666; }
-
-
-        .badge{
-            padding: 8px 16px;
-            border-radius: 999px;
-            color: white;
-            font-size: 13px;
-            font-weight: bold;
-            display: inline-block;
-        }
-        .bg-success { background: #28a745; }
-        .bg-warning { background: #ffc107; color: #333; }
-        .bg-secondary { background: #6c757d; }
-
-
-        .alert-info {
-            background: #e1f5fe;
-            color: #0277bd;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 15px;
-        }
-
-
-        .btn {
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            transition: 0.3s;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-        .btn-outline { background: transparent; color: #007bff; border: 2px solid #007bff; }
-        .btn-outline:hover { background: #007bff; color: white; }
-        .btn-danger { background: #dc3545; color: white; width: 100%; margin-bottom: 10px; }
-        .btn-danger:hover { background: #b52a37; }
-        .btn-secondary-outline { background: transparent; color: #6c757d; border: 2px solid #6c757d; width: 100%; }
-        .btn-secondary-outline:hover { background: #6c757d; color: white; }
-
-        /* BẢNG SẢN PHẨM */
-        .table-card {
-            background: white;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-            overflow-x: auto;
-        }
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        .custom-table th {
-            background: #f8f9fc;
-            padding: 15px;
-            text-align: left;
-            color: #555;
-            font-size: 14px;
-            border-bottom: 2px solid #eee;
-        }
-        .custom-table td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
-        }
-        .product-col {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .product-img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-        .product-name { font-weight: bold; color: #222; }
-
-
-        .tfoot-row td {
-            padding: 12px 15px;
-            border: none;
-            font-size: 15px;
-        }
-        .tfoot-row td:first-child { text-align: right; font-weight: bold; color: #555; }
-        .tfoot-row td:last-child { text-align: right; font-weight: bold; }
-        .tfoot-total td {
-            border-top: 2px solid #eee;
-            font-size: 18px !important;
-            color: #222;
-        }
-        .text-price-total { color: #dc3545 !important; }
-
-        /* MOBILE RESPOSNIVE */
-        @media(max-width: 768px){
-            .top-grid { grid-template-columns: 1fr; }
-            .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .custom-table th, .custom-table td { white-space: nowrap; }
-        }
+        .bg-warning-subtle { background-color: #fff3cd !important; }
+        .bg-primary-subtle { background-color: #cfe2ff !important; }
+        .bg-info-subtle { background-color: #cff4fc !important; }
     </style>
 </head>
-
 <body>
 
-<div class="container">
+<jsp:include page="/WEB-INF/layout/index.jsp" />
 
-    <div class="breadcrumb">
-        <a href="${root}/home">🏠 Trang chủ</a>
-        <span>/</span>
-        <a href="${root}/order-history">Lịch sử đơn hàng</a>
-        <span>/</span>
-        <span style="color: #222; font-weight: bold;">Chi tiết #${order.id}</span>
-    </div>
+<div class="container my-5 py-4">
 
-    <div class="page-header">
-        <h1 class="page-title">ℹ️ Chi tiết đơn hàng #${order.id}</h1>
-        <a class="btn btn-outline" href="${root}/order-history">
-            🔙 Quay lại danh sách
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="${pageContext.request.contextPath}/" class="text-danger-custom text-decoration-none">
+                    <i class="fas fa-home"></i> Trang chủ
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <a href="${pageContext.request.contextPath}/order-history" class="text-secondary text-decoration-none fw-semibold">Lịch sử đơn hàng</a>
+            </li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0 text-danger-custom">
+            <a href="${pageContext.request.contextPath}/order-history" class="text-danger-custom text-decoration-none">
+                <i class="fas fa-history me-2"></i>Lịch sử đơn hàng
+            </a>
+        </h2>
+        <a href="${pageContext.request.contextPath}/" class="btn btn-danger-custom fw-bold shadow-sm">
+            <i class="fas fa-cart-plus me-2"></i>Mua sắm thêm
         </a>
     </div>
 
-    <div class="top-grid">
-
-        <div class="info-card" style="border: 1px solid #c3e6cb; background: #f8fdf9;">
-            <div class="box-title text-success">🚚 Thông tin nhận hàng</div>
-
-            <div class="info-row">
-                <strong>Người nhận:</strong> ${not empty order.receiverName ? order.receiverName : sessionScope.user.fullName}
-            </div>
-            <div class="info-row">
-                <strong>SĐT:</strong> ${not empty order.receiverPhone ? order.receiverPhone : sessionScope.user.phoneNumber}
-            </div>
-            <div class="info-row">
-                <strong>Địa chỉ:</strong> ${order.address}
-            </div>
-            <div class="info-row">
-                <strong>Ngày đặt:</strong>
-                <fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm" />
-            </div>
-
-            <c:if test="${not empty order.note}">
-                <div class="note-box">
-                    <strong>📝 Ghi chú:</strong>
-                    <p>"${order.note}"</p>
-                </div>
-            </c:if>
+    <c:if test="${empty orders}">
+        <div class="alert alert-info shadow-sm border-0">
+            <i class="fas fa-info-circle me-2"></i> Bạn chưa có đơn hàng nào.
+            <a href="${pageContext.request.contextPath}/" class="fw-bold text-info text-decoration-none">Mua sắm ngay tại đây!</a>
         </div>
+    </c:if>
 
-        <%-- Phần Trạng thái đơn hàng --%>
-        <div class="info-card" style="border: 1px solid #ffeeba; background: #fff9f0;">
-            <div class="box-title text-warning">💳 Trạng thái đơn hàng</div>
-
-            <div class="info-row">
-                <strong>Phương thức:</strong> ${order.paymentMethod}
-            </div>
-
-            <div class="info-row" style="display: flex; align-items: center; gap: 10px;">
-                <strong>Tình trạng:</strong>
-                <c:choose>
-                    <c:when test="${order.status eq 'CANCELLED'}">
-                        <span class="badge bg-secondary">🚫 Đã hủy</span>
-                    </c:when>
-                    <c:when test="${order.status eq 'DELIVERED'}">
-                        <span class="badge bg-success">✅ Thành công</span>
-                    </c:when>
-                    <c:when test="${order.status eq 'SHIPPING'}">
-                        <span class="badge bg-primary">🚚 Đang giao</span>
-                    </c:when>
-                    <c:when test="${order.status eq 'PENDING'}">
-                        <span class="badge bg-warning">⏳ Chờ xác nhận</span>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="badge bg-info">${order.status}</span>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
-
-            <%-- Nút Hủy đơn hàng (Chỉ cho phép khi đơn hàng đang PENDING) --%>
-            <c:if test="${order.status eq 'PENDING'}">
-                <form action="${root}/cancel-order" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn này?')">
-                    <input type="hidden" name="orderCode" value="${order.orderCode}" />
-                    <button type="submit" class="btn btn-secondary-outline">
-                        ❌ HỦY ĐƠN HÀNG
-                    </button>
-                </form>
-            </c:if>
-        </div>
-
-    <div class="table-card">
-        <div class="box-title text-success" style="margin-bottom: 10px;">
-            🛒 Danh sách sản phẩm
-        </div>
-
-        <table class="custom-table">
-            <thead>
-            <tr>
-                <th>Sản phẩm</th>
-                <th style="text-align: center;">Đơn giá</th>
-                <th style="text-align: center;">Số lượng</th>
-                <th style="text-align: right;">Thành tiền</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach var="item" items="${order.orderDetails}">
+    <c:if test="${not empty orders}">
+        <div id="orderArea" class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle bg-white mb-0">
+                <thead class="table-danger-custom">
                 <tr>
-                    <td>
-                        <div class="product-col">
-                            <img src="${empty item.product.imageUrl ? root.concat('/images/default-prod.png') : item.product.imageUrl}"
-                                 alt="Hình ảnh" class="product-img">
-                            <span class="product-name">${item.product.name}</span>
-                        </div>
-                    </td>
-                    <td style="text-align: center;">
-                        <fmt:formatNumber value="${item.price}" type="number"/> đ
-                    </td>
-                    <td style="text-align: center; font-weight: bold;">
-                            ${item.quantity}
-                    </td>
-                    <td style="text-align: right; font-weight: bold; color: #28a745;">
-                        <fmt:formatNumber value="${item.price * item.quantity}" type="number"/> đ
-                    </td>
+                    <th>Mã đơn</th>
+                    <th>Ngày đặt</th>
+                    <th>Phương thức</th>
+                    <th>Tổng tiền</th>
+                    <th class="text-center">Thanh toán</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
                 </tr>
-            </c:forEach>
-            </tbody>
-            <tfoot>
-            <tr class="tfoot-row">
-                <td colspan="3">Tiền hàng:</td>
-                <td><fmt:formatNumber value="${order.totalPrice - order.shippingFee}" type="number"/> đ</td>
-            </tr>
-            <tr class="tfoot-row">
-                <td colspan="3">Phí vận chuyển:</td>
-                <td><fmt:formatNumber value="${order.shippingFee}" type="number"/> đ</td>
-            </tr>
-            <tr class="tfoot-row tfoot-total">
-                <td colspan="3">TỔNG CỘNG:</td>
-                <td class="text-price-total"><fmt:formatNumber value="${order.totalPrice}" type="number"/> đ</td>
-            </tr>
-            </tfoot>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                <c:forEach var="item" items="${orders}">
+                    <tr>
+                        <td class="fw-bold">#<c:out value="${item.orderCode}" default="0000" /></td>
+                        <td class="small text-muted">
+                            <c:catch var="errDate">
+                                <fmt:formatDate value="${item.createdAt}" pattern="dd/MM/yyyy HH:mm" />
+                            </c:catch>
+                            <c:if test="${not empty errDate}">--/--/----</c:if>
+                        </td>
+                        <td>
+                            <span class="badge border text-dark bg-light px-2 py-1">
+                                <i class="fas ${item.paymentMethod eq 'VNPAY' ? 'fa-credit-card text-primary' : 'fa-money-bill-wave text-danger-custom'} me-1"></i>
+                                <c:out value="${item.paymentMethod}" default="COD" />
+                            </span>
+                        </td>
+                        <td class="fw-bold text-danger-custom">
+                            <c:catch var="errPrice">
+                                <fmt:formatNumber value="${item.totalPrice}" type="number" /> đ
+                            </c:catch>
+                            <c:if test="${not empty errPrice}">${item.totalPrice} đ</c:if>
+                        </td>
 
+                        <td class="text-center">
+                            <c:catch var="errPaid">
+                                <c:choose>
+                                    <c:when test="${item.paid}">
+                                        <span class="badge rounded-pill bg-danger-subtle-custom text-danger-custom border border-danger-custom px-2">
+                                            <i class="fas fa-check-circle me-1"></i>Đã xong
+                                        </span>
+                                    </c:when>
+                                    <c:when test="${item.paymentMethod eq 'VNPAY'}">
+                                        <span class="badge rounded-pill bg-warning-subtle text-dark border border-warning px-2">
+                                            <i class="fas fa-clock me-1"></i>Chờ tiền
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="text-muted small">--</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:catch>
+                            <c:if test="${not empty errPaid}">
+                                <span class="text-muted small">--</span>
+                            </c:if>
+                        </td>
+
+                        <td>
+                            <c:catch var="errStatus">
+                                <c:set var="statusLower" value="${not empty item.status ? fn:toLowerCase(item.status) : 'pending'}" />
+                                <c:choose>
+                                    <c:when test="${statusLower eq 'pending' or statusLower eq '0'}">
+                                        <span class="badge bg-primary-subtle text-primary px-2 py-1">
+                                            <i class="fas fa-sync-alt fa-spin me-1"></i>Đang xử lý
+                                        </span>
+                                    </c:when>
+                                    <c:when test="${statusLower eq 'shipping' or statusLower eq '1'}">
+                                        <span class="badge bg-info-subtle text-info px-2 py-1">
+                                            <i class="fas fa-truck me-1"></i>Đang giao
+                                        </span>
+                                    </c:when>
+                                    <c:when test="${statusLower eq 'delivered' or statusLower eq '2'}">
+                                        <span class="badge bg-danger text-white px-2 py-1">
+                                            <i class="fas fa-check me-1"></i>Hoàn tất
+                                        </span>
+                                    </c:when>
+                                    <c:when test="${statusLower eq 'cancelled' or statusLower eq '3'}">
+                                        <span class="badge bg-light text-secondary border px-2 py-1 text-decoration-line-through">
+                                            <i class="fas fa-ban me-1"></i>Đã hủy
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge bg-secondary px-2 py-1"><c:out value="${item.status}" /></span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:catch>
+                            <c:if test="${not empty errStatus}">
+                                <span class="badge bg-secondary px-2 py-1">Đang xử lý</span>
+                            </c:if>
+                        </td>
+
+                        <td>
+                            <a href="${pageContext.request.contextPath}/order-detail?id=${item.id}"
+                               class="btn btn-sm btn-info text-white shadow-sm" title="Xem chi tiết">
+                                👁️
+                            </a>
+                        </td>
+                    </tr>
+                </c:forEach>
+                </tbody>
+            </table>
+        </div>
+    </c:if>
 </div>
+
+<jsp:include page="/footer.jsp" />
 
 </body>
 </html>
