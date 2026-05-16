@@ -163,20 +163,26 @@ public class CheckoutServlet extends HttpServlet {
             );
 
 
-            cart.removeAll(selectedCart);
-            session.setAttribute("cart", cart);
-
-
-            session.setAttribute("lastOrderCode", orderCode);
-
             if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
 
-                response.sendRedirect(request.getContextPath() + "/vnpayPayment");
+                session.setAttribute("paymentAmount", total);
+
+                session.setAttribute("pendingOrderCode", orderCode);
+
+                response.sendRedirect(
+                        request.getContextPath() + "/vnpayPayment"
+                );
+
             } else {
 
-                response.sendRedirect(request.getContextPath() + "/orderSuccess");
-            }
+                cart.removeAll(selectedCart);
 
+                session.setAttribute("cart", cart);
+
+                response.sendRedirect(
+                        request.getContextPath() + "/orderSuccess"
+                );
+            }
         } catch (Exception e) {
             e.printStackTrace();
             response.setContentType("text/html;charset=UTF-8");
