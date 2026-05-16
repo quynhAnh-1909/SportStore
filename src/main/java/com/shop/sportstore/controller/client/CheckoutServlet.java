@@ -32,8 +32,6 @@ public class CheckoutServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
-
-
         String selectedIds = request.getParameter("selectedIds");
         List<CartItem> selectedItems = new ArrayList<>();
 
@@ -166,8 +164,6 @@ public class CheckoutServlet extends HttpServlet {
                 shippingFee = 35000;
             }
         }
-
-
 
         double total = subtotal - discount + shippingFee;
         if (total < 0) total = 0;
