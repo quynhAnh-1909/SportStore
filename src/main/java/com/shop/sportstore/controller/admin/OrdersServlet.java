@@ -26,19 +26,14 @@ public class OrdersServlet extends HttpServlet {
                          HttpServletResponse response)
             throws ServletException, IOException {
 
-        // lấy status từ URL
         String status = request.getParameter("status");
 
         List<Order> orders;
-
-        // nếu không có status -> lấy tất cả
         if (status == null || status.isEmpty()) {
 
             orders = orderDAO.getAllOrders();
 
         } else {
-
-            // mapping status sidebar -> DB
             switch (status.toLowerCase()) {
 
                 case "pending":
@@ -70,7 +65,6 @@ public class OrdersServlet extends HttpServlet {
                 "contentPage",
                 "/WEB-INF/admin/order.jsp"
         );
-
         request.getRequestDispatcher(
                 "/WEB-INF/admin/dashboard.jsp"
         ).forward(request, response);
