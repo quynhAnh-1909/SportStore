@@ -22,9 +22,8 @@ public class OrderDetailDAO extends DBConnection {
                         "p.image_url, " +
                         "p.price AS productPrice " +
                         "FROM orderdetails od " +
-                        "JOIN products p ON od.ProductId = p.id " +
+                        "LEFT JOIN products p ON od.ProductId = p.id " +
                         "WHERE od.OrderId = ?";
-
         try (
                 Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)

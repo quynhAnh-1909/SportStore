@@ -39,7 +39,7 @@ public class OrderDetailServlet extends HttpServlet {
 
             if (order != null) {
                 request.setAttribute("order", order);
-                request.getRequestDispatcher("/user/order-detail.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/client/order-detail.jsp").forward(request, response);
             } else {
                 response.sendRedirect("order-history");
             }
