@@ -20,8 +20,6 @@ public class OrderSuccessServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-
-            // ✔ LẤY TỪ REQUEST (chuẩn VNPay flow)
             String orderCode = request.getParameter("orderCode");
 
             if (orderCode == null || orderCode.isEmpty()) {
@@ -30,11 +28,7 @@ public class OrderSuccessServlet extends HttpServlet {
             }
 
             OrderDAO orderDAO = new OrderDAO();
-
-            // ✔ lấy order
             Order order = orderDAO.getOrderByCode(orderCode);
-
-            // ✔ lấy items
             List<OrderItem> items = orderDAO.getOrderItems(orderCode);
 
             request.setAttribute("order", order);
