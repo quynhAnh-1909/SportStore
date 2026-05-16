@@ -32,8 +32,6 @@ public class CheckoutServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
-
-
         String selectedIds = request.getParameter("selectedIds");
         List<CartItem> selectedItems = new ArrayList<>();
 
@@ -167,8 +165,6 @@ public class CheckoutServlet extends HttpServlet {
             }
         }
 
-
-
         double total = subtotal - discount + shippingFee;
         if (total < 0) total = 0;
 
@@ -197,20 +193,26 @@ public class CheckoutServlet extends HttpServlet {
             );
 
 
-            if (cart != null) {
-                cart.removeAll(selectedCart);
-                session.setAttribute("cart", cart);
-            }
-
-            session.setAttribute("lastOrderCode", orderCode);
-
-
             if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
-                response.sendRedirect(request.getContextPath() + "/vnpayPayment");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/orderSuccess");
-            }
 
+                session.setAttribute("paymentAmount", total);
+
+                session.setAttribute("pendingOrderCode", orderCode);
+
+                response.sendRedirect(
+                        request.getContextPath() + "/vnpayPayment"
+                );
+
+            } else {
+
+                cart.removeAll(selectedCart);
+
+                session.setAttribute("cart", cart);
+
+                response.sendRedirect(
+                        request.getContextPath() + "/orderSuccess"
+                );
+            }
         } catch (Exception e) {
             e.printStackTrace();
             response.setContentType("text/html;charset=UTF-8");
