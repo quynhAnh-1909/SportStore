@@ -22,14 +22,14 @@ public class Order {
     private String cancelReason;
     private String address;
 
-
     private String receiverName;
     private String receiverPhone;
     private double shippingFee;
     private boolean paid;
     private List<OrderDetail> orderDetails;
 
-
+    private int districtId;
+    private String wardCode;
 
     public int getId() {
         return id;
@@ -157,8 +157,6 @@ public class Order {
         this.cancelReason = cancelReason;
     }
 
-
-
     public String getReceiverName() {
         return receiverName;
     }
@@ -197,5 +195,22 @@ public class Order {
 
     public void setOrderDetails(List<OrderDetail> orderDetails) {
         this.orderDetails = orderDetails;
+    }
+
+
+    public int getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(int districtId) {
+        this.districtId = districtId;
+    }
+
+    public String getWardCode() {
+        return wardCode;
+    }
+
+    public void setWardCode(String wardCode) {
+        this.wardCode = wardCode;
     }
 }

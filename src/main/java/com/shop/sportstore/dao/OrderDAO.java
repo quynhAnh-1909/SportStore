@@ -38,7 +38,7 @@ public class OrderDAO extends DBConnection {
                     data.put("orderId", rs.getString("Id"));
                     data.put("orderCode", rs.getString("OrderCode"));
                     data.put("totalPrice", rs.getString("TotalPrice"));
-                    data.put("address", rs.getString("Address")); // Cực kỳ quan trọng để hiện địa chỉ
+                    data.put("address", rs.getString("Address"));
                     data.put("receiverName", rs.getString("ReceiverName"));
                     data.put("fullName", rs.getString("full_name"));
                     data.put("email", rs.getString("email"));
@@ -72,18 +72,22 @@ public class OrderDAO extends DBConnection {
             String receiverName,
             String receiverPhone,
             String address,
+            int districtId,
+            String wardCode,
             String note,
             Integer voucherId,
             double discountAmount,
+            double shippingFee,
             List<CartItem> cart
     ) throws SQLException {
+
 
         String insertOrderSQL =
                 "INSERT INTO orders (" +
                         "UserId, OrderCode, TotalPrice, PaymentMethod, Status, " +
-                        "ReceiverName, ReceiverPhone, Address, Note, " +
-                        "VoucherId, DiscountAmount, CreatedAt" +
-                        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                        "ReceiverName, ReceiverPhone, Address, district_id, ward_code, Note, " +
+                        "VoucherId, DiscountAmount, shipping_fee, CreatedAt" + // <-- Đã thêm cột mới
+                        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 
         String insertDetailSQL =
                 "INSERT INTO orderdetails (OrderId, ProductId, Quantity, Price) VALUES (?, ?, ?, ?)";
@@ -95,7 +99,6 @@ public class OrderDAO extends DBConnection {
             conn.setAutoCommit(false);
             int orderId;
 
-
             try (PreparedStatement psOrder = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
                 psOrder.setInt(1, userId);
                 psOrder.setString(2, orderCode);
@@ -105,14 +108,19 @@ public class OrderDAO extends DBConnection {
                 psOrder.setString(6, receiverName);
                 psOrder.setString(7, receiverPhone);
                 psOrder.setString(8, address);
-                psOrder.setString(9, note);
+                psOrder.setInt(9, districtId);
+                psOrder.setString(10, wardCode);
+                psOrder.setString(11, note);
 
                 if (voucherId == null) {
-                    psOrder.setNull(10, Types.INTEGER);
+                    psOrder.setNull(12, Types.INTEGER);
                 } else {
-                    psOrder.setInt(10, voucherId);
+                    psOrder.setInt(12, voucherId);
                 }
-                psOrder.setDouble(11, discountAmount);
+                psOrder.setDouble(13, discountAmount);
+
+
+                psOrder.setDouble(14, shippingFee);
 
                 psOrder.executeUpdate();
 
@@ -144,7 +152,6 @@ public class OrderDAO extends DBConnection {
         }
     }
 
-
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
@@ -165,6 +172,10 @@ public class OrderDAO extends DBConnection {
                 order.setReceiverPhone(rs.getString("ReceiverPhone"));
                 order.setAddress(rs.getString("Address"));
                 order.setNote(rs.getString("Note"));
+
+
+                order.setDistrictId(rs.getInt("district_id"));
+                order.setWardCode(rs.getString("ward_code"));
 
                 order.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 order.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
@@ -257,6 +268,10 @@ public class OrderDAO extends DBConnection {
                 order.setAddress(rs.getString("Address"));
                 order.setNote(rs.getString("Note"));
 
+
+                order.setDistrictId(rs.getInt("district_id"));
+                order.setWardCode(rs.getString("ward_code"));
+
                 order.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 order.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
                 order.setShippingAt(rs.getTimestamp("ShippingAt"));
@@ -294,11 +309,16 @@ public class OrderDAO extends DBConnection {
                 o.setReceiverName(rs.getString("ReceiverName"));
                 o.setReceiverPhone(rs.getString("ReceiverPhone"));
 
+
+                o.setDistrictId(rs.getInt("district_id"));
+                o.setWardCode(rs.getString("ward_code"));
+
                 orders.add(o);
             }
         } catch (Exception e) { e.printStackTrace(); }
         return orders;
     }
+
     public Order getOrderById(int id) {
 
         String sql = "SELECT * FROM orders WHERE Id = ?";
@@ -323,6 +343,12 @@ public class OrderDAO extends DBConnection {
                 o.setAddress(rs.getString("Address"));
                 o.setNote(rs.getString("Note"));
 
+                o.setDistrictId(rs.getInt("district_id"));
+                o.setWardCode(rs.getString("ward_code"));
+
+
+                o.setShippingFee(rs.getDouble("shipping_fee"));
+
                 o.setCreatedAt(rs.getTimestamp("CreatedAt"));
                 o.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
                 o.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
@@ -330,7 +356,6 @@ public class OrderDAO extends DBConnection {
                 o.setCompletedAt(rs.getTimestamp("CompletedAt"));
                 o.setCancelledAt(rs.getTimestamp("CancelledAt"));
                 o.setCancelReason(rs.getString("CancelReason"));
-
 
                 OrderDetailDAO detailDAO = new OrderDetailDAO();
                 List<OrderDetail> details = detailDAO.getOrderDetailsByOrderId(id);

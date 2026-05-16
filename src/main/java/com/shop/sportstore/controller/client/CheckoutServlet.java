@@ -111,6 +111,25 @@ public class CheckoutServlet extends HttpServlet {
         String district = request.getParameter("district");
         String province = request.getParameter("province");
 
+
+        int districtId = 0;
+        String wardCode = "";
+
+        try {
+            String districtIdRaw = request.getParameter("districtId");
+            if (districtIdRaw != null && !districtIdRaw.isEmpty()) {
+                districtId = Integer.parseInt(districtIdRaw);
+            }
+
+            String wardCodeRaw = request.getParameter("wardCode");
+            if (wardCodeRaw != null && !wardCodeRaw.isEmpty()) {
+                wardCode = wardCodeRaw;
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi nhận mã vùng districtId/wardCode: " + e.getMessage());
+        }
+
+
         String fullAddress = "";
         if (specific != null && !specific.isBlank()) {
             fullAddress = specific + ", " + ward + ", " + district + ", " + province;
@@ -136,16 +155,28 @@ public class CheckoutServlet extends HttpServlet {
             }
         }
 
-        double shippingFee = 30000;
+
+        double shippingFee = 35000;
+
+        if (province != null && !province.isEmpty()) {
+            String provinceLower = province.toLowerCase();
+            if (provinceLower.contains("hồ chí minh") || provinceLower.contains("hcm")) {
+                shippingFee = 15000;
+            } else if (provinceLower.contains("hà nội")) {
+                shippingFee = 35000;
+            }
+        }
+
+
+
         double total = subtotal - discount + shippingFee;
         if (total < 0) total = 0;
 
-
         String orderCode = "ORD" + System.currentTimeMillis();
-
 
         try {
             OrderDAO orderDAO = new OrderDAO();
+
 
             orderDAO.createOrder(
                     userId,
@@ -156,31 +187,34 @@ public class CheckoutServlet extends HttpServlet {
                     receiverName,
                     receiverPhone,
                     fullAddress,
+                    districtId,
+                    wardCode,
                     note,
                     voucherId,
                     discount,
+                    shippingFee,
                     selectedCart
             );
 
 
-            cart.removeAll(selectedCart);
-            session.setAttribute("cart", cart);
-
+            if (cart != null) {
+                cart.removeAll(selectedCart);
+                session.setAttribute("cart", cart);
+            }
 
             session.setAttribute("lastOrderCode", orderCode);
 
-            if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
 
+            if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
                 response.sendRedirect(request.getContextPath() + "/vnpayPayment");
             } else {
-
                 response.sendRedirect(request.getContextPath() + "/orderSuccess");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             response.setContentType("text/html;charset=UTF-8");
-            response.getWriter().println("<h2>Lỗi tạo đơn hàng: " + e.getMessage() + "</h2>");
+            response.getWriter().println("<h2>Lỗi tạo đơn hàng trên hệ thống: " + e.getMessage() + "</h2>");
         }
     }
 }
