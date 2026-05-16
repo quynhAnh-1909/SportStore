@@ -139,14 +139,26 @@
 
         <div class="row justify-content-end mt-4">
             <div class="col-md-5">
+
                 <div class="total-box">
                     <div class="total-row">
                         <span class="text-muted">Tiền hàng:</span>
-                        <span class="fw-semibold"><fmt:formatNumber value="${order.totalPrice}" type="number"/> ₫</span>
+                        <span class="fw-semibold">
+            <fmt:formatNumber value="${order.totalPrice - order.shippingFee}" type="number"/> ₫
+        </span>
                     </div>
                     <div class="total-row">
                         <span class="text-muted">Phí vận chuyển:</span>
-                        <span class="text-success fw-semibold">30.000đ</span>
+                        <span class="text-success fw-semibold">
+            <c:choose>
+                <c:when test="${order.shippingFee > 0}">
+                    <fmt:formatNumber value="${order.shippingFee}" type="number"/> ₫
+                </c:when>
+                <c:otherwise>
+                    Mễn phí
+                </c:otherwise>
+            </c:choose>
+        </span>
                     </div>
                     <hr class="my-2">
                     <div class="total-row total-final">
@@ -154,12 +166,13 @@
                         <span><fmt:formatNumber value="${order.totalPrice}" type="number"/> ₫</span>
                     </div>
                 </div>
+
+
             </div>
         </div>
     </div>
 </div>
 
 <jsp:include page="/footer.jsp" />
-
 </body>
 </html>

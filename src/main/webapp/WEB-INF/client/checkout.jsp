@@ -20,7 +20,7 @@
             color: #333;
         }
 
-        /* CARD */
+
 
         .card {
             border-radius: 18px;
@@ -30,7 +30,7 @@
             overflow: hidden;
         }
 
-        /* TITLE */
+
 
         .checkout-title {
             color: #d81f19;
@@ -39,7 +39,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* LABEL */
+
 
         .form-label {
             font-size: 0.95rem;
@@ -47,7 +47,7 @@
             color: #222;
         }
 
-        /* INPUT + SELECT */
+
 
         .form-control,
         .form-select {
@@ -73,7 +73,7 @@
             padding-top: 12px;
         }
 
-        /* FOCUS */
+
 
         .form-control:focus,
         .form-select:focus {
@@ -85,7 +85,6 @@
             background: #fff;
         }
 
-        /* ĐÃ NHẬP */
 
         .form-control:not(:placeholder-shown),
         .form-select:valid {
@@ -102,7 +101,7 @@
             background: #f3fff8;
         }
 
-        /* BUTTON BACK */
+
 
         .btn-back {
 
@@ -134,7 +133,7 @@
             border-color: #d81f19;
         }
 
-        /* PAYMENT */
+
 
         .payment-box input[type="radio"] {
             display: none;
@@ -173,7 +172,7 @@
             box-shadow: 0 8px 20px rgba(216,31,25,0.12);
         }
 
-        /* BUTTON ORDER */
+
 
         .btn-order {
 
@@ -213,7 +212,7 @@
             box-shadow: 0 10px 24px rgba(216,31,25,0.25);
         }
 
-        /* SUMMARY */
+
 
         .order-summary .card-body {
 
@@ -245,7 +244,7 @@
             font-weight: 800;
         }
 
-        /* PRODUCT */
+
 
         .d-flex img {
 
@@ -358,14 +357,13 @@
             font-size: 15px;
         }
 
-        /* HR */
+
 
         hr {
 
             opacity: 0.1;
         }
 
-        /* RESPONSIVE */
 
         @media (max-width: 768px) {
 
@@ -527,7 +525,6 @@
                                       class="form-control"
                                       rows="2"></textarea>
                         </div>
-                        <!-- VOUCHER -->
                         <div class="mb-3 mt-4">
 
                             <label class="form-label fw-bold">
@@ -592,6 +589,8 @@
                             </div>
 
                         </div>
+
+                        <input type="hidden" name="shippingFee" id="shippingFeeInput" value="30000">
 
                         <button type="submit"
                                 class="btn btn-order w-100 mt-4">
@@ -668,7 +667,7 @@
                     <div class="d-flex justify-content-between mt-2">
                         <span>Phí giao hàng</span>
 
-                        <span>
+                        <span id="shippingFeeDisplay">
                             30,000 ₫
                         </span>
                     </div>
@@ -702,7 +701,8 @@
 <script>
 
     const subtotal = ${total};
-    const shippingFee = 30000;
+
+    let shippingFee = 30000;
 
     const voucherSelect =
             document.getElementById("voucherSelect");
@@ -712,6 +712,10 @@
 
     const finalPrice =
             document.getElementById("finalPrice");
+
+
+    const shippingFeeDisplay = document.getElementById("shippingFeeDisplay");
+    const shippingFeeInput = document.getElementById("shippingFeeInput");
 
     const vouchers = {
 
@@ -776,6 +780,10 @@
 
         discountPrice.innerText =
                 "- " + formatMoney(discount);
+
+
+        shippingFeeDisplay.innerText = formatMoney(shippingFee);
+        shippingFeeInput.value = shippingFee;
 
         finalPrice.innerText =
                 formatMoney(finalTotal);
@@ -854,6 +862,10 @@
                                         districtSelect.options.add(option);
                                     });
                                 }
+
+
+                                shippingFee = 30000;
+                                updateTotal();
                             });
 
                     districtSelect.addEventListener(
@@ -902,6 +914,21 @@
                                     });
                                 }
                             });
+
+
+                    wardSelect.addEventListener('change', function() {
+                        const provinceName = provinceSelect.value;
+
+
+                        if (provinceName.includes("Hà Nội") || provinceName.includes("Hồ Chí Minh")) {
+                            shippingFee = 15000;
+                        } else {
+                            shippingFee = 35000;
+                        }
+
+
+                        updateTotal();
+                    });
                 })
 
                 .catch(error =>
