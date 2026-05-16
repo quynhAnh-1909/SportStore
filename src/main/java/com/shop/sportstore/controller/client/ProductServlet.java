@@ -1,5 +1,6 @@
 package com.shop.sportstore.controller.client;
 
+import com.shop.sportstore.dao.BannerDAO;
 import com.shop.sportstore.dao.CategoryDAO;
 import com.shop.sportstore.dao.ProductDAO;
 import com.shop.sportstore.model.Category;
@@ -19,7 +20,7 @@ public class ProductServlet extends HttpServlet {
 
     private ProductDAO productDAO;
     private CategoryDAO categoryDAO;
-
+    private BannerDAO bannerDAO = new BannerDAO();
     @Override
     public void init() {
         productDAO = new ProductDAO();
@@ -103,7 +104,6 @@ public class ProductServlet extends HttpServlet {
             // CATEGORY TREE
             List<Category> allCategories =
                     categoryDAO.getAllCategories();
-
             List<Category> categories =
                     categoryDAO.buildTree(allCategories);
 
@@ -146,6 +146,12 @@ public class ProductServlet extends HttpServlet {
 
             request.setAttribute("keyword", keyword);
             request.setAttribute("categoryId", categoryId);
+
+            // ACTIVE BANNERS
+            request.setAttribute(
+                    "banners",
+                    bannerDAO.findActiveBanners()
+            );
 
             request.getRequestDispatcher("/products.jsp")
                     .forward(request, response);

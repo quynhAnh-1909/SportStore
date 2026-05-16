@@ -6,6 +6,8 @@ public class Banner {
     private String title;
     private String image;
     private boolean status;
+    private Integer productId;
+    private String link;
 
     public Banner() {
     }
@@ -52,4 +54,21 @@ public class Banner {
     public void setStatus(boolean status) {
         this.status = status;
     }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setProductId(Integer productId) {
+        this.productId = productId;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public Integer getProductId() {
+        return productId;
+    }
+
 }

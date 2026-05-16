@@ -49,13 +49,12 @@ public class CategoryDAO {
         List<Category> roots = new ArrayList<>();
         Map<Integer, Category> map = new HashMap<>();
 
-        // B1: đưa tất cả vào map
+
         for (Category c : list) {
             c.setChildren(new ArrayList<>());
             map.put(c.getId(), c);
         }
 
-        // B2: build cây
         for (Category c : list) {
 
             if (c.getParentId() == null) {
@@ -106,5 +105,12 @@ public class CategoryDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public List<Category> getParentCategories() {
+
+        List<Category> all =
+                getAllCategories();
+
+        return buildTree(all);
     }
 }

@@ -33,10 +33,10 @@
                 <thead class="table-dark">
                 <tr>
                     <th style="width: 80px;">ID</th>
-                    <th style="width: 160px;">Hình ảnh</th>
+                    <th style="width: 180px;">Hình ảnh</th>
                     <th class="text-start">Tiêu đề</th>
-                    <th>Trạng thái</th>
-                    <th style="width: 220px;">Thao tác</th>
+                    <th style="width: 150px;">Trạng thái</th>
+                    <th style="width: 260px;">Thao tác</th>
                 </tr>
                 </thead>
 
@@ -54,9 +54,9 @@
                         <!-- IMAGE -->
                         <td>
 
-                            <img src="${root}/uploads/${b.image}"
+                            <img src="${root}/resources/${b.image}"
                                  class="rounded shadow-sm"
-                                 style="width:120px;height:65px;object-fit:cover;">
+                                 style="width:140px;height:70px;object-fit:cover;">
 
                         </td>
 
@@ -108,11 +108,22 @@
 
                                 </a>
 
-                                <!-- TOGGLE -->
+                                <!-- TOGGLE STATUS -->
                                 <a href="${root}/admin/banners?action=toggle&id=${b.id}"
-                                   class="btn btn-sm btn-outline-info">
+                                   class="btn btn-sm
+                                   ${b.status ? 'btn-outline-warning' : 'btn-outline-success'}">
 
-                                    <i class="fas fa-sync"></i>
+                                    <c:choose>
+
+                                        <c:when test="${b.status}">
+                                            <i class="fas fa-eye-slash"></i>
+                                        </c:when>
+
+                                        <c:otherwise>
+                                            <i class="fas fa-eye"></i>
+                                        </c:otherwise>
+
+                                    </c:choose>
 
                                 </a>
 
