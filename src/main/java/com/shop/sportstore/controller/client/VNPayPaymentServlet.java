@@ -17,16 +17,16 @@ public class VNPayPaymentServlet extends HttpServlet {
 
     // ===== CONFIG =====
     private static final String VNP_TMNCODE =
-            "YOUR_TMN_CODE";
+            "SKHL50DJ";
 
     private static final String VNP_HASH_SECRET =
-            "YOUR_SECRET_KEY";
+            "B70Y9KNAN3VMHE3Q0W0IAZ6PGGU8UL5U";
 
     private static final String VNP_PAY_URL =
             "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 
     private static final String VNP_RETURN_URL =
-            "http://192.168.58.130/vnpay-return";
+            "http://10.208.147.195/vnpay-return";
 
     @Override
     protected void doGet(HttpServletRequest request,
