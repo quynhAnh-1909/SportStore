@@ -1,9 +1,6 @@
 package com.shop.sportstore.dao;
 
-import com.shop.sportstore.model.CartItem;
-import com.shop.sportstore.model.Order;
-import com.shop.sportstore.model.OrderDetail;
-import com.shop.sportstore.model.Product;
+import com.shop.sportstore.model.*;
 import com.shop.sportstore.untils.DBConnection;
 
 import java.sql.*;
@@ -193,26 +190,36 @@ public class OrderDAO extends DBConnection {
         return orders;
     }
 
-    public List<Map<String, String>> getOrderItems(String orderCode) throws SQLException {
-        List<Map<String, String>> items = new ArrayList<>();
+    public List<OrderItem> getOrderItems(String orderCode) throws SQLException {
+
+        List<OrderItem> items = new ArrayList<>();
+
         String sql = "SELECT p.id AS productId, p.name AS productName, p.price, od.Quantity " +
-                "FROM orderdetails od JOIN orders o ON od.OrderId = o.Id " +
-                "JOIN products p ON od.ProductId = p.id WHERE o.OrderCode = ?";
+                "FROM orderdetails od " +
+                "JOIN orders o ON od.OrderId = o.Id " +
+                "JOIN products p ON od.ProductId = p.id " +
+                "WHERE o.OrderCode = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, orderCode);
+
             try (ResultSet rs = ps.executeQuery()) {
+
                 while (rs.next()) {
-                    Map<String, String> item = new HashMap<>();
-                    item.put("productId", rs.getString("productId"));
-                    item.put("productName", rs.getString("productName"));
-                    item.put("price", rs.getString("price"));
-                    item.put("quantity", rs.getString("Quantity"));
-                    item.put("subtotal", String.valueOf(rs.getDouble("price") * rs.getInt("Quantity")));
+
+                    OrderItem item = new OrderItem();
+                    item.setProductId(rs.getInt("productId"));
+                    item.setProductName(rs.getString("productName"));
+                    item.setPrice(rs.getDouble("price"));
+                    item.setQuantity(rs.getInt("Quantity"));
+
                     items.add(item);
                 }
             }
         }
+
         return items;
     }
 
