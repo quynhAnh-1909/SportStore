@@ -246,47 +246,89 @@ public class OrderDAO extends DBConnection {
         return 0;
     }
 
+
+    public boolean updateStatusByGhnCode(String orderCode, String status) throws SQLException {
+
+        String timeColumn = "";
+        switch (status) {
+            case "PROCESSING":
+                timeColumn = ", ConfirmedAt = NOW()";
+                break;
+            case "SHIPPING":
+                timeColumn = ", ShippingAt = NOW()";
+                break;
+            case "DELIVERED":
+                timeColumn = ", CompletedAt = NOW()";
+                break;
+            case "CANCELLED":
+                timeColumn = ", CancelledAt = NOW()";
+                break;
+        }
+
+        String sql = "UPDATE orders SET Status = ?, UpdatedAt = NOW() " + timeColumn + " WHERE OrderCode = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, orderCode);
+            return ps.executeUpdate() > 0;
+        }
+    }
     public List<Order> getOrdersByStatus(String status) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
                 "JOIN users u ON o.UserId = u.user_id WHERE o.Status = ? ORDER BY o.CreatedAt DESC";
+
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, status);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Order order = new Order();
-                order.setId(rs.getInt("Id"));
-                order.setUserId(rs.getInt("UserId"));
-                order.setOrderCode(rs.getString("OrderCode"));
-                order.setTotalPrice(rs.getDouble("TotalPrice"));
-                order.setStatus(rs.getString("Status"));
-                order.setPaymentMethod(rs.getString("PaymentMethod"));
 
-                order.setReceiverName(rs.getString("ReceiverName"));
-                order.setReceiverPhone(rs.getString("ReceiverPhone"));
-                order.setAddress(rs.getString("Address"));
-                order.setNote(rs.getString("Note"));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Order order = new Order();
+                    order.setId(rs.getInt("Id"));
+                    order.setUserId(rs.getInt("UserId"));
+                    order.setOrderCode(rs.getString("OrderCode"));
+                    order.setTotalPrice(rs.getDouble("TotalPrice"));
+                    order.setStatus(rs.getString("Status"));
+                    order.setPaymentMethod(rs.getString("PaymentMethod"));
 
 
-                order.setDistrictId(rs.getInt("district_id"));
-                order.setWardCode(rs.getString("ward_code"));
+                    order.setReceiverName(rs.getString("ReceiverName"));
+                    order.setReceiverPhone(rs.getString("ReceiverPhone"));
+                    order.setAddress(rs.getString("Address"));
+                    order.setNote(rs.getString("Note"));
 
-                order.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                order.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
-                order.setShippingAt(rs.getTimestamp("ShippingAt"));
-                order.setCompletedAt(rs.getTimestamp("CompletedAt"));
-                order.setCancelledAt(rs.getTimestamp("CancelledAt"));
-                order.setCancelReason(rs.getString("CancelReason"));
-                order.setUserFullName(rs.getString("userFullName"));
-                orders.add(order);
+
+                    order.setDistrictId(rs.getInt("district_id"));
+                    order.setWardCode(rs.getString("ward_code"));
+
+
+                    order.setShippingFee(rs.getDouble("shipping_fee"));
+
+
+                    order.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                    order.setUpdatedAt(rs.getTimestamp("UpdatedAt")); // Đã bổ sung trường này tránh khuyết dữ liệu
+                    order.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
+                    order.setShippingAt(rs.getTimestamp("ShippingAt"));
+                    order.setCompletedAt(rs.getTimestamp("CompletedAt"));
+                    order.setCancelledAt(rs.getTimestamp("CancelledAt"));
+                    order.setCancelReason(rs.getString("CancelReason"));
+
+
+                    order.setUserFullName(rs.getString("userFullName"));
+
+                    orders.add(order);
+                }
             }
         } catch (Exception e) {
+            System.err.println("❌ Lỗi xảy ra tại hàm getOrdersByStatus: " + e.getMessage());
             e.printStackTrace();
         }
         return orders;
     }
-
     public List<Order> getOrdersByUser(int userId) {
         List<Order> orders = new ArrayList<>();
 
@@ -441,5 +483,59 @@ public class OrderDAO extends DBConnection {
             e.printStackTrace();
         }
         return cartItems;
+    }
+
+
+    public Order findOrderByCodeOrPhone(String keyword) {
+
+        String sql = "SELECT * FROM orders WHERE OrderCode = ? OR ReceiverPhone = ? OR Id = ? ORDER BY CreatedAt DESC LIMIT 1";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            String cleanKeyword = keyword.trim();
+            ps.setString(1, cleanKeyword);
+            ps.setString(2, cleanKeyword);
+
+
+            int idSearch = 0;
+            try {
+                idSearch = Integer.parseInt(cleanKeyword);
+            } catch (NumberFormatException e) {
+                idSearch = -1;
+            }
+            ps.setInt(3, idSearch);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Order o = new Order();
+                    o.setId(rs.getInt("Id"));
+                    o.setUserId(rs.getInt("UserId"));
+                    o.setOrderCode(rs.getString("OrderCode"));
+                    o.setTotalPrice(rs.getDouble("TotalPrice"));
+                    o.setPaymentMethod(rs.getString("PaymentMethod"));
+                    o.setStatus(rs.getString("Status"));
+                    o.setNote(rs.getString("Note"));
+                    o.setVoucherId(rs.getObject("VoucherId") != null ? rs.getInt("VoucherId") : null);
+                    o.setDiscountAmount(rs.getDouble("DiscountAmount"));
+                    o.setReceiverName(rs.getString("ReceiverName"));
+                    o.setReceiverPhone(rs.getString("ReceiverPhone"));
+                    o.setAddress(rs.getString("Address"));
+                    o.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                    o.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                    o.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
+                    o.setShippingAt(rs.getTimestamp("ShippingAt"));
+                    o.setCompletedAt(rs.getTimestamp("CompletedAt"));
+                    o.setCancelledAt(rs.getTimestamp("CancelledAt"));
+                    o.setCancelReason(rs.getString("CancelReason"));
+
+                    return o;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi tại findOrderByCodeOrPhone: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 }
