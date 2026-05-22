@@ -19,7 +19,9 @@
             <div class="info-header">
                 <div>
                     <span class="label">Mã đơn hàng</span>
-                    <h3 class="order-code">${order.orderCode}</h3>
+                    <c:if test="${not empty order}">
+                        <h3 class="order-code">${order.orderCode}</h3>
+                    </c:if>
                 </div>
                 <div class="total-box">
                     <span class="label">Tổng thanh toán</span>
@@ -42,25 +44,41 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <c:forEach var="item" items="${items}">
-                            <tr>
-                                <td>
-                                    <div class="product-box">
-                                        <div class="product-name">${item.productName}</div>
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <span class="qty-badge">${item.quantity}</span>
-                                </td>
-                                <td class="text-end fw-semibold">
-                                    <fmt:formatNumber value="${item.price}" type="number" /> ₫
-                                </td>
-                                <td class="text-end text-danger fw-bold">
-                                    <fmt:formatNumber value="${item.subtotal}" type="number" /> ₫
-                                </td>
-                            </tr>
-                        </c:forEach>
+                        <c:if test="${not empty items}">
+                            <c:forEach var="item" items="${items}">
+                                <tr>
+                                    <td>
+                                        <div class="product-box">
+                                            <div class="product-name">${item.productName}</div>
+                                        </div>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span class="qty-badge">${item.quantity}</span>
+                                    </td>
+
+                                    <td class="text-end fw-semibold">
+                                        <fmt:formatNumber value="${item.price}" type="number"/> ₫
+                                    </td>
+
+                                    <td class="text-end text-danger fw-bold">
+                                        <fmt:formatNumber value="${item.price * item.quantity}" type="number"/> ₫
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </c:if>
                         </tbody>
+    <c:if test="${param.vnp_ResponseCode == '00'}">
+        <div class="alert alert-success">
+            Thanh toán VNPay thành công
+        </div>
+    </c:if>
+
+    <c:if test="${param.vnp_ResponseCode != '00'}">
+        <div class="alert alert-danger">
+            Thanh toán thất bại
+        </div>
+    </c:if>
                         <tfoot class="border-top">
                         <tr>
                             <th colspan="3" class="text-end py-3">Tổng giá trị sản phẩm:</th>

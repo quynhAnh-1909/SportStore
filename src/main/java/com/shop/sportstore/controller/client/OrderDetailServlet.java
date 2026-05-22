@@ -15,14 +15,10 @@ import java.util.List;
 @WebServlet("/order-detail")
 public class OrderDetailServlet extends HttpServlet {
 
-    private final OrderDAO orderDAO =
-            new OrderDAO();
-
-    private final OrderDetailDAO detailDAO =
-            new OrderDetailDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
+    private final OrderDetailDAO detailDAO = new OrderDetailDAO();
 
     @Override
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -34,10 +30,16 @@ public class OrderDetailServlet extends HttpServlet {
             if (order != null) {
                 System.out.println("Mã đơn: " + order.getOrderCode());
                 System.out.println("Số lượng SP: " + (order.getOrderDetails() != null ? order.getOrderDetails().size() : 0));
+                System.out.println("Phí ship lấy từ DB: " + order.getShippingFee()); // Kiểm tra xem log có ra đúng số tiền không
             }
             System.out.println("===============================");
 
             if (order != null) {
+
+                double finalTotalPrice = order.getTotalPrice();
+
+
+                request.setAttribute("finalTotalPrice", finalTotalPrice);
                 request.setAttribute("order", order);
                 request.getRequestDispatcher("/WEB-INF/client/order-detail.jsp").forward(request, response);
             } else {

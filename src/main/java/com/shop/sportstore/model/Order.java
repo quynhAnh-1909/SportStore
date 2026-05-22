@@ -22,20 +22,24 @@ public class Order {
     private String cancelReason;
     private String address;
 
-
     private String receiverName;
     private String receiverPhone;
     private double shippingFee;
     private boolean paid;
     private List<OrderDetail> orderDetails;
 
-
+    private int districtId;
+    private String wardCode;
+    private Integer voucherId;
+    private double discountAmount;
 
     public int getId() {
+
         return id;
     }
 
     public void setId(int id) {
+
         this.id = id;
     }
 
@@ -44,13 +48,16 @@ public class Order {
     }
 
     public void setAddress(String address) {
+
         this.address = address;
     }
     public int getUserId() {
+
         return userId;
     }
 
     public void setUserId(int userId) {
+
         this.userId = userId;
     }
 
@@ -59,10 +66,12 @@ public class Order {
     }
 
     public void setOrderCode(String orderCode) {
+
         this.orderCode = orderCode;
     }
 
     public double getTotalPrice() {
+
         return totalPrice;
     }
 
@@ -83,119 +92,182 @@ public class Order {
     }
 
     public void setPaymentMethod(String paymentMethod) {
+
         this.paymentMethod = paymentMethod;
     }
 
     public Timestamp getCreatedAt() {
+
         return createdAt;
     }
 
     public void setCreatedAt(Timestamp createdAt) {
+
         this.createdAt = createdAt;
     }
 
     public Timestamp getUpdatedAt() {
+
         return updatedAt;
     }
 
     public void setUpdatedAt(Timestamp updatedAt) {
+
         this.updatedAt = updatedAt;
     }
 
     public String getNote() {
+
         return note;
     }
 
     public void setNote(String note) {
+
         this.note = note;
     }
 
     public String getUserFullName() {
+
         return userFullName;
     }
 
     public void setUserFullName(String userFullName) {
+
         this.userFullName = userFullName;
     }
 
     public Timestamp getConfirmedAt() {
+
         return confirmedAt;
     }
 
     public void setConfirmedAt(Timestamp confirmedAt) {
+
         this.confirmedAt = confirmedAt;
     }
 
     public Timestamp getShippingAt() {
+
         return shippingAt;
     }
 
     public void setShippingAt(Timestamp shippingAt) {
+
         this.shippingAt = shippingAt;
     }
 
     public Timestamp getCompletedAt() {
+
         return completedAt;
     }
 
     public void setCompletedAt(Timestamp completedAt) {
+
         this.completedAt = completedAt;
     }
     public Timestamp getCancelledAt() {
+
         return cancelledAt;
     }
 
     public void setCancelledAt(Timestamp cancelledAt) {
+
         this.cancelledAt = cancelledAt;
     }
 
     public String getCancelReason() {
+
         return cancelReason;
     }
 
     public void setCancelReason(String cancelReason) {
+
         this.cancelReason = cancelReason;
     }
 
-
-
     public String getReceiverName() {
+
         return receiverName;
     }
 
     public void setReceiverName(String receiverName) {
+
         this.receiverName = receiverName;
     }
 
     public String getReceiverPhone() {
+
         return receiverPhone;
     }
 
     public void setReceiverPhone(String receiverPhone) {
+
         this.receiverPhone = receiverPhone;
     }
 
     public double getShippingFee() {
+
         return shippingFee;
     }
 
     public void setShippingFee(double shippingFee) {
+
         this.shippingFee = shippingFee;
     }
 
     public boolean isPaid() {
+
         return paid;
     }
 
     public void setPaid(boolean paid) {
+
         this.paid = paid;
     }
 
     public List<OrderDetail> getOrderDetails() {
+
         return orderDetails;
     }
 
     public void setOrderDetails(List<OrderDetail> orderDetails) {
         this.orderDetails = orderDetails;
+    }
+
+
+    public int getDistrictId() {
+
+        return districtId;
+    }
+
+    public void setDistrictId(int districtId) {
+
+
+        this.districtId = districtId;
+    }
+
+    public String getWardCode() {
+
+
+        return wardCode;
+    }
+
+    public void setWardCode(String wardCode) {
+
+        this.wardCode = wardCode;
+    }
+
+    public Integer getVoucherId() {
+        return voucherId;
+    }
+    public void setVoucherId(Integer voucherId) {
+        this.voucherId = voucherId;
+    }
+
+    public double getDiscountAmount() {
+        return discountAmount;
+    }
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount = discountAmount;
     }
 }
