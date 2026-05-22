@@ -417,4 +417,89 @@ public class OrderDAO extends DBConnection {
         }
         return cartItems;
     }
+<<<<<<< Updated upstream
+=======
+
+
+    public Order findOrderByCodeOrPhone(String keyword) {
+
+        String sql = "SELECT * FROM orders WHERE OrderCode = ? OR ReceiverPhone = ? OR Id = ? ORDER BY CreatedAt DESC LIMIT 1";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            String cleanKeyword = keyword.trim();
+            ps.setString(1, cleanKeyword);
+            ps.setString(2, cleanKeyword);
+
+
+            int idSearch = 0;
+            try {
+                idSearch = Integer.parseInt(cleanKeyword);
+            } catch (NumberFormatException e) {
+                idSearch = -1;
+            }
+            ps.setInt(3, idSearch);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Order o = new Order();
+                    o.setId(rs.getInt("Id"));
+                    o.setUserId(rs.getInt("UserId"));
+                    o.setOrderCode(rs.getString("OrderCode"));
+                    o.setTotalPrice(rs.getDouble("TotalPrice"));
+                    o.setPaymentMethod(rs.getString("PaymentMethod"));
+                    o.setStatus(rs.getString("Status"));
+                    o.setNote(rs.getString("Note"));
+                    o.setVoucherId(rs.getObject("VoucherId") != null ? rs.getInt("VoucherId") : null);
+                    o.setDiscountAmount(rs.getDouble("DiscountAmount"));
+                    o.setReceiverName(rs.getString("ReceiverName"));
+                    o.setReceiverPhone(rs.getString("ReceiverPhone"));
+                    o.setAddress(rs.getString("Address"));
+                    o.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                    o.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+                    o.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
+                    o.setShippingAt(rs.getTimestamp("ShippingAt"));
+                    o.setCompletedAt(rs.getTimestamp("CompletedAt"));
+                    o.setCancelledAt(rs.getTimestamp("CancelledAt"));
+                    o.setCancelReason(rs.getString("CancelReason"));
+
+                    return o;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi tại findOrderByCodeOrPhone: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Order getOrderByCode(String orderCode) {
+        String sql = "SELECT * FROM orders WHERE order_code = ?";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, orderCode);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Order order = new Order();
+
+                order.setId(rs.getInt("id"));
+                order.setOrderCode(rs.getString("order_code"));
+
+                return order;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+>>>>>>> Stashed changes
 }

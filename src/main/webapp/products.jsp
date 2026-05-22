@@ -98,6 +98,66 @@
             color: #198754;
         }
 
+        /* SECTION TITLE */
+        .section-title{
+
+            font-size:28px;
+
+            font-weight:700;
+
+            color:#198754;
+
+            margin:0;
+
+            letter-spacing:0.5px;
+        }
+
+        /* SECTION WRAPPER */
+        .section-header{
+
+            margin-top:40px;
+
+            margin-bottom:20px;
+        }
+
+        /* PRODUCT NAME */
+        .product-name{
+
+            font-size:15px;
+
+            font-weight:600;
+
+            min-height:45px;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            text-align:center;
+        }
+
+        /* PRICE */
+        .price{
+
+            font-size:20px;
+
+            color:#e41e31;
+
+            font-weight:700;
+        }
+
+        /* BUTTON */
+        .btn-cart{
+
+            font-size:14px;
+
+            border-radius:8px;
+
+            padding:8px;
+        }
+
     </style>
 
 </head>
@@ -112,11 +172,11 @@
     <c:if test="${empty param.categoryId}">
 
         <!-- BEST SELLER -->
-        <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+        <div class="d-flex justify-content-between align-items-center section-header">
 
-            <h3 class="fw-bold text-success m-0">
-                SẢN PHẨM BÁN CHẠY
-            </h3>
+            <h2 class="section-title">
+                Sản phẩm bán chạy
+            </h2>
 
             <a href="${root}/products"
                class="btn btn-outline-success btn-sm">
@@ -180,11 +240,11 @@
 
 
         <!-- FOOTBALL -->
-        <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+        <div class="d-flex justify-content-between align-items-center section-header">
 
-            <h3 class="fw-bold text-success m-0">
-                SẢN PHẨM BÓNG ĐÁ
-            </h3>
+            <h2 class="section-title">
+                Sản phẩm bóng đá
+            </h2>
 
             <a href="${root}/products?categoryId=4"
                class="btn btn-outline-success btn-sm">
@@ -250,11 +310,11 @@
 
 
         <!-- BADMINTON -->
-        <div class="d-flex justify-content-between align-items-center mt-5 mb-4">
+        <div class="d-flex justify-content-between align-items-center section-header">
 
-            <h3 class="fw-bold text-success m-0">
-                SẢN PHẨM CẦU LÔNG
-            </h3>
+            <h2 class="section-title">
+                Sản phẩm cầu lông
+            </h2>
 
             <a href="${root}/products?categoryId=14"
                class="btn btn-outline-success btn-sm">
@@ -476,6 +536,7 @@
 <!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <jsp:include page="footer.jsp"/>
+
 <script>
 
     const ROOT = "${pageContext.request.contextPath}";

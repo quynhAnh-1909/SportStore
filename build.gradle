@@ -43,10 +43,11 @@ apply plugin: 'org.hidetake.ssh'
 
 remotes {
     server {
-        host = '192.168.44.128'
+        host = '192.168.131.128'
         port = 22
-        user = 'huynhtran'
-        password = '123456'
+        user = 'huynhhuuthuc'
+        identity = file("${System.properties['user.home']}/.ssh/id_ed25519")
+
     }
 }
 
@@ -77,15 +78,13 @@ task restartDocker {
         ssh.run {
             session(remotes.server) {
 
-                // Xóa container cũ
                 execute 'docker rm -f tomcat10 || true'
 
-                // Chạy container mới
                 execute '''
 docker run -d \
 --name tomcat10 \
 --network sport-network \
--v /usr/deploy:/usr/local/tomcat/webapps \
+-v /usr/deploy/ROOT.war:/usr/local/tomcat/webapps/ROOT.war \
 -p 80:8080 \
 tomcat:10.1
 '''
@@ -93,6 +92,28 @@ tomcat:10.1
         }
     }
 }
+
+//task restartDocker {
+//    doLast {
+//        ssh.run {
+//            session(remotes.server) {
+//
+//                // Xóa container cũ
+//                execute 'docker rm -f tomcat10 || true'
+//
+//                // Chạy container mới
+//                execute '''
+//docker run -d \
+//--name tomcat10 \
+//--network sport-network \
+//-v /usr/deploy:/usr/local/tomcat/webapps \
+//-p 80:8080 \
+//tomcat:10.1
+//'''
+//            }
+//        }
+//    }
+//}
 
 task deploy {
     dependsOn uploadWar, restartDocker

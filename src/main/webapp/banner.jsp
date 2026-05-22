@@ -96,23 +96,44 @@
 
         <div class="category-menu">
 
-            <div class="menu-title">☰ Danh mục sản phẩm</div>
+            <div class="menu-title">
+                ☰ Danh mục sản phẩm
+            </div>
 
             <div class="mega-menu">
 
-                <c:forEach var="parent" items="${categories}">
-                    <div class="menu-column">
+                <!-- MÔN THỂ THAO -->
+                <div class="menu-group">
 
-                        <h6>${parent.name}</h6>
+                    <h5>Môn thể thao</h5>
 
-                        <c:forEach var="child" items="${parent.children}">
-                            <a href="${root}/products?categoryId=${child.id}">
-                                    ${child.name}
-                            </a>
-                        </c:forEach>
+                    <a href="${root}/products?categoryId=4">Bóng đá</a>
+                    <a href="${root}/products?categoryId=5">Bóng rổ</a>
+                    <a href="${root}/products?categoryId=6">Gym & Fitness</a>
+                    <a href="${root}/products?categoryId=14">Cầu lông</a>
+                    <a href="${root}/products?categoryId=15">Tennis</a>
 
-                    </div>
-                </c:forEach>
+                </div>
+
+                <!-- THỜI TRANG -->
+                <div class="menu-group">
+
+                    <h5>Thời trang</h5>
+
+                    <a href="${root}/products?categoryId=7">Áo thể thao</a>
+                    <a href="${root}/products?categoryId=8">Quần thể thao</a>
+
+                </div>
+
+                <!-- PHỤ KIỆN -->
+                <div class="menu-group">
+
+                    <h5>Phụ kiện</h5>
+
+                    <a href="${root}/products?categoryId=9">Túi thể thao</a>
+                    <a href="${root}/products?categoryId=10">Găng tay</a>
+
+                </div>
 
             </div>
 
@@ -125,102 +146,145 @@
 <!-- ===== STYLE ===== -->
 <style>
     .menu-bar{
-        position:absolute;
 
-        top:10px;
-        left:20px;
+        position:relative;
+
+        margin-top:20px;
+
+        margin-bottom:20px;
 
         z-index:10;
-
-        background:rgba(0,0,0,0.6);
-        border-radius:6px;
-        padding:8px 12px;
-    }
-
-    .menu-title{
-        color:white;
-        cursor:pointer;
-        font-weight:bold;
-        user-select:none;
     }
 
     .category-menu{
         position:relative;
     }
 
+    .menu-title{
+
+        background:#444;
+
+        color:white;
+
+        padding:10px 16px;
+
+        border-radius:8px;
+
+        cursor:pointer;
+
+        font-weight:600;
+
+        font-size:16px;
+
+        width:230px;
+
+        transition:0.3s;
+    }
+
+    .menu-title:hover{
+        background:#333;
+    }
+
     .mega-menu{
+
         display:none;
 
         position:absolute;
-        top:40px;
+
+        top:100%;
         left:0;
 
-        width:900px;
+        width:230px;
 
         background:white;
-        box-shadow:0 10px 40px rgba(0,0,0,0.3);
 
-        padding:20px;
         border-radius:8px;
 
-        z-index:20;
+        box-shadow:0 8px 20px rgba(0,0,0,0.15);
 
-        grid-template-columns:repeat(5,1fr);
-        gap:20px;
+        padding:12px;
+
+        z-index:9999;
     }
 
-    .menu-column h6{
-        font-weight:bold;
-        margin-bottom:10px;
-        color:#d81f19;
-    }
-
-    .menu-column a{
+    .category-menu:hover .mega-menu{
         display:block;
-        color:#333;
-        text-decoration:none;
-        margin-bottom:5px;
-        font-size:14px;
     }
 
-    .menu-column a:hover{
+    .menu-group{
+        margin-bottom:14px;
+    }
+
+    .menu-group:last-child{
+        margin-bottom:0;
+    }
+
+    .menu-group h5{
+
         color:#d81f19;
+
+        font-size:16px;
+
+        margin-bottom:6px;
+
+        font-weight:700;
     }
 
+    .menu-group a{
+
+        display:block;
+
+        padding:5px 0;
+
+        color:#333;
+
+        text-decoration:none;
+
+        font-size:14px;
+
+        transition:0.2s;
+    }
+
+    .menu-group a:hover{
+
+        color:#d81f19;
+
+        padding-left:6px;
+    }
 </style>
 
 <!-- ===== SCRIPT ===== -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const menu = document.querySelector('.category-menu');
-        const title = document.querySelector('.menu-title');
-        const mega = document.querySelector('.mega-menu');
-
-        if (!menu || !title || !mega) return;
-
-        let open = false;
-
-        title.addEventListener('click', (e) => {
-            e.stopPropagation();
-            open = !open;
-            mega.style.display = open ? 'grid' : 'none';
-        });
-
-        menu.addEventListener('mouseenter', () => {
-            mega.style.display = 'grid';
-            open = true;
-        });
-
-        menu.addEventListener('mouseleave', () => {
-            mega.style.display = 'none';
-            open = false;
-        });
-
-        document.addEventListener('click', () => {
-            mega.style.display = 'none';
-            open = false;
-        });
-
-    });
+    // document.addEventListener("DOMContentLoaded", function () {
+    //
+    //     const menu = document.querySelector('.category-menu');
+    //     const title = document.querySelector('.menu-title');
+    //     const mega = document.querySelector('.mega-menu');
+    //
+    //     if (!menu || !title || !mega) return;
+    //
+    //     let open = false;
+    //
+    //     title.addEventListener('click', (e) => {
+    //         e.stopPropagation();
+    //         open = !open;
+    //         mega.style.display = open ? 'grid' : 'none';
+    //     });
+    //
+    //     menu.addEventListener('mouseenter', () => {
+    //         mega.style.display = 'grid';
+    //         open = true;
+    //     });
+    //
+    //     menu.addEventListener('mouseleave', () => {
+    //         mega.style.display = 'none';
+    //         open = false;
+    //     });
+    //
+    //     document.addEventListener('click', () => {
+    //         mega.style.display = 'none';
+    //         open = false;
+    //     });
+    //
+    // });
 </script>
