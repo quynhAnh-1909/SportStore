@@ -112,37 +112,82 @@
         color:white;
         text-decoration:none;
     }
-
-
-
+    /* DROPDOWN */
     .dropdown {
         position: relative;
     }
 
+    /* menu */
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 120%;
+        left: 0;
+
+        min-width: 220px;
+
+        background: white;
+
+        border-radius: 12px;
+
+        padding: 10px 0;
+
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+
+        z-index: 9999;
+
+        border: none;
+    }
+
+    /* hover hiện menu */
     .dropdown:hover .dropdown-menu {
         display: block;
     }
 
-    .dropdown-menu {
-        display: none;
-        position: absolute;
-        background: white;
-        min-width: 180px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        border-radius: 6px;
-        z-index: 999;
-    }
-
+    /* item */
     .dropdown-menu a {
         display: block;
-        padding: 10px 15px;
-        color: black;
+
+        padding: 12px 18px;
+
+        color: #333 !important;
+
         text-decoration: none;
-        opacity: 1;
+
+        font-weight: 500;
+
+        transition: 0.2s;
     }
 
+    /* hover item */
     .dropdown-menu a:hover {
-        background: #f0f0f0;
+        background: #f5f5f5 !important;
+        color: #d81f19 !important;
+    }
+
+    /* menu cha */
+    .nav-links > a,
+    .dropdown > a {
+
+        color:white;
+
+        text-decoration:none;
+
+        font-weight:600;
+
+        padding:8px 14px;
+
+        border-radius:20px;
+
+        transition:0.25s;
+    }
+
+    /* hover menu cha */
+    .nav-links > a:hover,
+    .dropdown > a:hover {
+
+        background:white;
+        color:#d81f19;
     }
 
     .nav-links {
@@ -441,19 +486,11 @@
             <a href="${root}/products">Trang chủ</a>
 
             <div class="dropdown">
-                <a href="#">Khuyến mãi</a>
-                <div class="dropdown-menu">
-                    <a href="#"> Giảm giá hôm nay</a>
-                    <a href="#"> Mã giảm giá</a>
-                </div>
+                <a href="${root}/promotions">Khuyến mãi</a>
             </div>
 
             <div class="dropdown">
                 <a href="#">Thành viên</a>
-                <div class="dropdown-menu">
-                    <a href="#"> Hồ sơ</a>
-                    <a href="#"> Đơn hàng</a>
-                </div>
             </div>
         </div>
 

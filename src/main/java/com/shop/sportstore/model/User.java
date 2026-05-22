@@ -14,6 +14,7 @@ public class User implements Serializable {
     private String provider;
     private String address;
     private boolean status = true;
+    private String memberLevel;
 
     public User() {
     }
@@ -105,6 +106,14 @@ public class User implements Serializable {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getMemberLevel() {
+        return memberLevel;
+    }
+
+    public void setMemberLevel(String memberLevel) {
+        this.memberLevel = memberLevel;
     }
 
     @Override
