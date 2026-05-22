@@ -49,6 +49,17 @@ public class ReviewServlet extends HttpServlet {
 
         ReviewDAO dao = new ReviewDAO();
 
+        if (!dao.hasPurchased(user.getUserId(), productId)) {
+
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+            response.getWriter().write(
+                    "Bạn phải mua sản phẩm mới được đánh giá!"
+            );
+
+            return;
+        }
+
         dao.addReview(
                 productId,
                 user.getUserId(),
