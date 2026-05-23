@@ -29,18 +29,53 @@ public class AuthServlet extends HttpServlet {
     }
 
     // Cập nhật hàm loginUser để lưu thêm role và chuyển hướng Admin
-    private void loginUser(HttpSession session, HttpServletRequest request,
-                           HttpServletResponse response, User user) throws IOException {
+    private void loginUser(HttpSession session,
+                           HttpServletRequest request,
+                           HttpServletResponse response,
+                           User user) throws IOException {
 
         session.setAttribute("user", user);
-        session.setAttribute("userId", user.getUserId());
-        session.setAttribute("userFullName", user.getFullName());
-        session.setAttribute("userRole", user.getRole());
 
+        session.setAttribute("userId",
+                user.getUserId());
+
+        session.setAttribute("userFullName",
+                user.getFullName());
+
+        session.setAttribute("userRole",
+                user.getRole());
+
+        // ADMIN
         if ("ADMIN".equals(user.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/admin/dashboard"
+            );
+
+            return;
+        }
+
+        // USER redirect lại page cũ
+        String redirect =
+                (String) session.getAttribute(
+                        "redirectAfterLogin"
+                );
+
+        if (redirect != null) {
+
+            session.removeAttribute(
+                    "redirectAfterLogin"
+            );
+
+            response.sendRedirect(redirect);
+
         } else {
-            response.sendRedirect(request.getContextPath() + "/products");
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/products"
+            );
         }
     }
 

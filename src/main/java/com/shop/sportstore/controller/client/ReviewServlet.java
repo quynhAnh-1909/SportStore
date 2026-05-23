@@ -49,16 +49,16 @@ public class ReviewServlet extends HttpServlet {
 
         ReviewDAO dao = new ReviewDAO();
 
-        if (!dao.hasPurchased(user.getUserId(), productId)) {
-
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-
-            response.getWriter().write(
-                    "Bạn phải mua sản phẩm mới được đánh giá!"
-            );
-
-            return;
-        }
+//        if (!dao.hasPurchased(user.getUserId(), productId)) {
+//
+//            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+//
+//            response.getWriter().write(
+//                    "Bạn phải mua sản phẩm mới được đánh giá!"
+//            );
+//
+//            return;
+//        }
 
         dao.addReview(
                 productId,
@@ -72,7 +72,13 @@ public class ReviewServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         out.println(
+
                 "<div class='border-top pt-3 pb-3'>"
+
+                        + "<div class='d-flex justify-content-between'>"
+
+                        + "<div>"
+
                         + "<div class='fw-bold'>"
                         + user.getFullName()
                         + "</div>"
@@ -81,9 +87,42 @@ public class ReviewServlet extends HttpServlet {
                         + rating + " ★"
                         + "</div>"
 
+                        + "</div>"
+
+                        // ACTION BUTTONS
+                        + "<div class='review-actions'>"
+
+                        + "<button class='review-btn edit-btn' "
+                        + "onclick=\"editReview("
+                        + "'" + 0 + "',"
+                        + "'" + rating + "',"
+                        + "'" + comment + "'"
+                        + ")\">"
+
+                        + "<i class='bi bi-pencil'></i>"
+
+                        + "</button>"
+
+                        + "<button class='review-btn delete-btn' "
+                        + "onclick=\"deleteReview('0')\">"
+
+                        + "<i class='bi bi-trash'></i>"
+
+                        + "</button>"
+
+                        + "</div>"
+
+                        + "</div>"
+
+                        // COMMENT
                         + "<div class='mt-2'>"
                         + comment
                         + "</div>"
+
+                        // DATE
+                        + "<small class='text-muted'>"
+                        + new java.util.Date()
+                        + "</small>"
 
                         + "</div>"
         );

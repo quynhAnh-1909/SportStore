@@ -437,6 +437,11 @@
             transform:scale(1.08);
         }
 
+        #reviewList > div{
+
+            transition:0.3s ease;
+        }
+
     </style>
 
 </head>
@@ -656,7 +661,8 @@
 
             </div>
 
-            <button class="btn btn-danger">
+            <button type="submit"
+                    class="btn btn-danger">
                 Gửi đánh giá
             </button>
 
@@ -665,7 +671,8 @@
         <!-- REVIEW LIST -->
         <div class="mt-4" id="reviewList">
 
-            <c:forEach var="r" items="${reviews}">
+            <c:forEach var="r"
+                       items="${reviews}">
 
                 <div class="border-top pt-3 pb-3"
                      id="review-${r.id}">
@@ -690,18 +697,20 @@
 
                             <div class="review-actions">
 
-                                <button class="review-btn edit-btn"
-                                        onclick="editReview(
-                                                '${r.id}',
-                                                '${r.rating}',
+                                <button type="button"
+                                        class="review-btn edit-btn"
+                                        onclick='editReview(
+                                                "${r.id}",
+                                                "${r.rating}",
                                                 `${r.comment}`
-                                                )">
+                                                )'>
 
                                     <i class="bi bi-pencil"></i>
 
                                 </button>
 
-                                <button class="review-btn delete-btn"
+                                <button type="button"
+                                        class="review-btn delete-btn"
                                         onclick="deleteReview('${r.id}')">
 
                                     <i class="bi bi-trash"></i>
@@ -716,7 +725,7 @@
 
                     <!-- CONTENT -->
                     <div class="mt-2 review-comment">
-                            ${r.comment}
+                        <c:out value="${r.comment}"/>
                     </div>
 
                     <small class="text-muted">
@@ -728,6 +737,49 @@
             </c:forEach>
 
         </div>
+
+        <c:if test="${totalPages > 1}">
+
+            <div class="d-flex justify-content-center mt-4 gap-2"
+                 id="reviewPagination">
+
+                <!-- PREV -->
+                <c:if test="${currentPage > 1}">
+                    <button type="button"
+                            class="btn btn-light"
+                            onclick="loadReviewPage(${currentPage - 1})">
+                        ←
+                    </button>
+                </c:if>
+
+                <!-- PAGE -->
+                <c:forEach begin="1"
+                           end="${totalPages}"
+                           var="i">
+
+                    <button
+                        type="button"
+                        onclick="loadReviewPage(${i})"
+                        class="btn ${i == currentPage ? 'btn-danger' : 'btn-light'}">
+
+                            ${i}
+
+                    </button>
+
+                </c:forEach>
+
+                <!-- NEXT -->
+                <c:if test="${currentPage < totalPages}">
+                    <button type="button"
+                            class="btn btn-light"
+                            onclick="loadReviewPage(${currentPage + 1})">
+                        →
+                    </button>
+                </c:if>
+
+            </div>
+
+        </c:if>
 
     </div>
 
@@ -823,10 +875,10 @@
 </div>
 
 <script>
-    const ROOT = "${pageContext.request.contextPath}";
-</script>
 
-<script>
+    const ROOT = "${pageContext.request.contextPath}";
+
+    let currentReviewPage = 1;
 
     function editReview(id, rating, comment) {
 
@@ -837,6 +889,15 @@
 
         const newRating =
                 prompt("Số sao (1-5)", rating);
+
+        if(
+                !newRating ||
+                newRating < 1 ||
+                newRating > 5
+        ){
+            alert("Số sao không hợp lệ");
+            return;
+        }
 
         fetch("${root}/updateReview", {
 
@@ -854,12 +915,12 @@
                     + encodeURIComponent(newComment)
         })
 
-                .then(res => {
+                .then(res => res.text())
 
-                    if (res.ok) {
+                .then(data => {
 
-                        location.reload();
-                    }
+                    loadReviewPage(currentReviewPage);
+
                 });
     }
 
@@ -886,11 +947,33 @@
 
                     if (res.ok) {
 
-                        document
-                                .getElementById(
+                        const review =
+                                document.getElementById(
                                         "review-" + reviewId
-                                )
-                                .remove();
+                                );
+
+                        review.style.opacity = "0";
+
+                        review.style.transform =
+                                "translateX(30px)";
+
+                        review.style.pointerEvents = "none";
+
+                        setTimeout(() => {
+
+                            const totalReview =
+                                    document.querySelectorAll(
+                                            "#reviewList > div[id^='review-']"
+                                    ).length;
+
+                            if(totalReview <= 1 && currentReviewPage > 1){
+
+                                currentReviewPage--;
+                            }
+
+                            loadReviewPage(currentReviewPage);
+
+                        }, 300);
                     }
                 });
     }
@@ -1040,35 +1123,6 @@
             });
     }
 
-    // let expanded = false;
-    //
-    // function toggleProducts() {
-    //
-    //     const items =
-    //             document.querySelectorAll('.hidden-product');
-    //
-    //     const btn = event.target;
-    //
-    //     if (!expanded) {
-    //
-    //         items.forEach(i => {
-    //             i.style.display = '';
-    //         });
-    //
-    //         btn.innerText = "Thu gọn";
-    //
-    //     } else {
-    //
-    //         items.forEach(i => {
-    //             i.style.display = 'none';
-    //         });
-    //
-    //         btn.innerText = "Xem thêm";
-    //     }
-    //
-    //     expanded = !expanded;
-    // }
-
     document.getElementById("reviewForm")
             .addEventListener("submit", function (e) {
 
@@ -1104,8 +1158,37 @@
 
                             if (res.status === 401) {
 
+                                // lưu url
+                                sessionStorage.setItem(
+                                        "redirectUrl",
+                                        window.location.href
+                                );
+
+                                // lưu scroll
+                                sessionStorage.setItem(
+                                        "redirectScroll",
+                                        window.scrollY
+                                );
+
+                                // lưu rating
+                                sessionStorage.setItem(
+                                        "reviewRating",
+                                        document.getElementById("rating").value
+                                );
+
+                                // lưu comment
+                                sessionStorage.setItem(
+                                        "reviewComment",
+                                        document.getElementById("comment").value
+                                );
+
+                                sessionStorage.setItem(
+                                        "restoreReview",
+                                        "true"
+                                );
+
                                 window.location.href =
-                                        "${root}/products";
+                                        "${root}/login";
 
                                 return null;
                             }
@@ -1117,13 +1200,23 @@
 
                             if (!data) return;
 
-                            document.getElementById("reviewList")
-                                    .insertAdjacentHTML(
-                                            "afterbegin",
-                                            data
-                                    );
-
                             document.getElementById("comment").value = "";
+
+                            document.getElementById("rating").value = "";
+
+                            sessionStorage.removeItem("reviewRating");
+
+                            sessionStorage.removeItem("reviewComment");
+
+                            sessionStorage.removeItem("restoreReview");
+
+                            currentReviewPage = 1;
+
+                            setTimeout(() => {
+
+                                loadReviewPage(1);
+
+                            }, 100);
 
                         });
 
@@ -1152,6 +1245,186 @@
 
         alert("Đã copy link để gửi Messenger!");
     }
+
+    window.addEventListener("load", () => {
+
+        const shouldRestore =
+                sessionStorage.getItem(
+                        "restoreReview"
+                );
+
+        // CHỈ restore khi login xong quay lại
+        if(shouldRestore === "true"){
+
+            // restore rating
+            const savedRating =
+                    sessionStorage.getItem(
+                            "reviewRating"
+                    );
+
+            if(savedRating){
+
+                document.getElementById(
+                        "rating"
+                ).value = savedRating;
+            }
+
+            // restore comment
+            const savedComment =
+                    sessionStorage.getItem(
+                            "reviewComment"
+                    );
+
+            if(savedComment){
+
+                document.getElementById(
+                        "comment"
+                ).value = savedComment;
+            }
+
+            // restore scroll
+            const scrollPos =
+                    sessionStorage.getItem(
+                            "redirectScroll"
+                    );
+
+            if(scrollPos){
+
+                setTimeout(() => {
+
+                    window.scrollTo({
+                        top: parseInt(scrollPos),
+                        behavior: "smooth"
+                    });
+
+                }, 200);
+            }
+
+            // restore xong thì xóa
+            sessionStorage.removeItem(
+                    "restoreReview"
+            );
+            sessionStorage.removeItem(
+                    "redirectScroll"
+            );
+
+            sessionStorage.removeItem(
+                    "reviewRating"
+            );
+
+            sessionStorage.removeItem(
+                    "reviewComment"
+            );
+        }
+    });
+
+    function loadReviewPage(page){
+
+        currentReviewPage = page;
+
+        const productId =
+                ${product.id};
+
+        fetch(
+                `${ROOT}/productDetail?id=${
+                    productId
+            }&page=${
+                    page
+            }`
+        )
+
+                .then(res => res.text())
+
+                .then(html => {
+
+                    // parse html mới
+                    const parser =
+                            new DOMParser();
+
+                    const doc =
+                            parser.parseFromString(
+                                    html,
+                                    "text/html"
+                            );
+
+                    // lấy review mới
+                    const newReviewList =
+                            doc.getElementById(
+                                    "reviewList"
+                            );
+
+                    // lấy pagination mới
+                    const newPagination =
+                            doc.getElementById(
+                                    "reviewPagination"
+                            );
+
+                    // replace
+                    document.getElementById(
+                            "reviewList"
+                    ).innerHTML =
+                            newReviewList.innerHTML;
+
+                    const paginationContainer =
+                            document.getElementById(
+                                    "reviewPagination"
+                            );
+
+                    if(paginationContainer){
+
+                        if(newPagination){
+
+                            paginationContainer.innerHTML =
+                                    newPagination.innerHTML;
+
+                        }else{
+
+                            paginationContainer.remove();
+                        }
+
+                    }else if(newPagination){
+
+                        document
+                                .getElementById("reviewList")
+                                .insertAdjacentHTML(
+                                        "afterend",
+                                        newPagination.outerHTML
+                                );
+                    }
+                    bindReviewEvents();
+
+                    // scroll nhẹ tới review
+                    window.scrollTo({
+                        top:
+                                document.getElementById(
+                                        "reviewList"
+                                ).offsetTop - 120,
+
+                        behavior:"instant"
+                    });
+
+                });
+    }
+
+    function bindReviewEvents(){
+
+        document
+                .querySelectorAll(".edit-btn")
+                .forEach(btn => {
+
+                    btn.type = "button";
+                });
+
+        document
+                .querySelectorAll(".delete-btn")
+                .forEach(btn => {
+
+                    btn.type = "button";
+                });
+    }
+
+    bindReviewEvents();
+
 </script>
 
 <jsp:include page="footer.jsp"/>

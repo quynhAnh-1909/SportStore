@@ -158,6 +158,96 @@
             padding:8px;
         }
 
+        .best-seller-container{
+
+            position:relative;
+
+            overflow:hidden;
+
+            width:100%;
+
+            padding:0 40px;
+        }
+
+        /* TRACK */
+        .best-seller-track{
+
+            display:flex;
+
+            gap:24px;
+
+            transition:transform 0.5s ease;
+        }
+
+        /* ITEM */
+        .best-seller-item{
+
+            min-width:calc((100% - 72px) / 4);
+
+            flex-shrink:0;
+        }
+
+        /* BUTTON */
+        .slider-btn{
+
+            position:absolute;
+
+            top:50%;
+
+            transform:translateY(-50%);
+
+            width:46px;
+            height:46px;
+
+            border:none;
+            border-radius:50%;
+
+            background:white;
+
+            box-shadow:0 4px 15px rgba(0,0,0,0.15);
+
+            z-index:20;
+
+            cursor:pointer;
+
+            font-size:24px;
+
+            transition:0.25s ease;
+        }
+
+        .slider-btn:hover{
+
+            background:#198754;
+            color:white;
+
+            transform:translateY(-50%) scale(1.08);
+        }
+
+        .slider-prev{
+            left:-22px;
+        }
+
+        .slider-next{
+            right:-22px;
+        }
+
+        .best-seller-container{
+            overflow:visible;
+        }
+
+        .product-card{
+            position:relative;
+            z-index:1;
+        }
+
+        .best-seller-container .slider-btn{
+            opacity:0;
+        }
+
+        .best-seller-container:hover .slider-btn{
+            opacity:1;
+        }
+
     </style>
 
 </head>
@@ -185,56 +275,83 @@
 
         </div>
 
-        <div class="row g-4">
+        <div class="best-seller-container">
 
-            <c:forEach items="${bestSellerProducts}" var="p">
+            <!-- LEFT -->
+            <button class="slider-btn slider-prev"
+                    onclick="moveBestSeller(-1)">
+                ‹
+            </button>
 
-                <div class="col-md-3">
+            <!-- RIGHT -->
+            <button class="slider-btn slider-next"
+                    onclick="moveBestSeller(1)">
+                ›
+            </button>
 
-                    <div class="card product-card h-100">
+            <!-- TRACK -->
+            <div class="best-seller-track"
+                 id="bestSellerTrack">
 
-                        <a href="${root}/productDetail?id=${p.id}">
-                            <div class="product-img-area">
-                                <img src="${root}/resources/${p.imageUrl}"
-                                     class="product-img">
-                            </div>
-                        </a>
+                <c:forEach items="${bestSellerProducts}"
+                           var="p"
+                           begin="0"
+                           end="9">
 
-                        <div class="card-body text-center">
+                    <div class="best-seller-item">
 
-                            <a href="${root}/productDetail?id=${p.id}"
-                               class="product-link">
+                        <div class="card product-card h-100">
 
-                                <div>${p.name}</div>
+                            <a href="${root}/productDetail?id=${p.id}">
+
+                                <div class="product-img-area">
+
+                                    <img src="${root}/resources/${p.imageUrl}"
+                                         class="product-img">
+
+                                </div>
 
                             </a>
 
-                            <div class="price">
+                            <div class="card-body text-center">
 
-                                <fmt:formatNumber
-                                        value="${p.price}"
-                                        type="number"
-                                        groupingUsed="true"/>
+                                <a href="${root}/productDetail?id=${p.id}"
+                                   class="product-link">
 
-                                VNĐ
+                                    <div class="product-name">
+                                            ${p.name}
+                                    </div>
+
+                                </a>
+
+                                <div class="price">
+
+                                    <fmt:formatNumber
+                                            value="${p.price}"
+                                            type="number"
+                                            groupingUsed="true"/>
+
+                                    VNĐ
+
+                                </div>
+
+                                <button type="button"
+                                        onclick="addToCart(this, ${p.id})"
+                                        class="btn btn-success btn-sm mt-2 w-100">
+
+                                    🛒 Thêm vào giỏ hàng
+
+                                </button>
 
                             </div>
-
-                            <button type="button"
-                                    onclick="addToCart(this, ${p.id})"
-                                    class="btn btn-success btn-sm mt-2 w-100">
-
-                                🛒 Thêm vào giỏ hàng
-
-                            </button>
 
                         </div>
 
                     </div>
 
-                </div>
+                </c:forEach>
 
-            </c:forEach>
+            </div>
 
         </div>
 
@@ -633,6 +750,47 @@
                 });
     }
 
+    let currentBestSeller = 0;
+
+    function moveBestSeller(direction){
+
+        const track =
+                document.getElementById(
+                        "bestSellerTrack"
+                );
+
+        const items =
+                document.querySelectorAll(
+                        ".best-seller-item"
+                );
+
+        const visibleItems = 4;
+
+        const totalItems = items.length;
+
+        const maxIndex =
+                totalItems - visibleItems;
+
+        currentBestSeller += direction;
+
+        if(currentBestSeller < 0){
+
+            currentBestSeller = 0;
+        }
+
+        if(currentBestSeller > maxIndex){
+
+            currentBestSeller = maxIndex;
+        }
+
+        const itemWidth =
+                items[0].offsetWidth + 24;
+
+        track.style.transform =
+                `translateX(-${
+                    currentBestSeller * itemWidth
+            }px)`;
+    }
 
 </script>
 </body>

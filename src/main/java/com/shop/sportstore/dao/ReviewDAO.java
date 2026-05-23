@@ -210,4 +210,120 @@ public class ReviewDAO {
 
         return check;
     }
+
+    public List<Review> getReviewsByProductPaging(
+            int productId,
+            int page,
+            int pageSize
+    ) {
+
+        List<Review> list = new ArrayList<>();
+
+        try {
+
+            Connection conn =
+                    DBConnection.getConnection();
+
+            String sql =
+                    """
+                    SELECT r.*, u.full_name
+                    FROM reviews r
+                    JOIN users u
+                    ON r.user_id = u.user_id
+                    WHERE r.product_id = ?
+                    ORDER BY r.rating DESC,
+                             r.created_at DESC
+                    LIMIT ? OFFSET ?
+                    """;
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setInt(1, productId);
+
+            ps.setInt(2, pageSize);
+
+            ps.setInt(3,
+                    (page - 1) * pageSize
+            );
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Review r = new Review();
+
+                r.setId(rs.getInt("id"));
+
+                r.setProductId(
+                        rs.getInt("product_id")
+                );
+
+                r.setUserId(
+                        rs.getInt("user_id")
+                );
+
+                r.setRating(
+                        rs.getInt("rating")
+                );
+
+                r.setComment(
+                        rs.getString("comment")
+                );
+
+                r.setFullName(
+                        rs.getString("full_name")
+                );
+
+                r.setCreatedAt(
+                        rs.getTimestamp("created_at")
+                );
+
+                list.add(r);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public int countReviewByProduct(
+            int productId
+    ) {
+
+        int total = 0;
+
+        try {
+
+            Connection conn =
+                    DBConnection.getConnection();
+
+            String sql =
+                    """
+                    SELECT COUNT(*)
+                    FROM reviews
+                    WHERE product_id = ?
+                    """;
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setInt(1, productId);
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            if (rs.next()) {
+
+                total = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return total;
+    }
 }

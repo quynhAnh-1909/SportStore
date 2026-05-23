@@ -545,4 +545,34 @@ public class OrderDAO extends DBConnection {
         }
         return null;
     }
+
+    public Order getOrderByCode(String orderCode) {
+
+        String sql = "SELECT * FROM orders WHERE order_code = ?";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, orderCode);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Order order = new Order();
+
+                order.setId(rs.getInt("id"));
+                order.setOrderCode(rs.getString("order_code"));
+
+                return order;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }
