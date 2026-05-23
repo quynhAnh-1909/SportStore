@@ -360,12 +360,15 @@ public class ProductDAO extends DBConnection {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Product p = new Product(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getDouble("price"),
-                        rs.getString("image_url")
-                );
+
+                Product p = new Product();
+
+                p.setId(rs.getInt("id"));
+                p.setName(rs.getString("name"));
+                p.setPrice(rs.getDouble("price"));
+                p.setImageUrl(rs.getString("image_url"));
+                p.setCategoryId(rs.getInt("category_id"));
+
                 list.add(p);
             }
 
@@ -375,6 +378,124 @@ public class ProductDAO extends DBConnection {
 
         return list;
     }
+
+    private Product mapProduct(ResultSet rs)
+            throws SQLException {
+
+        Product p = new Product();
+
+        p.setId(rs.getInt("id"));
+        p.setName(rs.getString("name"));
+        p.setPrice(rs.getDouble("price"));
+        p.setImageUrl(rs.getString("image_url"));
+        p.setDescription(rs.getString("description"));
+        p.setStockQuantity(rs.getInt("stock_quantity"));
+        p.setCategoryId(rs.getInt("category_id"));
+
+        return p;
+    }
+
+    public List<Product> getAllExcept(int productId) {
+
+        List<Product> list = new ArrayList<>();
+
+        String sql = """
+        SELECT *
+        FROM products
+        WHERE id != ?
+    """;
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, productId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Product p = new Product();
+
+                p.setId(rs.getInt("id"));
+                p.setName(rs.getString("name"));
+                p.setPrice(rs.getDouble("price"));
+                p.setImageUrl(rs.getString("image_url"));
+                p.setCategoryId(rs.getInt("category_id"));
+
+                list.add(p);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<Product> getRelatedProducts(int categoryId, int productId) {
+
+        List<Product> list = new ArrayList<>();
+
+        String sql = """
+        SELECT *
+        FROM products
+        WHERE category_id = ?
+        AND id != ?
+        LIMIT 4
+    """;
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, categoryId);
+            ps.setInt(2, productId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Product p = mapProduct(rs);
+                list.add(p);
+            }
+
+            // nếu chưa đủ 4 sản phẩm
+            if (list.size() < 4) {
+
+                String extraSql = """
+                SELECT *
+                FROM products
+                WHERE id != ?
+                AND category_id != ?
+                LIMIT ?
+            """;
+
+                PreparedStatement extraPs =
+                        conn.prepareStatement(extraSql);
+
+                extraPs.setInt(1, productId);
+                extraPs.setInt(2, categoryId);
+                extraPs.setInt(3, 4 - list.size());
+
+                ResultSet extraRs = extraPs.executeQuery();
+
+                while (extraRs.next()) {
+
+                    Product p = mapProduct(extraRs);
+                    list.add(p);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
     public List<Product> getProductsByCategory(int categoryId, int limit) {
 
         List<Product> list = new ArrayList<>();

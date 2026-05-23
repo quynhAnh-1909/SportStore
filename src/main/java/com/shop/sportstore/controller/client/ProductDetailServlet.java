@@ -56,9 +56,16 @@ public class ProductDetailServlet extends HttpServlet {
             product.setVouchers(vouchers);
             request.setAttribute("product", product);
 
-            List<Product> relatedProducts = productDAO.getAll();
 
-            relatedProducts.removeIf(p -> p.getId() == id);
+            List<Product> relatedProducts =
+                    productDAO.getAllExcept(product.getId());
+
+            request.setAttribute(
+                    "relatedProducts",
+                    relatedProducts
+            );
+
+            request.setAttribute("relatedProducts", relatedProducts);
 
 //            String showAll = request.getParameter("showAll");
 

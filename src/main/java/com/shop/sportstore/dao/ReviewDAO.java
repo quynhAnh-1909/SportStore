@@ -84,4 +84,130 @@ public class ReviewDAO {
 
         return list;
     }
+
+    public Review getReviewById(int id) {
+
+        String sql =
+                "SELECT * FROM reviews WHERE id=?";
+
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Review r = new Review();
+
+                r.setId(rs.getInt("id"));
+
+                r.setUserId(rs.getInt("user_id"));
+
+                return r;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void deleteReview(int id) {
+
+        String sql =
+                "DELETE FROM reviews WHERE id=?";
+
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateReview(int id,
+                             int rating,
+                             String comment) {
+
+        String sql =
+                """
+                UPDATE reviews
+                SET rating=?,
+                    comment=?
+                WHERE id=?
+                """;
+
+        try (
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, rating);
+
+            ps.setString(2, comment);
+
+            ps.setInt(3, id);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean hasPurchased(int userId, int productId) {
+
+        boolean check = false;
+
+        try {
+
+            Connection conn = DBConnection.getConnection();
+
+            String sql = """
+            SELECT *
+            FROM order_items oi
+            JOIN orders o ON oi.order_id = o.id
+            WHERE o.user_id = ?
+            AND oi.product_id = ?
+            AND o.status = 'completed'
+        """;
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setInt(1, userId);
+            ps.setInt(2, productId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                check = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return check;
+    }
 }

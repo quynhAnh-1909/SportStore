@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%--<%@ taglib prefix="c" uri="jakarta.tags.core" %>--%>
-<%--<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>--%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
@@ -332,6 +332,111 @@
             background: #eee;
         }
 
+        .btn-show-more{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+
+            padding:12px 28px;
+
+            background:#ee4d2d;
+            color:white;
+
+            text-decoration:none;
+
+            border-radius:999px;
+
+            font-weight:600;
+            font-size:15px;
+
+            transition:0.3s ease;
+
+            box-shadow:0 4px 12px rgba(238,77,45,0.25);
+        }
+
+        .btn-show-more:hover{
+            background:#d93f21;
+            transform:translateY(-2px);
+            color:white;
+
+            box-shadow:0 6px 18px rgba(238,77,45,0.35);
+        }
+
+        /* FIX INPUT QUANTITY OVERLAY MODAL */
+        .quantity-box,
+        .quantity-box input,
+        .qty-btn {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* LOGIN MODAL */
+        .modal,
+        .modal-dialog,
+        .modal-content,
+        .auth-modal,
+        .login-modal {
+            z-index: 99999 !important;
+        }
+
+        /* OVERLAY */
+        .modal-backdrop,
+        .overlay {
+            z-index: 99998 !important;
+        }
+
+        .quantity-box input[type=number]::-webkit-outer-spin-button,
+        .quantity-box input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+
+        .review-actions{
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        .review-btn{
+            width:32px;
+            height:32px;
+
+            border:none;
+            border-radius:50%;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            background:#f5f5f5;
+
+            transition:0.2s ease;
+            cursor:pointer;
+
+            font-size:14px;
+        }
+
+        /* EDIT */
+        .edit-btn{
+            color:#0d6efd;
+        }
+
+        .edit-btn:hover{
+            background:#e7f1ff;
+            transform:scale(1.08);
+        }
+
+        /* DELETE */
+        .delete-btn{
+            color:#dc3545;
+        }
+
+        .delete-btn:hover{
+            background:#ffe5e8;
+            transform:scale(1.08);
+        }
+
     </style>
 
 </head>
@@ -562,17 +667,55 @@
 
             <c:forEach var="r" items="${reviews}">
 
-                <div class="border-top pt-3 pb-3">
+                <div class="border-top pt-3 pb-3"
+                     id="review-${r.id}">
 
-                    <div class="fw-bold">
-                            ${r.fullName}
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+
+                            <div class="fw-bold">
+                                    ${r.fullName}
+                            </div>
+
+                            <div class="text-warning">
+                                    ${r.rating} ★
+                            </div>
+
+                        </div>
+
+                        <!-- OWNER ACTION -->
+                        <c:if test="${sessionScope.user != null
+                            && sessionScope.user.userId == r.userId}">
+
+                            <div class="review-actions">
+
+                                <button class="review-btn edit-btn"
+                                        onclick="editReview(
+                                                '${r.id}',
+                                                '${r.rating}',
+                                                `${r.comment}`
+                                                )">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </button>
+
+                                <button class="review-btn delete-btn"
+                                        onclick="deleteReview('${r.id}')">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </button>
+
+                            </div>
+
+                        </c:if>
+
                     </div>
 
-                    <div class="text-warning">
-                            ${r.rating} ★
-                    </div>
-
-                    <div class="mt-2">
+                    <!-- CONTENT -->
+                    <div class="mt-2 review-comment">
                             ${r.comment}
                     </div>
 
@@ -595,53 +738,82 @@
             GỢI Ý CHO BẠN
         </div>
 
-        <div class="row">
+        <!-- 4 sản phẩm đầu -->
+        <div id="preview-products" class="row">
 
-                    <c:forEach var="p" items="${relatedProducts}" varStatus="status">
+            <c:forEach var="p"
+                       items="${relatedProducts}"
+                       varStatus="status">
 
-                        <div class="col-md-3 mb-4 ${status.index >= 4 ? 'hidden-product' : ''}">
+                <c:if test="${status.index < 4}">
 
-                            <!-- Tạo URL đúng -->
-                            <c:url var="link" value="/productDetail">
-                                <c:param name="id" value="${p.id}" />
-                                <c:if test="${showAll != null}">
-                                    <c:param name="showAll" value="true" />
-                                </c:if>
-                            </c:url>
+                    <div class="col-md-3 mb-4">
 
-                            <!-- Dùng link -->
-                            <a href="${link}" class="suggest-card">
+                        <a href="${root}/productDetail?id=${p.id}"
+                           class="suggest-card">
 
-                                <img src="${root}/resources/${p.imageUrl}" class="suggest-img">
+                            <img src="${root}/resources/${p.imageUrl}"
+                                 class="suggest-img">
 
-                                <div class="suggest-name">
-                                        ${p.name}
-                                </div>
+                            <div class="suggest-name">
+                                    ${p.name}
+                            </div>
 
-                                <div class="suggest-price">
-                                    <fmt:formatNumber value="${p.price}"/> VNĐ
-                                </div>
+                            <div class="suggest-price">
+                                <fmt:formatNumber value="${p.price}"/> VNĐ
+                            </div>
 
-                            </a>
+                        </a>
 
-                        </div>
+                    </div>
 
-                    </c:forEach>
+                </c:if>
+
+            </c:forEach>
 
         </div>
 
-<%--        <c:if test="${showAll == null}">--%>
-<%--            <div style="text-align: center; margin-top: 20px;">--%>
-<%--                <a href="${root}/productDetail?id=${product.id}&showAll=true"--%>
-<%--                   class="btn btn-outline-danger">--%>
-<%--                    Xem thêm--%>
-<%--                </a>--%>
-<%--            </div>--%>
-<%--        </c:if>--%>
-        <div style="text-align: center; margin-top: 20px;">
-            <button onclick="toggleProducts()" class="btn btn-outline-danger">
-                Xem thêm
+        <!-- TẤT CẢ SẢN PHẨM -->
+        <div id="all-products"
+             class="row d-none">
+
+            <c:forEach var="p"
+                       items="${relatedProducts}">
+
+                <div class="col-md-3 mb-4">
+
+                    <a href="${root}/productDetail?id=${p.id}"
+                       class="suggest-card">
+
+                        <img src="${root}/resources/${p.imageUrl}"
+                             class="suggest-img">
+
+                        <div class="suggest-name">
+                                ${p.name}
+                        </div>
+
+                        <div class="suggest-price">
+                            <fmt:formatNumber value="${p.price}"/> VNĐ
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </c:forEach>
+
+        </div>
+
+        <div class="text-center mt-4">
+
+            <button id="toggleBtn"
+                    class="btn-show-more">
+
+                <i class="bi bi-grid"></i>
+                Xem thêm sản phẩm
+
             </button>
+
         </div>
 
     </div>
@@ -651,6 +823,119 @@
 </div>
 
 <script>
+    const ROOT = "${pageContext.request.contextPath}";
+</script>
+
+<script>
+
+    function editReview(id, rating, comment) {
+
+        const newComment =
+                prompt("Sửa bình luận", comment);
+
+        if (newComment == null) return;
+
+        const newRating =
+                prompt("Số sao (1-5)", rating);
+
+        fetch("${root}/updateReview", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                        "application/x-www-form-urlencoded"
+            },
+
+            body:
+                    "reviewId=" + id
+                    + "&rating=" + newRating
+                    + "&comment="
+                    + encodeURIComponent(newComment)
+        })
+
+                .then(res => {
+
+                    if (res.ok) {
+
+                        location.reload();
+                    }
+                });
+    }
+
+
+    function deleteReview(reviewId) {
+
+        if (!confirm("Xóa đánh giá này?")) {
+            return;
+        }
+
+        fetch("${root}/deleteReview", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                        "application/x-www-form-urlencoded"
+            },
+
+            body: "reviewId=" + reviewId
+        })
+
+                .then(res => {
+
+                    if (res.ok) {
+
+                        document
+                                .getElementById(
+                                        "review-" + reviewId
+                                )
+                                .remove();
+                    }
+                });
+    }
+
+    const toggleBtn =
+            document.getElementById("toggleBtn");
+
+    const previewProducts =
+            document.getElementById("preview-products");
+
+    const allProducts =
+            document.getElementById("all-products");
+
+    let expanded = false;
+
+    toggleBtn.addEventListener("click", function () {
+
+        expanded = !expanded;
+
+        if (expanded) {
+
+            previewProducts.classList.add("d-none");
+
+            allProducts.classList.remove("d-none");
+
+            toggleBtn.innerHTML =
+                    '<i class="bi bi-chevron-up"></i> Thu gọn';
+
+        } else {
+
+            allProducts.classList.add("d-none");
+
+            previewProducts.classList.remove("d-none");
+
+            toggleBtn.innerHTML =
+                    '<i class="bi bi-grid"></i> Xem thêm sản phẩm';
+
+            window.scrollTo({
+                top: previewProducts.offsetTop - 100,
+                behavior: "smooth"
+            });
+        }
+
+    });
+
     const container = document.querySelector('.zoom-container');
     const img = document.querySelector('.zoom-img');
 
@@ -755,22 +1040,34 @@
             });
     }
 
-    let expanded = false;
-
-    function toggleProducts() {
-        const items = document.querySelectorAll('.hidden-product');
-        const btn = event.target;
-
-        if (!expanded) {
-            items.forEach(i => i.style.display = 'block');
-            btn.innerText = "Thu gọn";
-        } else {
-            items.forEach(i => i.style.display = 'none');
-            btn.innerText = "Xem thêm";
-        }
-
-        expanded = !expanded;
-    }
+    // let expanded = false;
+    //
+    // function toggleProducts() {
+    //
+    //     const items =
+    //             document.querySelectorAll('.hidden-product');
+    //
+    //     const btn = event.target;
+    //
+    //     if (!expanded) {
+    //
+    //         items.forEach(i => {
+    //             i.style.display = '';
+    //         });
+    //
+    //         btn.innerText = "Thu gọn";
+    //
+    //     } else {
+    //
+    //         items.forEach(i => {
+    //             i.style.display = 'none';
+    //         });
+    //
+    //         btn.innerText = "Xem thêm";
+    //     }
+    //
+    //     expanded = !expanded;
+    // }
 
     document.getElementById("reviewForm")
             .addEventListener("submit", function (e) {
@@ -857,6 +1154,6 @@
     }
 </script>
 
-</body>
 <jsp:include page="footer.jsp"/>
+</body>
 </html>
