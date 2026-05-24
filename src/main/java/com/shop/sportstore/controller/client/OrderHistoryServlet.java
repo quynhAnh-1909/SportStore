@@ -31,7 +31,7 @@ public class OrderHistoryServlet extends HttpServlet {
         List<Order> orders = orderDAO.getOrdersByUser(user.getUserId());
         request.setAttribute("orders", orders);
 
-        request.getRequestDispatcher("/WEB-INF/client/order-history.jsp")
+        request.getRequestDispatcher("/WEB-INF/client/account.jsp")
                 .forward(request, response);
     }
 }

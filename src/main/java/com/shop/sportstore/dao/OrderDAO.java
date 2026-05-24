@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.shop.sportstore.untils.DBConnection.getConnection;
+
 public class OrderDAO extends DBConnection {
 
     public void updateOrderStatus(String orderCode, String status) throws SQLException {
@@ -254,30 +256,43 @@ public class OrderDAO extends DBConnection {
     }
 
 
-    public boolean updateStatusByGhnCode(String orderCode, String status) throws SQLException {
+    public boolean updateStatusByGhnCode(String ghnCode, String status)
+            throws SQLException {
 
         String timeColumn = "";
+
         switch (status) {
+
             case "PROCESSING":
                 timeColumn = ", ConfirmedAt = NOW()";
                 break;
+
             case "SHIPPING":
                 timeColumn = ", ShippingAt = NOW()";
                 break;
+
             case "DELIVERED":
                 timeColumn = ", CompletedAt = NOW()";
                 break;
+
             case "CANCELLED":
                 timeColumn = ", CancelledAt = NOW()";
                 break;
         }
 
-        String sql = "UPDATE orders SET Status = ?, UpdatedAt = NOW() " + timeColumn + " WHERE OrderCode = ?";
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = ?, UpdatedAt = NOW() "
+                        + timeColumn +
+                        " WHERE ghn_code = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, status);
-            ps.setString(2, orderCode);
+
+            ps.setString(2, ghnCode);
+
             return ps.executeUpdate() > 0;
         }
     }
@@ -338,13 +353,15 @@ public class OrderDAO extends DBConnection {
     }
     public List<Order> getOrdersByUser(int userId) {
         List<Order> orders = new ArrayList<>();
-
         String sql = "SELECT * FROM orders WHERE UserId = ? ORDER BY CreatedAt DESC";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
+
+            OrderDetailDAO detailDAO = new OrderDetailDAO();
+
             while (rs.next()) {
                 Order o = new Order();
                 o.setId(rs.getInt("Id"));
@@ -352,22 +369,55 @@ public class OrderDAO extends DBConnection {
                 o.setTotalPrice(rs.getDouble("TotalPrice"));
                 o.setStatus(rs.getString("Status"));
                 o.setCreatedAt(rs.getTimestamp("CreatedAt"));
-
-
                 o.setAddress(rs.getString("Address"));
                 o.setReceiverName(rs.getString("ReceiverName"));
                 o.setReceiverPhone(rs.getString("ReceiverPhone"));
-
-
                 o.setDistrictId(rs.getInt("district_id"));
                 o.setWardCode(rs.getString("ward_code"));
+
+
+                List<OrderDetail> details = detailDAO.getOrderDetailsByOrderId(o.getId());
+                o.setOrderDetails(details);
 
                 orders.add(o);
             }
         } catch (Exception e) { e.printStackTrace(); }
         return orders;
     }
+    public List<Order> getOrdersByUserAndStatus(int userId, String status) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM orders WHERE UserId = ? AND Status = ? ORDER BY CreatedAt DESC";
 
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setString(2, status);
+            ResultSet rs = ps.executeQuery();
+
+            OrderDetailDAO detailDAO = new OrderDetailDAO();
+
+            while (rs.next()) {
+                Order o = new Order();
+                o.setId(rs.getInt("Id"));
+                o.setOrderCode(rs.getString("OrderCode"));
+                o.setTotalPrice(rs.getDouble("TotalPrice"));
+                o.setStatus(rs.getString("Status"));
+                o.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                o.setAddress(rs.getString("Address"));
+                o.setReceiverName(rs.getString("ReceiverName"));
+                o.setReceiverPhone(rs.getString("ReceiverPhone"));
+                o.setDistrictId(rs.getInt("district_id"));
+                o.setWardCode(rs.getString("ward_code"));
+
+
+                List<OrderDetail> details = detailDAO.getOrderDetailsByOrderId(o.getId());
+                o.setOrderDetails(details);
+
+                orders.add(o);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return orders;
+    }
     public Order getOrderById(int id) {
 
         String sql = "SELECT * FROM orders WHERE Id = ?";
@@ -515,34 +565,142 @@ public class OrderDAO extends DBConnection {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
+
                     Order o = new Order();
+
                     o.setId(rs.getInt("Id"));
                     o.setUserId(rs.getInt("UserId"));
+
                     o.setOrderCode(rs.getString("OrderCode"));
+
                     o.setTotalPrice(rs.getDouble("TotalPrice"));
+
                     o.setPaymentMethod(rs.getString("PaymentMethod"));
+
                     o.setStatus(rs.getString("Status"));
+
                     o.setNote(rs.getString("Note"));
-                    o.setVoucherId(rs.getObject("VoucherId") != null ? rs.getInt("VoucherId") : null);
+
+                    o.setVoucherId(
+                            rs.getObject("VoucherId") != null
+                                    ? rs.getInt("VoucherId")
+                                    : null
+                    );
+
                     o.setDiscountAmount(rs.getDouble("DiscountAmount"));
+
                     o.setReceiverName(rs.getString("ReceiverName"));
+
                     o.setReceiverPhone(rs.getString("ReceiverPhone"));
+
                     o.setAddress(rs.getString("Address"));
+
+                    // QUAN TRỌNG
+                    o.setDistrictId(rs.getInt("district_id"));
+
+                    o.setWardCode(rs.getString("ward_code"));
+
+                    o.setGhnCode(rs.getString("ghn_code"));
+
+                    o.setShippingFee(rs.getDouble("shipping_fee"));
+
                     o.setCreatedAt(rs.getTimestamp("CreatedAt"));
+
                     o.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+
                     o.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
+
                     o.setShippingAt(rs.getTimestamp("ShippingAt"));
+
                     o.setCompletedAt(rs.getTimestamp("CompletedAt"));
+
                     o.setCancelledAt(rs.getTimestamp("CancelledAt"));
+
                     o.setCancelReason(rs.getString("CancelReason"));
 
                     return o;
                 }
+
             }
         } catch (Exception e) {
             System.err.println("❌ Lỗi tại findOrderByCodeOrPhone: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
+
+    }
+    public Order getOrderByCode(String orderCode) {
+        String sql = "SELECT * FROM orders WHERE OrderCode = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, orderCode);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Order o = new Order();
+                o.setId(rs.getInt("Id"));
+                o.setUserId(rs.getInt("UserId"));
+                o.setOrderCode(rs.getString("OrderCode"));
+                o.setTotalPrice(rs.getDouble("TotalPrice"));
+                o.setPaymentMethod(rs.getString("PaymentMethod"));
+                o.setStatus(rs.getString("Status"));
+                o.setReceiverName(rs.getString("ReceiverName"));
+                o.setReceiverPhone(rs.getString("ReceiverPhone"));
+                o.setAddress(rs.getString("Address"));
+                o.setNote(rs.getString("Note"));
+                o.setDistrictId(rs.getInt("district_id"));
+                o.setWardCode(rs.getString("ward_code"));
+                o.setShippingFee(rs.getDouble("shipping_fee"));
+                o.setCreatedAt(rs.getTimestamp("CreatedAt"));
+
+                return o;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean cancelOrderByAdmin(int id) {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = 'CANCELLED', " +
+                        "CancelledAt = NOW() " +
+                        "WHERE Id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public void updateGhnCode(int id, String ghnCode) {
+        String sql = "UPDATE orders SET ghn_code = ? WHERE Id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, ghnCode);
+            ps.setInt(2, id);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

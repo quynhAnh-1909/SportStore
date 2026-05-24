@@ -38,22 +38,8 @@
 </head>
 <body>
 
-<jsp:include page="/WEB-INF/layout/index.jsp" />
 
 <div class="container my-5 py-4">
-
-    <nav aria-label="breadcrumb" class="mb-2">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="${pageContext.request.contextPath}/" class="text-danger-custom text-decoration-none">
-                    <i class="fas fa-home"></i> Trang chủ
-                </a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-                <a href="${pageContext.request.contextPath}/order-history" class="text-secondary text-decoration-none fw-semibold">Lịch sử đơn hàng</a>
-            </li>
-        </ol>
-    </nav>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold mb-0 text-danger-custom">
