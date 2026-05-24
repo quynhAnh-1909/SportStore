@@ -10,25 +10,47 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="10cda3dc-66e4-4c2b-9646-794b16c52f33" name="Changes" comment="fix ket noi db">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/CancelOrderServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/GhnFeeServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/TrackingWebhookServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/VNPayPaymentServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/VNPayReturnServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/service/GhnShippingService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/tracking.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/ShipOrderServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/GhnDistrictServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/GhnWardServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/service/GhnOrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/checksums/checksums.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/checksums/md5-checksums.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/checksums/sha1-checksums.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/executionHistory/executionHistory.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/executionHistory/executionHistory.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/fileChanges/last-build.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/fileHashes/fileHashes.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/fileHashes/fileHashes.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/fileHashes/resourceHashesCache.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.0.0/gc.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_05_2026_1_44_AM_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_05_2026_1_44_AM__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/OrdersServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/OrdersServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/CheckoutServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/CheckoutServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderDetailServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderDetailServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderSuccessServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderSuccessServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/GhnFeeServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/GhnFeeServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderHistoryServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/OrderHistoryServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/TrackingWebhookServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/TrackingWebhookServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/VNPayPaymentServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/VNPayPaymentServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/dao/OrderDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/dao/OrderDAO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/model/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/model/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/model/OrderItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/model/OrderItem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/admin/customer.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/admin/customer.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/service/GhnShippingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/service/GhnShippingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/admin/order.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/admin/order.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/account.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/account.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/checkout.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/checkout.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/order-detail.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/order-detail.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/order-history.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/order-history.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/orderSuccess.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/orderSuccess.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/tracking.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/tracking.jsp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -186,59 +208,59 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "Gradle.Build SportStore.executor": "Run",
-    "Gradle.D:/IdeaProjects/SportStore [build].executor": "Run",
-    "Gradle.SportStore [build].executor": "Run",
-    "Gradle.SportStore [uploadWar].executor": "Run",
-    "Gradle.Sport_Store [build].executor": "Run",
-    "Gradle.Sport_Store [clean].executor": "Run",
-    "Gradle.Sport_Store [dependencies].executor": "Run",
-    "Gradle.Sport_Store.executor": "Run",
-    "Gradle.Tests in 'Sport_Store'.executor": "Run",
-    "Maven.SportStore.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Notification.DisplayName-DoNotAsk-Execution": "External process execution failed",
-    "Notification.DoNotAsk-Execution": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Shell Script.mvnw.executor": "Run",
-    "TomEE Server.SportStore.executor": "Run",
-    "TomEE Server.TomEE 10.1.52.executor": "Run",
-    "Tomcat Server.Tomcat 10.1.52.executor": "Run",
-    "Tomcat Server.Unnamed.executor": "Debug",
-    "git-widget-placeholder": "Merging 23130323__HuynhHuuThuc",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/IdeaProjects/SportStore",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.26509723",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;Gradle.Build SportStore.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.D:/IdeaProjects/SportStore [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.SportStore [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.SportStore [uploadWar].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Sport_Store [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Sport_Store [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Sport_Store [dependencies].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Sport_Store.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Tests in 'Sport_Store'.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.SportStore.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Notification.DisplayName-DoNotAsk-Execution&quot;: &quot;External process execution failed&quot;,
+    &quot;Notification.DoNotAsk-Execution&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Shell Script.mvnw.executor&quot;: &quot;Run&quot;,
+    &quot;TomEE Server.SportStore.executor&quot;: &quot;Run&quot;,
+    &quot;TomEE Server.TomEE 10.1.52.executor&quot;: &quot;Run&quot;,
+    &quot;Tomcat Server.Tomcat 10.1.52.executor&quot;: &quot;Run&quot;,
+    &quot;Tomcat Server.Unnamed.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;23130015-VOLEQUYNHANH&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/IdeaProjects/SportStore&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.26509723&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "ChangesTree.GroupingKeys": [
-      "directory",
-      "module",
-      "repository"
+  &quot;keyToStringList&quot;: {
+    &quot;ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;,
+      &quot;module&quot;,
+      &quot;repository&quot;
     ],
-    "DatabaseDriversLRU": [
-      "mysql",
-      "sqlserver"
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;,
+      &quot;sqlserver&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.shop.sportstore.model" />
@@ -570,6 +592,12 @@
       <workItem from="1778338895327" duration="9159000" />
       <workItem from="1778351808162" duration="1170000" />
       <workItem from="1778824198649" duration="3519000" />
+      <workItem from="1779511986283" duration="6430000" />
+      <workItem from="1779550670428" duration="1739000" />
+      <workItem from="1779630872357" duration="10950000" />
+      <workItem from="1779643063014" duration="3702000" />
+      <workItem from="1779646821137" duration="3223000" />
+      <workItem from="1779650287168" duration="637000" />
     </task>
     <task id="LOCAL-00001" summary="FIX giao dien gio hang">
       <option name="closed" value="true" />

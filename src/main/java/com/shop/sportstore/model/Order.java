@@ -32,6 +32,8 @@ public class Order {
     private String wardCode;
     private Integer voucherId;
     private double discountAmount;
+    private String ghnCode;
+    private String shippingStatus;
 
     public int getId() {
 
@@ -269,5 +271,22 @@ public class Order {
     }
     public void setDiscountAmount(double discountAmount) {
         this.discountAmount = discountAmount;
+    }
+
+    public String getGhnCode() {
+        return ghnCode;
+    }
+
+    public void setGhnCode(String ghnCode) {
+        this.ghnCode = ghnCode;
+    }
+    public String getShippingStatus() {
+
+        return shippingStatus;
+    }
+
+    public void setShippingStatus(String shippingStatus) {
+
+        this.shippingStatus = shippingStatus;
     }
 }

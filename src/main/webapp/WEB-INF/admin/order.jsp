@@ -60,7 +60,7 @@
                                     <c:when test="${order.status eq 'DELIVERED'}">
                                         <span class="badge bg-success text-white">Hoàn tất</span>
                                     </c:when>
-                                    <c:when test="${order.status eq 'CANCELED'}">
+                                    <c:when test='${order.status eq "CANCELLED"}'>
                                         <span class="badge bg-danger text-white">Đã hủy</span>
                                     </c:when>
                                     <c:otherwise>
@@ -94,7 +94,9 @@
                                                        name="id"
                                                        value="${order.id}">
 
-                                                <button class="btn btn-sm btn-success">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-success"
+                                                        onclick="showToast('Xác nhận đơn hàng thành công!', '#198754')">
                                                     Xác nhận
                                                 </button>
 
@@ -113,10 +115,11 @@
                                                        name="id"
                                                        value="${order.id}">
 
-                                                <button class="btn btn-sm btn-danger">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-danger"
+                                                        onclick="showToast('Đã hủy đơn hàng!', '#dc3545')">
                                                     Hủy
                                                 </button>
-
                                             </form>
 
                                         </c:if>
@@ -124,20 +127,20 @@
                                         <!-- CONFIRMED -->
                                         <c:if test="${order.status eq 'CONFIRMED'}">
 
-                                            <form action="${root}/admin/orders"
+                                            <form action="${root}/admin/ship-order"
                                                   method="post"
                                                   class="d-inline">
-
-                                                <input type="hidden"
-                                                       name="action"
-                                                       value="shipping">
 
                                                 <input type="hidden"
                                                        name="id"
                                                        value="${order.id}">
 
-                                                <button class="btn btn-sm btn-primary">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-primary"
+                                                        onclick="showToast('Đã gửi đơn sang GHN!', '#0d6efd')">
+
                                                     Giao ĐVVC
+
                                                 </button>
 
                                             </form>
@@ -214,3 +217,36 @@
         font-size: 11px;
     }
 </style>
+<!-- TOAST -->
+<div id="toast"
+     style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        display: none;
+        z-index: 9999;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+     ">
+</div>
+
+<script>
+
+    function showToast(message, color) {
+
+        const toast = document.getElementById("toast");
+
+        toast.innerText = message;
+
+        toast.style.background = color;
+
+        toast.style.display = "block";
+
+        setTimeout(() => {
+            toast.style.display = "none";
+        }, 3000);
+    }
+
+</script>
