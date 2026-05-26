@@ -4,6 +4,7 @@ import com.shop.sportstore.dao.OrderDAO;
 import com.shop.sportstore.dao.VoucherDAO;
 import com.shop.sportstore.model.CartItem;
 import com.shop.sportstore.model.Voucher;
+import com.shop.sportstore.service.GhnShippingService;
 import com.shop.sportstore.untils.DBConnection;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -49,7 +50,6 @@ public class CheckoutServlet extends HttpServlet {
             selectedItems = cart;
         }
 
-
         try (Connection conn = DBConnection.getConnection()) {
             VoucherDAO voucherDAO = new VoucherDAO(conn);
             request.setAttribute("vouchers", voucherDAO.getAll());
@@ -61,20 +61,17 @@ public class CheckoutServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/client/checkout.jsp").forward(request, response);
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
 
-
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-
 
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
         String selectedIds = request.getParameter("selectedIds");
@@ -98,7 +95,6 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-
         String receiverName = request.getParameter("receiverName");
         String receiverPhone = request.getParameter("receiverPhone");
         String note = request.getParameter("note");
@@ -108,7 +104,6 @@ public class CheckoutServlet extends HttpServlet {
         String ward = request.getParameter("ward");
         String district = request.getParameter("district");
         String province = request.getParameter("province");
-
 
         int districtId = 0;
         String wardCode = "";
@@ -127,14 +122,12 @@ public class CheckoutServlet extends HttpServlet {
             System.err.println("Lỗi nhận mã vùng districtId/wardCode: " + e.getMessage());
         }
 
-
         String fullAddress = "";
         if (specific != null && !specific.isBlank()) {
             fullAddress = specific + ", " + ward + ", " + district + ", " + province;
         } else {
             fullAddress = "Chưa có địa chỉ chi tiết";
         }
-
 
         double subtotal = 0;
         for (CartItem item : selectedCart) {
@@ -144,35 +137,71 @@ public class CheckoutServlet extends HttpServlet {
         double discount = 0;
         Integer voucherId = null;
         String vIdRaw = request.getParameter("voucherId");
+
         if (vIdRaw != null && !vIdRaw.isEmpty()) {
             try {
                 voucherId = Integer.parseInt(vIdRaw);
-
+                try (Connection conn = DBConnection.getConnection()) {
+                    VoucherDAO voucherDAO = new VoucherDAO(conn);
+                    Voucher v = voucherDAO.findById(voucherId);
+                    if (v != null) {
+                        discount = v.getDiscountValue();
+                    }
+                } catch (Exception e) {
+                    System.err.println("Lỗi hệ thống khi lấy giá trị Voucher: " + e.getMessage());
+                }
             } catch (NumberFormatException e) {
                 voucherId = null;
             }
         }
 
+        double shippingFee = 30000;
+        try {
+            GhnShippingService ghn = new GhnShippingService(
+                    "2eb2d430-50e9-11f1-a973-aee5264794df",
+                    "200403"
+            );
 
-        double shippingFee = 35000;
-
-        if (province != null && !province.isEmpty()) {
-            String provinceLower = province.toLowerCase();
-            if (provinceLower.contains("hồ chí minh") || provinceLower.contains("hcm")) {
-                shippingFee = 15000;
-            } else if (provinceLower.contains("hà nội")) {
-                shippingFee = 35000;
+            int fee = ghn.calculateShippingFee(
+                    1440,
+                    districtId,
+                    wardCode,
+                    1000,
+                    20,
+                    20,
+                    10,
+                    (int) subtotal
+            );
+            if (fee > 0) {
+                shippingFee = fee;
+            } else {
+                shippingFee = 30000;
             }
+
+        } catch (Exception e) {
+
+            System.out.println("GHN calculate error: " + e.getMessage());
+            shippingFee = 30000;
         }
 
+        // --- ĐOẠN THÊM DUY NHẤT: Ưu tiên lấy phí ship từ Giao diện gửi lên để chuẩn số tiền hiển thị ---
+        String shippingFeeRaw = request.getParameter("shippingFee");
+        if (shippingFeeRaw != null && !shippingFeeRaw.isEmpty()) {
+            try { shippingFee = Double.parseDouble(shippingFeeRaw); } catch (Exception e) {}
+        }
+        // -----------------------------------------------------------------------------------------
+
         double total = subtotal - discount + shippingFee;
-        if (total < 0) total = 0;
+
+        if (total < 0) {
+            total = 0;
+        }
 
         String orderCode = "ORD" + System.currentTimeMillis();
 
         try {
-            OrderDAO orderDAO = new OrderDAO();
 
+            OrderDAO orderDAO = new OrderDAO();
 
             orderDAO.createOrder(
                     userId,
@@ -191,27 +220,23 @@ public class CheckoutServlet extends HttpServlet {
                     shippingFee,
                     selectedCart
             );
-
-
             if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
-
                 session.setAttribute("paymentAmount", total);
-
                 session.setAttribute("pendingOrderCode", orderCode);
-
-                response.sendRedirect(
-                        request.getContextPath() + "/vnpayPayment"
-                );
-
+                response.sendRedirect(request.getContextPath() + "/vnpayPayment");
             } else {
+                if (voucherId != null) {
+                    try (Connection conn = DBConnection.getConnection()) {
+                        VoucherDAO voucherDAO = new VoucherDAO(conn);
+                        voucherDAO.updateUsed(voucherId);
+                    } catch (Exception e) {
+                        System.err.println("Lỗi cập nhật lượt dùng Voucher: " + e.getMessage());
+                    }
+                }
 
                 cart.removeAll(selectedCart);
-
                 session.setAttribute("cart", cart);
-
-                response.sendRedirect(
-                        request.getContextPath() + "/orderSuccess"
-                );
+                response.sendRedirect(request.getContextPath() + "/orderSuccess?orderCode=" + orderCode);
             }
         } catch (Exception e) {
             e.printStackTrace();
