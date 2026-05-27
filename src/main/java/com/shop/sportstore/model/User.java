@@ -9,20 +9,20 @@ public class User implements Serializable {
     private String email;
     private String password;
     private String phoneNumber;
-    private String role; // ADMIN / USER
+    private String role;
     private String avatar;
     private String provider;
     private String address;
     private boolean status = true;
     private String memberLevel;
-
+    private String gioiTinh;
     public User() {
     }
 
     public User(int userId, String fullName, String email, String password, String phoneNumber, String role) {
         this.userId = userId;
         this.fullName = fullName;
-        this.email = email; // Đã bổ sung gán giá trị cho email
+        this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.role = role;
@@ -116,6 +116,14 @@ public class User implements Serializable {
         this.memberLevel = memberLevel;
     }
 
+    public String getGioiTinh() {
+        return gioiTinh;
+    }
+
+    public void setGioiTinh(String gioiTinh) {
+        this.gioiTinh = gioiTinh;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -123,6 +131,7 @@ public class User implements Serializable {
                 ", fullName='" + fullName + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
+                ", gioiTinh='" + gioiTinh + '\'' +
                 ", role='" + role + '\'' +
                 ", status=" + status +
                 '}';

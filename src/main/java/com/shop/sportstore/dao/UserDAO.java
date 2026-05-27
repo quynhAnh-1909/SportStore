@@ -24,8 +24,9 @@ public class UserDAO extends DBConnection {
     }
 
     public boolean registerUser(User user) {
-        String sql = "INSERT INTO users (full_name, email, password, phone_number, role, provider) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+
+        String sql = "INSERT INTO users (full_name, email, password, phone_number, role, provider, gender) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getFullName());
@@ -34,6 +35,7 @@ public class UserDAO extends DBConnection {
             ps.setString(4, user.getPhoneNumber());
             ps.setString(5, user.getRole());
             ps.setString(6, "LOCAL");
+            ps.setString(7, user.getGioiTinh());
             return ps.executeUpdate() > 0;
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("Email đã tồn tại!");
@@ -92,8 +94,14 @@ public class UserDAO extends DBConnection {
         user.setPassword(rs.getString("password"));
         user.setPhoneNumber(rs.getString("phone_number"));
         user.setRole(rs.getString("role"));
-        // Lấy status từ Database
         user.setStatus(rs.getBoolean("status"));
+
+
+        try {
+            user.setGioiTinh(rs.getString("gender"));
+        } catch (SQLException e) {
+            System.out.println("Cột giới tính chưa tồn tại trong ResultSet");
+        }
         return user;
     }
 
@@ -119,9 +127,6 @@ public class UserDAO extends DBConnection {
         return null;
     }
 
-    // =========================================================================
-    // HÀM MỚI BỔ SUNG ĐỂ KHÓA TÀI KHOẢN KHI HỦY ĐƠN QUÁ NHIỀU
-    // =========================================================================
     public boolean lockUserAccount(int userId) {
         String sql = "UPDATE users SET status = 0 WHERE user_id = ?";
         try (Connection conn = getConnection();
