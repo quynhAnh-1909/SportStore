@@ -142,8 +142,12 @@
                                             <button type="submit" class="btn btn-sm btn-success">
                                                 Hoàn thành
                                             </button>
-
                                         </form>
+
+                                        <button type="button" class="btn btn-sm btn-info btn-tracking text-white"
+                                                data-ghncode="${order.ghnCode}">
+                                            <i class="fas fa-route"></i> Hành trình
+                                        </button>
 
                                     </c:if>
 
@@ -164,6 +168,22 @@
                 </table>
             </div>
         </c:if>
+    </div>
+</div>
+
+<div class="modal fade" id="trackingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-truck"></i> Hành trình đơn hàng</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="trackingTimeline" class="list-group list-group-flush">
+                    <li class="list-group-item text-center text-muted">Đang tải dữ liệu...</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -220,59 +240,43 @@
         }, 3000);
     }
 
-    // Gắn sự kiện submit cho tất cả form có class 'ajax-form'
     document.addEventListener("DOMContentLoaded", function() {
         const ajaxForms = document.querySelectorAll('.ajax-form');
 
         ajaxForms.forEach(form => {
             form.addEventListener('submit', function(event) {
-                // Chặn load lại trang mặc định
                 event.preventDefault();
 
                 const formData = new FormData(this);
                 const actionUrl = this.getAttribute('action');
-
-                // Lấy thông báo từ data-attributes của form
                 const successMsg = this.getAttribute('data-success-msg') || 'Thao tác thành công!';
                 const successColor = this.getAttribute('data-success-color') || '#198754';
-
-                // Vô hiệu hóa nút để tránh click nhiều lần
                 const submitBtn = this.querySelector('button[type="submit"]');
                 const originalBtnText = submitBtn.innerHTML;
+
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
-                // Lấy thẻ <tr> chứa form này để lát nữa xóa
                 const rowElement = this.closest('tr');
 
-                // Gửi request ngầm bằng Fetch API
                 fetch(actionUrl, {
                     method: 'POST',
                     body: new URLSearchParams(formData)
                 })
                         .then(response => {
                             if (response.ok) {
-                                // Hiện toast thành công
                                 showToast(successMsg, successColor);
-
-                                // --- XÓA DÒNG KHỎI BẢNG MÀ KHÔNG CẦN LOAD LẠI TRANG ---
                                 if (rowElement) {
-                                    // Tạo hiệu ứng mờ dần (fade out) cho đẹp
                                     rowElement.style.transition = "opacity 0.4s ease";
                                     rowElement.style.opacity = "0";
-
-                                    // Sau 0.4s (khi mờ hẳn) thì xóa hoàn toàn thẻ <tr> khỏi HTML
                                     setTimeout(() => {
                                         rowElement.remove();
-
-                                        // (Tùy chọn) Nếu bảng trống trơn thì hiện dòng thông báo
                                         const tbody = document.querySelector('table tbody');
                                         if (tbody && tbody.children.length === 0) {
                                             tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Đã hết đơn hàng trong mục này.</td></tr>';
                                         }
                                     }, 400);
                                 }
-
                             } else {
                                 throw new Error('Network response was not ok.');
                             }
@@ -280,12 +284,67 @@
                         .catch(error => {
                             console.error('Error:', error);
                             showToast('Có lỗi xảy ra, vui lòng thử lại!', '#dc3545');
-
-                            // Khôi phục lại nút nếu bị lỗi
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = originalBtnText;
                         });
             });
         });
+
+        const trackingModalElement = document.getElementById('trackingModal');
+        if (trackingModalElement) {
+            const trackingModal = new bootstrap.Modal(trackingModalElement);
+            const timelineContainer = document.getElementById('trackingTimeline');
+
+            document.querySelectorAll('.btn-tracking').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const ghnCode = this.getAttribute('data-ghncode');
+                    if(!ghnCode) {
+                        showToast('Đơn hàng này chưa có mã vận đơn GHN!', '#dc3545');
+                        return;
+                    }
+
+                    timelineContainer.innerHTML = '<li class="list-group-item text-center text-muted spinner-border spinner-border-sm mx-auto d-block my-3"></li>';
+                    trackingModal.show();
+
+                    const formData = new URLSearchParams();
+                    formData.append('action', 'tracking');
+                    formData.append('ghnCode', ghnCode);
+
+                    fetch('${root}/admin/orders', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    })
+                            .then(response => {
+                                if(!response.ok) throw new Error("Lỗi tải dữ liệu");
+                                return response.json();
+                            })
+                            .then(data => {
+                                if(data.code === 200 && data.data && data.data.log) {
+                                    const logs = data.data.log;
+                                    let html = '';
+
+                                    logs.reverse().forEach(log => {
+                                        const time = new Date(log.updated_date).toLocaleString('vi-VN');
+                                        html += `
+                                    <li class="list-group-item">
+                                        <div class="fw-bold text-primary">\${log.status}</div>
+                                        <div class="small text-muted"><i class="far fa-clock"></i> \${time}</div>
+                                    </li>
+                                `;
+                                    });
+
+                                    timelineContainer.innerHTML = html;
+                                } else {
+                                    timelineContainer.innerHTML = '<li class="list-group-item text-danger">Không tìm thấy thông tin hành trình.</li>';
+                                }
+                            })
+                            .catch(error => {
+                                console.error(error);
+                                timelineContainer.innerHTML = '<li class="list-group-item text-danger">Lỗi kết nối đến máy chủ!</li>';
+                            });
+                });
+            });
+        }
     });
 </script>

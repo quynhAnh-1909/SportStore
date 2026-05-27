@@ -3,7 +3,6 @@ package com.shop.sportstore.controller.admin;
 import com.shop.sportstore.dao.OrderDAO;
 import com.shop.sportstore.model.Order;
 import com.shop.sportstore.service.GhnOrderService;
-import com.shop.sportstore.service.GhnShippingService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -27,9 +26,29 @@ public class OrdersServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
-        int id = Integer.parseInt(request.getParameter("id"));
 
         try {
+            if ("tracking".equals(action)) {
+                String trackingCode = request.getParameter("ghnCode");
+                if (trackingCode == null || trackingCode.isEmpty()) {
+                    throw new RuntimeException("Thiếu mã vận đơn GHN");
+                }
+
+                GhnOrderService trackingService = new GhnOrderService(GHN_TOKEN, GHN_SHOP_ID);
+                String jsonGHN = trackingService.getOrderTracking(trackingCode);
+
+                response.setContentType("application/json;charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().write(jsonGHN);
+                return;
+            }
+
+            String idParam = request.getParameter("id");
+            if (idParam == null || idParam.isEmpty()) {
+                throw new RuntimeException("Thiếu ID đơn hàng");
+            }
+            int id = Integer.parseInt(idParam);
+
             switch (action) {
                 case "confirm":
                     orderDAO.confirmOrder(id);
@@ -57,6 +76,7 @@ public class OrdersServlet extends HttpServlet {
                     orderDAO.completeOrder(id);
                     break;
             }
+
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("success");
 
@@ -72,8 +92,8 @@ public class OrdersServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String status = request.getParameter("status");
-
         List<Order> orders;
+
         if (status == null || status.isEmpty()) {
             orders = orderDAO.getAllOrders();
         } else {
