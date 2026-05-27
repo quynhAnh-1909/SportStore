@@ -15,7 +15,7 @@ import java.util.List;
 @WebServlet("/admin/orders")
 public class OrdersServlet extends HttpServlet {
     private static final String GHN_TOKEN = "2eb2d430-50e9-11f1-a973-aee5264794df";
-    private static final String GHN_SHOP_ID = "200323";
+    private static final String GHN_SHOP_ID = "200403";
     private OrderDAO orderDAO;
 
     @Override
