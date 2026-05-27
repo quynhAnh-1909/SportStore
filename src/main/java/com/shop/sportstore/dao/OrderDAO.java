@@ -294,15 +294,14 @@ public class OrderDAO extends DBConnection {
         return 0;
     }
 
-
     public boolean updateStatusByGhnCode(String ghnCode, String status)
             throws SQLException {
 
         String timeColumn = "";
+        String dbStatus = status;
 
         switch (status) {
-
-            case "PROCESSING":
+            case "CONFIRMED":
                 timeColumn = ", ConfirmedAt = NOW()";
                 break;
 
@@ -311,6 +310,7 @@ public class OrderDAO extends DBConnection {
                 break;
 
             case "DELIVERED":
+                dbStatus = "COMPLETED";
                 timeColumn = ", CompletedAt = NOW()";
                 break;
 
@@ -328,13 +328,13 @@ public class OrderDAO extends DBConnection {
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, status);
-
+            ps.setString(1, dbStatus);
             ps.setString(2, ghnCode);
 
             return ps.executeUpdate() > 0;
         }
     }
+
     public List<Order> getOrdersByStatus(String status) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
@@ -372,13 +372,14 @@ public class OrderDAO extends DBConnection {
 
 
                     order.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                    order.setUpdatedAt(rs.getTimestamp("UpdatedAt")); // Đã bổ sung trường này tránh khuyết dữ liệu
+                    order.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
                     order.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
                     order.setShippingAt(rs.getTimestamp("ShippingAt"));
                     order.setCompletedAt(rs.getTimestamp("CompletedAt"));
                     order.setCancelledAt(rs.getTimestamp("CancelledAt"));
                     order.setCancelReason(rs.getString("CancelReason"));
 
+                    order.setGhnCode(rs.getString("ghn_code")); // THÊM DÒNG NÀY: Để không bị lỗi trống mã vận đơn khi bấm xem Lịch trình
 
                     order.setUserFullName(rs.getString("userFullName"));
 
@@ -391,6 +392,7 @@ public class OrderDAO extends DBConnection {
         }
         return orders;
     }
+
     public List<Order> getOrdersByUser(int userId) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders WHERE UserId = ? ORDER BY CreatedAt DESC";

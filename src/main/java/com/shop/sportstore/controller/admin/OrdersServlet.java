@@ -1,5 +1,7 @@
 package com.shop.sportstore.controller.admin;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.shop.sportstore.dao.OrderDAO;
 import com.shop.sportstore.model.Order;
 import com.shop.sportstore.service.GhnOrderService;
@@ -26,14 +28,12 @@ public class OrdersServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
-
         try {
             if ("tracking".equals(action)) {
                 String trackingCode = request.getParameter("ghnCode");
-                if (trackingCode == null || trackingCode.isEmpty()) {
-                    throw new RuntimeException("Thiếu mã vận đơn GHN");
+                if (trackingCode == null || trackingCode.isEmpty() || "null".equals(trackingCode)) {
+                    throw new RuntimeException("Đơn hàng này chưa được kích hoạt mã vận đơn GHN!");
                 }
-
                 GhnOrderService trackingService = new GhnOrderService(GHN_TOKEN, GHN_SHOP_ID);
                 String jsonGHN = trackingService.getOrderTracking(trackingCode);
 
@@ -42,10 +42,9 @@ public class OrdersServlet extends HttpServlet {
                 response.getWriter().write(jsonGHN);
                 return;
             }
-
             String idParam = request.getParameter("id");
             if (idParam == null || idParam.isEmpty()) {
-                throw new RuntimeException("Thiếu ID đơn hàng");
+                throw new RuntimeException("Thiếu ID đơn hàng để thực hiện thao tác!");
             }
             int id = Integer.parseInt(idParam);
 
@@ -61,12 +60,11 @@ public class OrdersServlet extends HttpServlet {
                 case "shipping":
                     Order order = orderDAO.getOrderById(id);
                     GhnOrderService ghnService = new GhnOrderService(GHN_TOKEN, GHN_SHOP_ID);
-
                     String ghnCode = ghnService.createOrder(order);
                     System.out.println("GHN CODE RETURN: " + ghnCode);
 
                     if (ghnCode == null || ghnCode.isEmpty()) {
-                        throw new RuntimeException("GHN không trả order_code");
+                        throw new RuntimeException("Hệ thống GHN đang bận hoặc thông tin địa chỉ đơn hàng không hợp lệ!");
                     }
                     orderDAO.updateGhnCode(id, ghnCode);
                     orderDAO.shippingOrder(id);
@@ -75,8 +73,10 @@ public class OrdersServlet extends HttpServlet {
                 case "complete":
                     orderDAO.completeOrder(id);
                     break;
-            }
 
+                default:
+                    throw new RuntimeException("Thao tác hành động (Action) không hợp lệ!");
+            }
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("success");
 
@@ -90,6 +90,46 @@ public class OrdersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        String action = request.getParameter("action");
+        if ("sync".equals(action)) {
+            try {
+                List<Order> shippingOrders = orderDAO.getOrdersByStatus("SHIPPING");
+                if (shippingOrders != null && !shippingOrders.isEmpty()) {
+                    GhnOrderService ghnService = new GhnOrderService(GHN_TOKEN, GHN_SHOP_ID);
+                    Gson gson = new Gson();
+
+                    for (Order order : shippingOrders) {
+                        String ghnCode = order.getGhnCode();
+                        if (ghnCode != null && !ghnCode.isEmpty()) {
+                            String jsonResponse = ghnService.getOrderTracking(ghnCode);
+                            JsonObject result = gson.fromJson(jsonResponse, JsonObject.class);
+
+                            if (result.has("code") && result.get("code").getAsInt() == 200) {
+                                String ghnStatus = result.getAsJsonObject("data").get("status").getAsString().toLowerCase();
+                                if ("delivered".equals(ghnStatus)) {
+                                    orderDAO.updateStatusByGhnCode(ghnCode, "COMPLETED");
+                                    System.out.println("ĐỒNG BỘ THÀNH CÔNG: Đơn hàng " + ghnCode + " -> COMPLETED");
+                                }
+                                else if ("cancel".equals(ghnStatus) || ghnStatus.contains("return") || "damage".equals(ghnStatus) || "lost".equals(ghnStatus)) {
+                                    orderDAO.updateStatusByGhnCode(ghnCode, "CANCELLED");
+                                    System.out.println("ĐỒNG BỘ THẤT BẠI/HỦY: Đơn hàng " + ghnCode + " -> CANCELLED");
+                                }
+                            }
+                        }
+                    }
+                }
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("sync_success");
+                return;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("Lỗi trong quá trình xử lý đồng bộ từ ĐVVC: " + e.getMessage());
+                return;
+            }
+        }
 
         String status = request.getParameter("status");
         List<Order> orders;
@@ -113,6 +153,8 @@ public class OrdersServlet extends HttpServlet {
                 case "cancelled":
                     status = "CANCELLED";
                     break;
+                default:
+                    status = "PENDING";
             }
             orders = orderDAO.getOrdersByStatus(status);
         }
