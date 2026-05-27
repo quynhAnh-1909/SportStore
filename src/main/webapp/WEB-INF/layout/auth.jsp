@@ -4,7 +4,6 @@
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <style>
-
     .overlay {
         position: fixed;
         top: 0;
@@ -26,6 +25,7 @@
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         position: relative;
         animation: fadeIn .3s ease;
+        z-index: 1000;
     }
 
     @keyframes fadeIn {
@@ -99,10 +99,6 @@
         background-color: white !important;
     }
 
-    .auth-box {
-        z-index: 1000;
-    }
-
     .error {
         color: #d81f19;
         font-size: 13px;
@@ -147,6 +143,55 @@
         text-align: center;
         margin-top: 15px;
     }
+
+
+    .password-wrapper {
+        position: relative;
+        margin-top: 5px;
+    }
+
+    .password-wrapper input {
+        margin-top: 0;
+        padding-right: 40px;
+    }
+
+    .toggle-eye {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        z-index: 1002;
+        font-size: 18px;
+        user-select: none;
+    }
+
+
+    .gender-group {
+        display: flex;
+        gap: 30px;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+
+    .gender-option {
+        display: flex;
+        align-items: center;
+    }
+
+    input[type="radio"] {
+        width: auto;
+        padding: 0;
+        margin: 0;
+        margin-right: 8px;
+        cursor: pointer;
+    }
+
+    .gender-label {
+        font-weight: normal;
+        cursor: pointer;
+        margin: 0;
+    }
 </style>
 
 
@@ -164,7 +209,6 @@
             <span id="tabRegister" onclick="switchTab('register')">Đăng ký</span>
         </div>
 
-        <!-- LOGIN -->
         <form id="loginForm" action="${root}/login" method="post" onsubmit="return validateLogin()">
             <div class="form-group">
                 <label>Email <span class="required">*</span></label>
@@ -177,14 +221,16 @@
 
             <div class="form-group">
                 <label>Mật khẩu <span class="required">*</span></label>
-                <input type="password" name="password" id="loginPass">
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="loginPass">
+                    <span class="toggle-eye" onclick="togglePassword('loginPass', this)">👁️</span>
+                </div>
                 <div class="error" id="loginPassError"></div>
             </div>
 
             <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
         </form>
 
-        <!-- REGISTER -->
         <form id="registerForm" action="${root}/register" method="post"
               onsubmit="return validateRegister()" style="display:none;">
 
@@ -206,8 +252,26 @@
 
             <div class="form-group">
                 <label>Mật khẩu <span class="required">*</span></label>
-                <input type="password" name="matKhau" id="regPass">
+                <div class="password-wrapper">
+                    <input type="password" name="matKhau" id="regPass">
+                    <span class="toggle-eye" onclick="togglePassword('regPass', this)">👁️</span>
+                </div>
                 <div class="error" id="regPassError"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Giới tính <span class="required">*</span></label>
+                <div class="gender-group">
+                    <div class="gender-option">
+                        <input type="radio" name="gioiTinh" id="genderMale" value="Nam" ${oldUser!=null && oldUser.gioiTinh=='Nam' ? 'checked' : ''}>
+                        <label class="gender-label" for="genderMale">Nam</label>
+                    </div>
+                    <div class="gender-option">
+                        <input type="radio" name="gioiTinh" id="genderFemale" value="Nữ" ${oldUser!=null && oldUser.gioiTinh=='Nữ' ? 'checked' : ''}>
+                        <label class="gender-label" for="genderFemale">Nữ</label>
+                    </div>
+                </div>
+                <div class="error" id="regGenderError"></div>
             </div>
 
             <div class="form-group">
@@ -220,7 +284,6 @@
             <button type="submit" class="btn-submit">ĐĂNG KÝ</button>
         </form>
 
-        <!-- SOCIAL -->
         <div class="social-login">
             <div class="social-btn" onclick="location.href='${root}/login-google'">
                 <img src="${root}/resources/gg.jpg"> Google
@@ -302,12 +365,16 @@
         document.getElementById("regNameError").innerText = "";
         document.getElementById("regEmailError").innerText = "";
         document.getElementById("regPassError").innerText = "";
+        document.getElementById("regGenderError").innerText = "";
         document.getElementById("regPhoneError").innerText = "";
 
         let name = document.getElementById("regName").value.trim();
         let email = document.getElementById("regEmail").value.trim();
         let pass = document.getElementById("regPass").value.trim();
         let phone = document.getElementById("regPhone").value.trim();
+
+        let isMaleChecked = document.getElementById("genderMale").checked;
+        let isFemaleChecked = document.getElementById("genderFemale").checked;
 
         let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         let phoneRegex = /^[0-9]{9,12}$/;
@@ -330,12 +397,29 @@
             valid = false;
         }
 
+
+        if (!isMaleChecked && !isFemaleChecked) {
+            document.getElementById("regGenderError").innerText = "Vui lòng chọn giới tính";
+            valid = false;
+        }
+
         if (phone !== "" && !phoneRegex.test(phone)) {
             document.getElementById("regPhoneError").innerText = "Số điện thoại không hợp lệ";
             valid = false;
         }
 
         return valid;
+    }
+
+    function togglePassword(inputId, iconElement) {
+        let input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            iconElement.innerHTML = "🙈";
+        } else {
+            input.type = "password";
+            iconElement.innerHTML = "👁️";
+        }
     }
 
     <c:if test="${not empty errorMessage}">
