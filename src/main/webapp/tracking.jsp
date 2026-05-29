@@ -16,46 +16,48 @@
         body {
             background-color: #f8f9fa;
         }
+
         .text-danger-custom {
             color: #d81f19 !important;
         }
+
         .btn-danger-custom {
             background-color: #d81f19 !important;
             border-color: #d81f19 !important;
             color: #ffffff !important;
         }
+
         .btn-danger-custom:hover {
             background-color: #b31410 !important;
             border-color: #b31410 !important;
         }
-        .table-danger-custom {
-            background-color: #fce8e6 !important;
-            color: #a81c18 !important;
-        }
-        .search-card {
+
+        .search-card, .result-card {
             border: none;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
+
         .result-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             display: none;
         }
+
         .ghn-timeline {
             position: relative;
             padding-left: 35px;
             margin-left: 15px;
             border-left: 3px dashed #e2e8f0;
         }
+
         .ghn-time-node {
             position: relative;
             padding-bottom: 35px;
         }
+
         .ghn-time-node:last-child {
             padding-bottom: 0;
         }
+
         .ghn-time-node::before {
             content: "";
             position: absolute;
@@ -69,30 +71,37 @@
             box-shadow: 0 0 0 3px #cbd5e1;
             transition: all 0.3s ease;
         }
+
         .ghn-time-node.active::before {
             background-color: #ff6600;
             box-shadow: 0 0 0 5px rgba(255, 102, 0, 0.25);
         }
+
         .ghn-time-node.active .node-title {
             color: #ff6600;
             font-weight: 700;
         }
+
         .ghn-time-node.done::before {
             background-color: #10b981;
             box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.25);
         }
+
         .ghn-time-node.done .node-title {
             color: #10b981;
             font-weight: 600;
         }
+
         .ghn-time-node.fail::before {
             background-color: #ef4444;
             box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.25);
         }
+
         .ghn-time-node.fail .node-title {
             color: #ef4444;
             font-weight: 600;
         }
+
         .node-title {
             font-size: 1.05rem;
             margin-bottom: 4px;
@@ -107,24 +116,13 @@
 <div class="container my-5 py-4">
     <nav aria-label="breadcrumb" class="mb-2">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="${pageContext.request.contextPath}/" class="text-danger-custom text-decoration-none">
-                    <i class="fas fa-home"></i> Trang chủ
-                </a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-                <span class="text-secondary fw-semibold">Tra cứu đơn hàng</span>
-            </li>
+            <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/" class="text-danger-custom text-decoration-none"><i class="fas fa-home"></i> Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><span class="text-secondary fw-semibold">Tra cứu đơn hàng</span></li>
         </ol>
     </nav>
-
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0 text-danger-custom">
-            <i class="fas fa-truck-fast me-2"></i>Tra cứu hành trình đơn hàng
-        </h2>
-        <a href="${pageContext.request.contextPath}/order-history" class="btn btn-danger-custom fw-bold shadow-sm">
-            <i class="fas fa-history me-2"></i>Lịch sử đơn hàng
-        </a>
+        <h2 class="fw-bold mb-0 text-danger-custom"><i class="fas fa-truck-fast me-2"></i>Tra cứu hành trình đơn hàng</h2>
+        <a href="${pageContext.request.contextPath}/order-history" class="btn btn-danger-custom fw-bold shadow-sm"><i class="fas fa-history me-2"></i>Lịch sử đơn hàng</a>
     </div>
 
     <div class="row justify-content-center">
@@ -132,11 +130,9 @@
             <div class="card p-4 search-card bg-white mb-4 shadow-sm">
                 <p class="text-muted mb-3 small">Vui lòng nhập mã bưu kiện (Ví dụ: ORD...) hoặc Số điện thoại mua hàng để kiểm tra vị trí đơn hàng thời gian thực.</p>
                 <div class="input-group input-group-lg shadow-sm rounded">
-                    <span class="input-group-text bg-white border-end-0">
-                        <i class="fa-solid fa-magnifying-glass text-muted"></i>
-                    </span>
-                    <input type="text" id="keywordInput" class="form-control border-start-0 ps-2 fs-6" placeholder="Nhập mã đơn hàng hoặc số điện thoại của bạn...">
-                    <button class="btn btn-danger-custom px-4 fs-6 fw-bold" type="button" id="btnSearch">Tìm kiếm</button>
+                    <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" id="keywordInput" class="form-control border-start-0 ps-2 fs-6" placeholder="Nhập mã đơn hàng hoặc số điện thoại của bạn..." onkeypress="if(event.key === 'Enter') performTracking()">
+                    <button class="btn btn-danger-custom px-4 fs-6 fw-bold" type="button" id="btnSearch" onclick="performTracking()">Tìm kiếm</button>
                 </div>
                 <div id="errorMessage" class="text-danger mt-3 small fw-bold"></div>
             </div>
@@ -164,9 +160,7 @@
                     </div>
                 </div>
 
-                <h6 class="fw-bold text-secondary text-uppercase mb-4">
-                    <i class="fa-solid fa-map-location-dot me-2"></i>Lịch trình vận chuyển chi tiết từ GHN:
-                </h6>
+                <h6 class="fw-bold text-secondary text-uppercase mb-4"><i class="fa-solid fa-map-location-dot me-2"></i>Lịch trình vận chuyển chi tiết từ GHN:</h6>
 
                 <div class="ghn-timeline">
                     <div class="ghn-time-node" id="node-delivered">
@@ -178,7 +172,7 @@
                         <p class="text-muted small mb-0">Bưu kiện đang nằm trên xe trung chuyển liên tỉnh hoặc bưu tá đang đi phát tới địa chỉ của bạn.</p>
                     </div>
                     <div class="ghn-time-node" id="node-processing">
-                        <div class="node-title">Shop đang chuẩn bị hàng / Đang phân loại bưu kiện</div>
+                        <div class="node-title">Shop đang chuẩn bị hàng / Đang phân loại</div>
                         <p class="text-muted small mb-0">Yêu cầu giao hàng đã được tiếp nhận, bưu kiện đang nằm trong luồng phân loại kho bưu cục GHN.</p>
                     </div>
                     <div class="ghn-time-node" id="node-pending">
@@ -192,105 +186,110 @@
 </div>
 
 <jsp:include page="/footer.jsp" />
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
 
-    document.getElementById("btnSearch").addEventListener("click", performTracking);
-    document.getElementById("keywordInput").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") performTracking();
-    });
-
     window.addEventListener('DOMContentLoaded', () => {
+        const keywordInput = document.getElementById("keywordInput");
         const urlParams = new URLSearchParams(window.location.search);
         const keywordParam = urlParams.get('keyword');
-        if (keywordParam) {
-            document.getElementById("keywordInput").value = keywordParam;
+        if (keywordParam && keywordInput) {
+            keywordInput.value = keywordParam;
             performTracking();
         }
     });
-
     function performTracking() {
         let keyword = document.getElementById("keywordInput").value.trim();
         const errorDiv = document.getElementById("errorMessage");
         const resultArea = document.getElementById("resultArea");
+        const btnSearch = document.getElementById("btnSearch");
 
+        // Reset trạng thái ban đầu
         errorDiv.innerText = "";
+
         if (!keyword) {
             errorDiv.innerText = "⚠️ Vui lòng cung cấp mã đơn hàng hoặc số điện thoại của bạn trước!";
+            resultArea.style.display = "none";
             return;
         }
 
-        if (keyword.startsWith("#")) {
-            keyword = keyword.substring(1);
-        }
+        if (keyword.startsWith("#")) keyword = keyword.substring(1);
 
-        document.getElementById("btnSearch").innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang check...`;
-        document.getElementById("btnSearch").disabled = true;
+        // Hiệu ứng xoay vòng lúc bấm nút
+        btnSearch.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...`;
+        btnSearch.disabled = true;
 
         fetch(`${CONTEXT_PATH}/api/track-order?keyword=${encodeURIComponent(keyword)}`)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error("HTTP error " + response.status);
-                    }
+                    if (!response.ok) throw new Error("Mã phản hồi từ Server không hợp lệ (" + response.status + ")");
                     return response.json();
                 })
                 .then(res => {
-                    document.getElementById("btnSearch").innerHTML = "Tìm kiếm";
-                    document.getElementById("btnSearch").disabled = false;
+                    // Trả lại trạng thái nút ban đầu
+                    btnSearch.innerHTML = "Tìm kiếm";
+                    btnSearch.disabled = false;
 
+                    // Nếu Backend trả về trạng thái lỗi (không tìm thấy đơn, lỗi API GHN...)
                     if (res.status === "error") {
                         resultArea.style.display = "none";
-                        errorDiv.innerText = "❌ " + res.message;
+                        errorDiv.innerHTML = `<div class="alert alert-danger shadow-sm py-2 px-3"><i class="fa-solid fa-circle-exclamation me-2"></i>${res.message}</div>`;
                         return;
                     }
 
+                    // Nếu thành công -> Hiện thị vùng dữ liệu và đổ thông tin vào các thẻ
                     resultArea.style.display = "block";
                     document.getElementById("resOrderId").innerText = res.orderId;
                     document.getElementById("resOrderDate").innerText = res.orderDate;
                     document.getElementById("resReceiverName").innerText = res.receiverName;
                     document.getElementById("resTotalPrice").innerText = res.totalPrice;
-                    document.getElementById("resStatusBadge").innerText = res.orderStatus;
 
+                    const badge = document.getElementById("resStatusBadge");
+                    badge.innerText = res.orderStatus;
                     resetTimelineStyles();
 
-                    const status = res.orderStatus.toLowerCase();
+                    const code = res.statusCode;
 
-                    if (status.includes("thành công") || status.includes("đã hoàn trả")) {
+                    // Đắp class màu sắc dựa theo các đầu mã trạng thái (statusCode)
+                    if (code === 4) {
                         setNodeStatus("node-pending", "done");
                         setNodeStatus("node-processing", "done");
                         setNodeStatus("node-shipping", "done");
                         setNodeStatus("node-delivered", "done");
-                        document.getElementById("resStatusBadge").className = "badge bg-success text-white px-3 py-2 fs-6 rounded-pill";
+                        badge.className = "badge bg-success text-white px-3 py-2 fs-6 rounded-pill";
                     }
-                    else if (status.includes("hủy bỏ") || status.includes("chuyển hoàn") || status.includes("sự cố")) {
+                    else if (code === 5) {
                         setNodeStatus("node-pending", "done");
                         setNodeStatus("node-processing", "fail");
                         setNodeStatus("node-shipping", "fail");
                         setNodeStatus("node-delivered", "fail");
-                        document.getElementById("resStatusBadge").className = "badge bg-danger text-white px-3 py-2 fs-6 rounded-pill";
+                        badge.className = "badge bg-danger text-white px-3 py-2 fs-6 rounded-pill";
                     }
-                    else if (status.includes("đã nhận") || status.includes("kho") || status.includes("trung chuyển") || status.includes("phân loại") || status.includes("shipper")) {
+                    else if (code === 3) {
                         setNodeStatus("node-pending", "done");
                         setNodeStatus("node-processing", "done");
                         setNodeStatus("node-shipping", "active");
-                        document.getElementById("resStatusBadge").className = "badge bg-primary text-white px-3 py-2 fs-6 rounded-pill";
+                        badge.className = "badge bg-primary text-white px-3 py-2 fs-6 rounded-pill";
                     }
-                    else {
+                    else if (code === 2) {
                         setNodeStatus("node-pending", "done");
                         setNodeStatus("node-processing", "active");
-                        document.getElementById("resStatusBadge").className = "badge bg-warning text-dark px-3 py-2 fs-6 rounded-pill";
+                        badge.className = "badge bg-warning text-dark px-3 py-2 fs-6 rounded-pill";
+                    }
+                    else {
+                        setNodeStatus("node-pending", "active");
+                        badge.className = "badge bg-secondary text-white px-3 py-2 fs-6 rounded-pill";
                     }
                 })
                 .catch(err => {
-                    document.getElementById("btnSearch").innerHTML = "Tìm kiếm";
-                    document.getElementById("btnSearch").disabled = false;
+                    btnSearch.innerHTML = "Tìm kiếm";
+                    btnSearch.disabled = false;
                     resultArea.style.display = "none";
-                    errorDiv.innerText = "❌ Lỗi hệ thống: Không thể kết nối tới API (Kiểm tra lại Server hoặc F12)";
-                    console.error("Fetch Error Detail:", err);
+                    errorDiv.innerHTML = `<div class="alert alert-danger shadow-sm py-2 px-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>Lỗi kết nối: Không thể kết nối tới máy chủ hoặc thiếu thư viện JSON!</div>`;
+                    console.error("Lỗi chi tiết:", err);
                 });
+
     }
 
     function setNodeStatus(nodeId, className) {
@@ -302,9 +301,7 @@
         const nodes = ["node-pending", "node-processing", "node-shipping", "node-delivered"];
         nodes.forEach(id => {
             const el = document.getElementById(id);
-            if (el) {
-                el.classList.remove("active", "done", "fail");
-            }
+            if (el) el.classList.remove("active", "done", "fail");
         });
     }
 </script>

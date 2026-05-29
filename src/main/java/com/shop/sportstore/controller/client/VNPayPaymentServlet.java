@@ -26,7 +26,7 @@ public class VNPayPaymentServlet extends HttpServlet {
             "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
 
     private static final String VNP_RETURN_URL =
-            "http://10.208.147.195/vnpay-return";
+            "http://192.168.58.130/vnpay-return";
 
     @Override
     protected void doGet(HttpServletRequest request,

@@ -28,54 +28,19 @@ public class AuthServlet extends HttpServlet {
         dao = new UserDAO();
     }
 
-    // Cập nhật hàm loginUser để lưu thêm role và chuyển hướng Admin
-    private void loginUser(HttpSession session,
-                           HttpServletRequest request,
-                           HttpServletResponse response,
-                           User user) throws IOException {
+
+    private void loginUser(HttpSession session, HttpServletRequest request,
+                           HttpServletResponse response, User user) throws IOException {
 
         session.setAttribute("user", user);
+        session.setAttribute("userId", user.getUserId());
+        session.setAttribute("userFullName", user.getFullName());
+        session.setAttribute("userRole", user.getRole());
 
-        session.setAttribute("userId",
-                user.getUserId());
-
-        session.setAttribute("userFullName",
-                user.getFullName());
-
-        session.setAttribute("userRole",
-                user.getRole());
-
-        // ADMIN
         if ("ADMIN".equals(user.getRole())) {
-
-            response.sendRedirect(
-                    request.getContextPath()
-                            + "/admin/dashboard"
-            );
-
-            return;
-        }
-
-        // USER redirect lại page cũ
-        String redirect =
-                (String) session.getAttribute(
-                        "redirectAfterLogin"
-                );
-
-        if (redirect != null) {
-
-            session.removeAttribute(
-                    "redirectAfterLogin"
-            );
-
-            response.sendRedirect(redirect);
-
+            response.sendRedirect(request.getContextPath() + "/admin/dashboard");
         } else {
-
-            response.sendRedirect(
-                    request.getContextPath()
-                            + "/products"
-            );
+            response.sendRedirect(request.getContextPath() + "/products");
         }
     }
 
@@ -176,7 +141,7 @@ public class AuthServlet extends HttpServlet {
             loginUser(session, request, response, user);
 
         } else {
-            // 3. Đăng nhập thất bại -> Đếm số lần sai
+            // 3. Đăng nhập thất bại  Đếm số lần sai
             Integer attempts = (Integer) session.getAttribute("loginAttempts");
             if (attempts == null) attempts = 0;
             attempts++;
@@ -202,6 +167,10 @@ public class AuthServlet extends HttpServlet {
         newUser.setFullName(request.getParameter("hoTen"));
         newUser.setEmail(request.getParameter("email"));
         newUser.setPassword(request.getParameter("matKhau"));
+
+
+        newUser.setGioiTinh(request.getParameter("gioiTinh"));
+
         newUser.setPhoneNumber(request.getParameter("soDienThoai"));
         newUser.setRole("USER");
 
@@ -295,7 +264,7 @@ public class AuthServlet extends HttpServlet {
                     "FACEBOOK"
             );
 
-            // Chặn đăng nhập nếu account Facebook này đã bị khóa do hủy đơn
+
             if (!user.isStatus()) {
                 session.setAttribute("errorLogin", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
                 response.sendRedirect(request.getContextPath() + "/products?showLogin=true");

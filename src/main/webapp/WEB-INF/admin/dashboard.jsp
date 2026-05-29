@@ -10,11 +10,9 @@
     <meta charset="UTF-8">
     <title>SPORT SHOP ADMIN</title>
 
-    <!-- Bootstrap -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -361,13 +359,6 @@
 
 <div id="wrapper">
 
-
-
-
-    <!-- =========================
-         SIDEBAR
-    ========================== -->
-
     <div id="sidebar-wrapper">
 
         <div class="sidebar-heading">
@@ -384,74 +375,82 @@
                 Tổng quan
             </a>
 
-            <!-- ORDER MENU -->
-            <!-- ORDER MENU -->
-            <a class="menu-item d-flex justify-content-between align-items-center"
+            <c:set var="isOrderMenuOpen" value="${
+                param.status == 'pending' or
+                param.status == 'pickup' or
+                param.status == 'shipping' or
+                param.status == 'completed' or
+                param.status == 'cancelled' or
+                param.status == 'refund_request' or
+                param.status == 'refunded'
+            }" />
+
+            <a class="menu-item d-flex justify-content-between align-items-center ${isOrderMenuOpen ? '' : 'collapsed'}"
                data-bs-toggle="collapse"
                href="#orderMenu"
+               aria-expanded="${isOrderMenuOpen ? 'true' : 'false'}"
                role="button">
 
-    <span>
-        <i class="fas fa-shopping-cart"></i>
-        Quản lý đơn hàng
-    </span>
+                <span>
+                    <i class="fas fa-shopping-cart"></i>
+                    Quản lý đơn hàng
+                </span>
 
                 <i class="fas fa-chevron-down small"></i>
             </a>
 
-            <!-- SUB MENU -->
-            <div class="collapse" id="orderMenu">
+            <div class="collapse ${isOrderMenuOpen ? 'show' : ''}" id="orderMenu">
 
-                <!-- CHỜ XÁC NHẬN -->
                 <a href="${root}/admin/orders?status=pending"
-                   class="sub-menu-item">
+                   class="sub-menu-item ${param.status == 'pending' ? 'active' : ''}">
                     <i class="fas fa-clock text-warning"></i>
                     Chờ xác nhận
                 </a>
 
-                <!-- CHỜ LẤY HÀNG -->
                 <a href="${root}/admin/orders?status=pickup"
-                   class="sub-menu-item">
+                   class="sub-menu-item ${param.status == 'pickup' ? 'active' : ''}">
                     <i class="fas fa-box text-info"></i>
                     Chờ lấy hàng
                 </a>
 
-                <!-- ĐANG GIAO -->
                 <a href="${root}/admin/orders?status=shipping"
-                   class="sub-menu-item">
+                   class="sub-menu-item ${param.status == 'shipping' ? 'active' : ''}">
                     <i class="fas fa-truck text-primary"></i>
                     Đang giao
                 </a>
 
-                <!-- ĐÃ GIAO -->
                 <a href="${root}/admin/orders?status=completed"
-                   class="sub-menu-item">
+                   class="sub-menu-item ${param.status == 'completed' ? 'active' : ''}">
                     <i class="fas fa-check-circle text-success"></i>
                     Đã giao
                 </a>
 
-                <!-- YÊU CẦU HOÀN TIỀN -->
-                <a href="${root}/admin/orders?status=refund_request"
-                   class="sub-menu-item">
-                    <i class="fas fa-money-bill-wave text-danger"></i>
-                    Yêu cầu hoàn tiền
-                </a>
-
-                <!-- ĐÃ HOÀN TIỀN -->
-                <a href="${root}/admin/orders?status=refunded"
-                   class="sub-menu-item">
-                    <i class="fas fa-undo text-secondary"></i>
-                    Đã hoàn tiền
-                </a>
-
-                <!-- ĐÃ HỦY -->
                 <a href="${root}/admin/orders?status=cancelled"
-                   class="sub-menu-item">
+                   class="sub-menu-item ${param.status == 'cancelled' ? 'active' : ''}">
                     <i class="fas fa-times-circle text-dark"></i>
                     Đã hủy
                 </a>
 
+                <c:if test="${param.status == 'cancelled' or param.status == 'refund_request' or param.status == 'refunded'}">
+                    <div class="ps-4 border-start ms-3 border-2 mb-2 mt-1">
+
+                        <a href="${root}/admin/orders?status=refund_request"
+                           class="sub-menu-item ${param.status == 'refund_request' ? 'fw-bold text-danger' : ''} d-block mb-1">
+                            <i class="fas fa-money-bill-wave text-danger" style="font-size: 0.9em;"></i>
+                            Yêu cầu hoàn tiền
+                        </a>
+
+                        <a href="${root}/admin/orders?status=refunded"
+                           class="sub-menu-item ${param.status == 'refunded' ? 'fw-bold text-secondary' : ''} d-block">
+                            <i class="fas fa-undo text-secondary" style="font-size: 0.9em;"></i>
+                            Đã hoàn tiền
+                        </a>
+
+                    </div>
+                </c:if>
+
             </div>
+
             <a href="${root}/admin/products" class="menu-item">
                 <i class="fas fa-box"></i>
                 Quản lý sản phẩm
@@ -489,13 +488,7 @@
 
     </div>
 
-    <!-- =========================
-         PAGE CONTENT
-    ========================== -->
-
     <div id="page-content-wrapper">
-
-        <!-- NAVBAR -->
 
         <nav class="navbar admin-navbar">
 
@@ -521,8 +514,6 @@
 
         </nav>
 
-        <!-- CONTENT -->
-
         <div id="mainContent">
 
             <c:choose>
@@ -536,8 +527,6 @@
                     <h2 class="dashboard-title">
                         Dashboard Admin
                     </h2>
-
-                    <!-- STATISTIC -->
 
                     <div class="row g-4">
 
@@ -581,8 +570,6 @@
                         </div>
 
                     </div>
-
-                    <!-- TABLE + NOTIFICATION -->
 
                     <div class="row">
 
@@ -663,8 +650,6 @@
 
                     </div>
 
-                    <!-- REVENUE -->
-
                     <div class="dashboard-box">
 
                         <h4 class="text-success">
@@ -690,8 +675,6 @@
 
 </div>
 
-
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>

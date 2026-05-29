@@ -37,150 +37,129 @@
                     <tbody>
                     <c:set var="stt" value="1"/>
                     <c:forEach var="order" items="${orders}">
-                        <tr class="<c:choose>
+                    <tr class="<c:choose>
                                             <c:when test='${order.status eq "PENDING"}'>table-warning</c:when>
                                             <c:when test='${order.status eq "DELIVERED"}'>table-success</c:when>
                                             <c:when test='${order.status eq "CANCELED"}'>table-danger</c:when>
                                        </c:choose>">
-                            <td>${stt}</td>
+                        <td>${stt}</td>
                             <c:set var="stt" value="${stt + 1}"/>
 
-                            <td>${order.orderCode}</td>
-                            <td class="fw-semibold text-success">${order.userFullName}</td>
-                            <td><fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                            <td class="text-danger fw-bold">
-                                <fmt:formatNumber value="${order.totalPrice}" type="currency" currencySymbol="₫"/>
-                            </td>
-                            <td>${order.paymentMethod}</td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${order.status eq 'PENDING'}">
-                                        <span class="badge bg-warning text-dark">Chờ xử lý</span>
-                                    </c:when>
-                                    <c:when test="${order.status eq 'DELIVERED'}">
-                                        <span class="badge bg-success text-white">Hoàn tất</span>
-                                    </c:when>
-                                    <c:when test="${order.status eq 'CANCELED'}">
-                                        <span class="badge bg-danger text-white">Đã hủy</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="badge bg-secondary text-white">Không xác định</span>
-                                    </c:otherwise>
-                                </c:choose>
-                            </td>
-                            <td class="text-truncate" style="max-width:150px;">
-                                    ${order.note}
-                            </td>
-                            <td>
+                        <td>${order.orderCode}</td>
+                        <td class="fw-semibold text-success">${order.userFullName}</td>
+                        <td><fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                        <td class="text-danger fw-bold">
+                            <fmt:formatNumber value="${order.totalPrice}" type="currency" currencySymbol="₫"/>
+                        </td>
+                        <td>${order.paymentMethod}</td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${order.status eq 'PENDING'}">
+                                    <span class="badge bg-warning text-dark">Chờ xử lý</span>
+                                </c:when>
+                                <c:when test="${order.status eq 'DELIVERED'}">
+                                    <span class="badge bg-success text-white">Hoàn tất</span>
+                                </c:when>
+                                <c:when test='${order.status eq "CANCELLED"}'>
+                                    <span class="badge bg-danger text-white">Đã hủy</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge bg-secondary text-white">Không xác định</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td class="text-truncate" style="max-width:150px;">
+                                ${order.note}
+                        </td>
+                        <td>
 
-                                <div class="d-flex flex-column gap-1">
+                            <div class="d-flex flex-column gap-1">
 
-                                    <!-- HÀNG NÚT TRẠNG THÁI -->
-                                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                <div class="d-flex justify-content-center gap-2 flex-wrap">
 
-                                        <!-- PENDING -->
-                                        <c:if test="${order.status eq 'PENDING'}">
+                                    <c:if test="${order.status eq 'PENDING'}">
 
-                                            <!-- XÁC NHẬN -->
-                                            <form action="${root}/admin/orders"
-                                                  method="post"
-                                                  class="d-inline">
+                                        <form action="${root}/admin/orders"
+                                              method="post"
+                                              class="d-inline ajax-form"
+                                              data-success-msg="Xác nhận đơn hàng thành công!"
+                                              data-success-color="#198754">
 
-                                                <input type="hidden"
-                                                       name="action"
-                                                       value="confirm">
+                                            <input type="hidden" name="action" value="confirm">
+                                            <input type="hidden" name="id" value="${order.id}">
 
-                                                <input type="hidden"
-                                                       name="id"
-                                                       value="${order.id}">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                Xác nhận
+                                            </button>
 
-                                                <button class="btn btn-sm btn-success">
-                                                    Xác nhận
-                                                </button>
+                                        </form>
 
-                                            </form>
+                                        <form action="${root}/admin/orders"
+                                              method="post"
+                                              class="d-inline ajax-form"
+                                              data-success-msg="Đã hủy đơn hàng!"
+                                              data-success-color="#dc3545">
 
-                                            <!-- HỦY -->
-                                            <form action="${root}/admin/orders"
-                                                  method="post"
-                                                  class="d-inline">
+                                            <input type="hidden" name="action" value="cancel">
+                                            <input type="hidden" name="id" value="${order.id}">
 
-                                                <input type="hidden"
-                                                       name="action"
-                                                       value="cancel">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                Hủy
+                                            </button>
+                                        </form>
 
-                                                <input type="hidden"
-                                                       name="id"
-                                                       value="${order.id}">
+                                    </c:if>
 
-                                                <button class="btn btn-sm btn-danger">
-                                                    Hủy
-                                                </button>
+                                    <c:if test="${order.status eq 'CONFIRMED'}">
 
-                                            </form>
+                                        <form action="${root}/admin/ship-order"
+                                              method="post"
+                                              class="d-inline ajax-form"
+                                              data-success-msg="Đã gửi đơn sang GHN!"
+                                              data-success-color="#0d6efd">
 
-                                        </c:if>
+                                            <input type="hidden" name="id" value="${order.id}">
 
-                                        <!-- CONFIRMED -->
-                                        <c:if test="${order.status eq 'CONFIRMED'}">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                Giao ĐVVC
+                                            </button>
 
-                                            <form action="${root}/admin/orders"
-                                                  method="post"
-                                                  class="d-inline">
+                                        </form>
 
-                                                <input type="hidden"
-                                                       name="action"
-                                                       value="shipping">
+                                    </c:if>
 
-                                                <input type="hidden"
-                                                       name="id"
-                                                       value="${order.id}">
+                                    <c:if test="${order.status eq 'SHIPPING'}">
 
-                                                <button class="btn btn-sm btn-primary">
-                                                    Giao ĐVVC
-                                                </button>
+                                        <form action="${root}/admin/orders"
+                                              method="post"
+                                              class="d-inline ajax-form"
+                                              data-success-msg="Đã hoàn thành đơn hàng!"
+                                              data-success-color="#198754">
 
-                                            </form>
+                                            <input type="hidden" name="action" value="complete">
+                                            <input type="hidden" name="id" value="${order.id}">
 
-                                        </c:if>
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                Hoàn thành
+                                            </button>
 
-                                        <!-- SHIPPING -->
-                                        <c:if test="${order.status eq 'SHIPPING'}">
+                                        </form>
 
-                                            <form action="${root}/admin/orders"
-                                                  method="post"
-                                                  class="d-inline">
-
-                                                <input type="hidden"
-                                                       name="action"
-                                                       value="complete">
-
-                                                <input type="hidden"
-                                                       name="id"
-                                                       value="${order.id}">
-
-                                                <button class="btn btn-sm btn-success">
-                                                    Hoàn thành
-                                                </button>
-
-                                            </form>
-
-                                        </c:if>
-
-                                    </div>
-
-                                    <!-- XEM CHI TIẾT -->
-                                    <div>
-                                        <a href="${root}/admin/orders/details?orderCode=${order.orderCode}"
-                                           class="btn btn-sm btn-outline-info w-100">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </div>
+                                    </c:if>
 
                                 </div>
 
-                            </td>
-                    </c:forEach>
+                                <div>
+                                    <a href="${root}/admin/orders/details?orderCode=${order.orderCode}"
+                                       class="btn btn-sm btn-outline-info w-100">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+
+                            </div>
+
+                        </td>
+                        </c:forEach>
                     </tbody>
                 </table>
             </div>
@@ -214,3 +193,99 @@
         font-size: 11px;
     }
 </style>
+
+<div id="toast"
+     style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        display: none;
+        z-index: 9999;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+     ">
+</div>
+
+<script>
+    function showToast(message, color) {
+        const toast = document.getElementById("toast");
+        toast.innerText = message;
+        toast.style.background = color;
+        toast.style.display = "block";
+
+        setTimeout(() => {
+            toast.style.display = "none";
+        }, 3000);
+    }
+
+    // Gắn sự kiện submit cho tất cả form có class 'ajax-form'
+    document.addEventListener("DOMContentLoaded", function() {
+        const ajaxForms = document.querySelectorAll('.ajax-form');
+
+        ajaxForms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                // Chặn load lại trang mặc định
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                const actionUrl = this.getAttribute('action');
+
+                // Lấy thông báo từ data-attributes của form
+                const successMsg = this.getAttribute('data-success-msg') || 'Thao tác thành công!';
+                const successColor = this.getAttribute('data-success-color') || '#198754';
+
+                // Vô hiệu hóa nút để tránh click nhiều lần
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+                // Lấy thẻ <tr> chứa form này để lát nữa xóa
+                const rowElement = this.closest('tr');
+
+                // Gửi request ngầm bằng Fetch API
+                fetch(actionUrl, {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                })
+                        .then(response => {
+                            if (response.ok) {
+                                // Hiện toast thành công
+                                showToast(successMsg, successColor);
+
+                                // --- XÓA DÒNG KHỎI BẢNG MÀ KHÔNG CẦN LOAD LẠI TRANG ---
+                                if (rowElement) {
+                                    // Tạo hiệu ứng mờ dần (fade out) cho đẹp
+                                    rowElement.style.transition = "opacity 0.4s ease";
+                                    rowElement.style.opacity = "0";
+
+                                    // Sau 0.4s (khi mờ hẳn) thì xóa hoàn toàn thẻ <tr> khỏi HTML
+                                    setTimeout(() => {
+                                        rowElement.remove();
+
+                                        // (Tùy chọn) Nếu bảng trống trơn thì hiện dòng thông báo
+                                        const tbody = document.querySelector('table tbody');
+                                        if (tbody && tbody.children.length === 0) {
+                                            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Đã hết đơn hàng trong mục này.</td></tr>';
+                                        }
+                                    }, 400);
+                                }
+
+                            } else {
+                                throw new Error('Network response was not ok.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToast('Có lỗi xảy ra, vui lòng thử lại!', '#dc3545');
+
+                            // Khôi phục lại nút nếu bị lỗi
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                        });
+            });
+        });
+    });
+</script>

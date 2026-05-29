@@ -9,26 +9,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="10cda3dc-66e4-4c2b-9646-794b16c52f33" name="Changes" comment="fix ket noi db">
+    <list default="true" id="10cda3dc-66e4-4c2b-9646-794b16c52f33" name="Changes" comment="Add tạo đơn hàng để gửi đơn vị vận chuyển dựa theo ward_code và district_id(cập nhât lại đúng api của GHN) , khi bấm Giao DVVC thì lập tức đơn hàng được tạo trên web (https://5sao.ghn.dev/order/order-created)">
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/9.4.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_05_2026_1_44_AM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_10_05_2026_1_44_AM__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/AuthServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/AuthServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/ProductDetailServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/ProductDetailServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/ReviewServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/ReviewServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/dao/OrderDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/dao/OrderDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/dao/ReviewDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/dao/ReviewDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/productDetail.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/productDetail.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/products.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/products.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/OrdersServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/admin/OrdersServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/CheckoutServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/shop/sportstore/controller/client/CheckoutServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/admin/dashboard.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/admin/dashboard.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/admin/order.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/admin/order.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/checkout.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/client/checkout.jsp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,8 +67,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="package-info" />
-        <option value="Class" />
         <option value="Jsp File" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -186,59 +180,59 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;Gradle.Build SportStore.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.D:/IdeaProjects/SportStore [build].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.SportStore [build].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.SportStore [uploadWar].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Sport_Store [build].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Sport_Store [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Sport_Store [dependencies].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Sport_Store.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Tests in 'Sport_Store'.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.SportStore.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Notification.DisplayName-DoNotAsk-Execution&quot;: &quot;External process execution failed&quot;,
-    &quot;Notification.DoNotAsk-Execution&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Shell Script.mvnw.executor&quot;: &quot;Run&quot;,
-    &quot;TomEE Server.SportStore.executor&quot;: &quot;Run&quot;,
-    &quot;TomEE Server.TomEE 10.1.52.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.Tomcat 10.1.52.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.Unnamed.executor&quot;: &quot;Debug&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;23130323__HuynhHuuThuc&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/IdeaProjects/SportStore&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.26509723&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "Gradle.Build SportStore.executor": "Run",
+    "Gradle.D:/IdeaProjects/SportStore [build].executor": "Run",
+    "Gradle.SportStore [build].executor": "Run",
+    "Gradle.SportStore [uploadWar].executor": "Run",
+    "Gradle.Sport_Store [build].executor": "Run",
+    "Gradle.Sport_Store [clean].executor": "Run",
+    "Gradle.Sport_Store [dependencies].executor": "Run",
+    "Gradle.Sport_Store.executor": "Run",
+    "Gradle.Tests in 'Sport_Store'.executor": "Run",
+    "Maven.SportStore.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Notification.DisplayName-DoNotAsk-Execution": "External process execution failed",
+    "Notification.DoNotAsk-Execution": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Shell Script.mvnw.executor": "Run",
+    "TomEE Server.SportStore.executor": "Run",
+    "TomEE Server.TomEE 10.1.52.executor": "Run",
+    "Tomcat Server.Tomcat 10.1.52.executor": "Run",
+    "Tomcat Server.Unnamed.executor": "Debug",
+    "git-widget-placeholder": "#62 on 23130015-VOLEQUYNHANH",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/IdeaProjects/SportStore",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.26509723",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;ChangesTree.GroupingKeys&quot;: [
-      &quot;directory&quot;,
-      &quot;module&quot;,
-      &quot;repository&quot;
+  "keyToStringList": {
+    "ChangesTree.GroupingKeys": [
+      "directory",
+      "module",
+      "repository"
     ],
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;,
-      &quot;sqlserver&quot;
+    "DatabaseDriversLRU": [
+      "mysql",
+      "sqlserver"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.shop.sportstore.model" />
@@ -486,8 +480,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.31033.145" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.31033.145" />
       </set>
     </attachedChunks>
   </component>
@@ -570,7 +564,12 @@
       <workItem from="1778338895327" duration="9159000" />
       <workItem from="1778351808162" duration="1170000" />
       <workItem from="1778824198649" duration="3519000" />
-      <workItem from="1779503023034" duration="9102000" />
+      <workItem from="1779511986283" duration="6430000" />
+      <workItem from="1779550670428" duration="1739000" />
+      <workItem from="1779630872357" duration="10950000" />
+      <workItem from="1779643063014" duration="3702000" />
+      <workItem from="1779646821137" duration="3223000" />
+      <workItem from="1779650287168" duration="3639000" />
     </task>
     <task id="LOCAL-00001" summary="FIX giao dien gio hang">
       <option name="closed" value="true" />
@@ -716,7 +715,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778825879445</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Add tạo đơn hàng để gửi đơn vị vận chuyển dựa theo ward_code và district_id(cập nhât lại đúng api của GHN) , khi bấm Giao DVVC thì lập tức đơn hàng được tạo trên web (https://5sao.ghn.dev/order/order-created)">
+      <option name="closed" value="true" />
+      <created>1779651222765</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1779651222765</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -830,7 +837,8 @@
     <MESSAGE value="ADD  hiển thị voucher của sản phẩm đó ở phần xem chi tiết sản phẩm" />
     <MESSAGE value="FIX sửa sản phẩm lỗi load ảnh và hiện mã giảm của sản phẩm đó khi admin thêm vào&#10;DELETE mục ĐƠN VỊ thay thành Mã Giảm ở trang product và productEdit" />
     <MESSAGE value="fix ket noi db" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix ket noi db" />
+    <MESSAGE value="Add tạo đơn hàng để gửi đơn vị vận chuyển dựa theo ward_code và district_id(cập nhât lại đúng api của GHN) , khi bấm Giao DVVC thì lập tức đơn hàng được tạo trên web (https://5sao.ghn.dev/order/order-created)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add tạo đơn hàng để gửi đơn vị vận chuyển dựa theo ward_code và district_id(cập nhât lại đúng api của GHN) , khi bấm Giao DVVC thì lập tức đơn hàng được tạo trên web (https://5sao.ghn.dev/order/order-created)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
