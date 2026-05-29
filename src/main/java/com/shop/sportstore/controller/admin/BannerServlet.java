@@ -46,7 +46,7 @@ public class BannerServlet extends HttpServlet {
             );
 
             request.getRequestDispatcher(
-                    "/WEB-INF/admin/dashboard.jsp"
+                    "/WEB-INF/admin/layout-admin.jsp"
             ).forward(request, response);
             return;
         }
@@ -95,7 +95,7 @@ public class BannerServlet extends HttpServlet {
                 "/WEB-INF/admin/banner.jsp");
 
         request.getRequestDispatcher(
-                "/WEB-INF/admin/dashboard.jsp"
+                "/WEB-INF/admin/layout-admin.jsp"
         ).forward(request, response);
     }
 

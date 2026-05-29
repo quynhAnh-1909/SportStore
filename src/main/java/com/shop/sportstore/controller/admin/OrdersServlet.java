@@ -192,6 +192,6 @@ public class OrdersServlet extends HttpServlet {
 
         request.setAttribute("orders", orders);
         request.setAttribute("contentPage", "/WEB-INF/admin/order.jsp");
-        request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
 }
