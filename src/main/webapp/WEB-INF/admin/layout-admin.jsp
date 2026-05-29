@@ -10,11 +10,8 @@
     <meta charset="UTF-8">
     <title>SPORT SHOP ADMIN</title>
 
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         :root{
@@ -26,7 +23,6 @@
             --border:#e5e7eb;
         }
 
-        /* RESET */
         *{
             margin:0;
             padding:0;
@@ -45,9 +41,6 @@
             width:100%;
         }
 
-        /* =========================
-            SIDEBAR
-        ========================= */
         #sidebar-wrapper{
             width:320px;
             height:100vh;
@@ -61,7 +54,6 @@
             z-index:1000;
         }
 
-        /* LOGO */
         .sidebar-heading{
             padding:30px 20px;
             text-align:center;
@@ -83,7 +75,6 @@
             font-size:26px;
         }
 
-        /* MENU */
         .list-group{
             padding:20px 14px;
         }
@@ -103,11 +94,11 @@
             border:1px solid transparent;
         }
 
-        .menu-item:hover{
-            background:rgba(255,255,255,0.12);
-            border:1px solid rgba(255,255,255,0.2);
-            color:white;
-            transform:translateX(5px);
+        .menu-item:hover, .menu-item.active-menu{
+            background:rgba(255,255,255,0.15) !important;
+            border:1px solid rgba(255,255,255,0.25) !important;
+            color:#ffd54f !important;
+            font-weight:700;
         }
 
         .menu-item i{
@@ -115,7 +106,6 @@
             font-size:16px;
         }
 
-        /* SUB MENU */
         .sub-menu-item{
             display:flex;
             align-items:center;
@@ -141,9 +131,6 @@
             width:22px;
         }
 
-        /* =========================
-            PAGE CONTENT
-        ========================= */
         #page-content-wrapper{
             margin-left:320px;
             width:calc(100% - 320px);
@@ -151,9 +138,6 @@
             overflow-x:hidden;
         }
 
-        /* =========================
-            NAVBAR
-        ========================= */
         .admin-navbar{
             background:white;
             padding:18px 30px;
@@ -163,9 +147,6 @@
             z-index:999;
         }
 
-        /* =========================
-            MAIN CONTENT VÙNG CHỨA DỮ LIỆU ĐỘNG
-        ========================= */
         #mainContent{
             padding:30px;
         }
@@ -177,9 +158,6 @@
             margin-bottom:30px;
         }
 
-        /* =========================
-            UI COMPONENTS (Dùng chung cho các trang con)
-        ========================= */
         .dashboard-card{
             background:white;
             border-radius:22px;
@@ -221,7 +199,6 @@
             margin-bottom:20px;
         }
 
-        /* TABLE DÙNG CHUNG */
         .table{
             width:100%;
             margin-bottom:0;
@@ -323,9 +300,11 @@
         </div>
 
         <div class="list-group">
-            <a href="${root}/admin/dashboard" class="menu-item">
-                <i class="fas fa-chart-line"></i>
-                Tổng quan
+            <c:set var="currentURI" value="${pageContext.request.requestURI}" />
+
+            <a href="${root}/admin/dashboard" class="menu-item ${currentURI.contains('analytics') ? 'active-menu' : ''}">
+                <i class="fas fa-chart-bar"></i>
+                Thống kê
             </a>
 
             <c:set var="isOrderMenuOpen" value="${
@@ -336,7 +315,8 @@
                 param.status == 'cancelled' or
                 param.status == 'refund_pending' or
                 param.status == 'refunded' or
-                param.status == 'refund_rejected'
+                param.status == 'refund_rejected' or
+                currentURI.contains('orders')
             }" />
 
             <a class="menu-item d-flex justify-content-between align-items-center ${isOrderMenuOpen ? '' : 'collapsed'}"
@@ -352,27 +332,27 @@
             </a>
 
             <div class="collapse ${isOrderMenuOpen ? 'show' : ''}" id="orderMenu">
-                <a href="${pageContext.request.contextPath}/admin/orders?status=pending"
+                <a href="${root}/admin/orders?status=pending"
                    class="sub-menu-item ${param.status == 'pending' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
                     <i class="fas fa-clock me-2"></i>Chờ xử lý
                 </a>
 
-                <a href="${pageContext.request.contextPath}/admin/orders?status=pickup"
+                <a href="${root}/admin/orders?status=pickup"
                    class="sub-menu-item ${param.status == 'pickup' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
                     <i class="fas fa-boxes me-2"></i>Chờ lấy hàng
                 </a>
 
-                <a href="${pageContext.request.contextPath}/admin/orders?status=shipping"
+                <a href="${root}/admin/orders?status=shipping"
                    class="sub-menu-item ${param.status == 'shipping' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
                     <i class="fas fa-truck me-2"></i>Đang giao
                 </a>
 
-                <a href="${pageContext.request.contextPath}/admin/orders?status=completed"
+                <a href="${root}/admin/orders?status=completed"
                    class="sub-menu-item ${param.status == 'completed' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
                     <i class="fas fa-check-circle me-2"></i>Đã giao (Hoàn tất)
                 </a>
 
-                <a href="${pageContext.request.contextPath}/admin/orders?status=cancelled"
+                <a href="${root}/admin/orders?status=cancelled"
                    class="sub-menu-item ${param.status == 'cancelled' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
                     <i class="fas fa-times-circle me-2"></i>Đã hủy
                 </a>
@@ -396,23 +376,23 @@
                 </div>
             </div>
 
-            <a href="${root}/admin/products" class="menu-item">
+            <a href="${root}/admin/products" class="menu-item ${currentURI.contains('products') ? 'active-menu' : ''}">
                 <i class="fas fa-box"></i> Quản lý sản phẩm
             </a>
 
-            <a href="${root}/admin/categories" class="menu-item">
+            <a href="${root}/admin/categories" class="menu-item ${currentURI.contains('categories') ? 'active-menu' : ''}">
                 <i class="fas fa-layer-group"></i> Quản lý danh mục
             </a>
 
-            <a href="${root}/admin/vouchers" class="menu-item">
+            <a href="${root}/admin/vouchers" class="menu-item ${currentURI.contains('vouchers') ? 'active-menu' : ''}">
                 <i class="fas fa-ticket-alt"></i> Quản lý voucher
             </a>
 
-            <a href="${root}/admin/customers" class="menu-item">
+            <a href="${root}/admin/customers" class="menu-item ${currentURI.contains('customers') ? 'active-menu' : ''}">
                 <i class="fas fa-users"></i> Quản lý khách hàng
             </a>
 
-            <a href="${root}/admin/banners" class="menu-item">
+            <a href="${root}/admin/banners" class="menu-item ${currentURI.contains('banners') ? 'active-menu' : ''}">
                 <i class="fas fa-image"></i> Quản lý banner
             </a>
 
@@ -451,7 +431,7 @@
                             <i class="fas fa-exclamation-triangle me-3 fs-4 text-warning"></i>
                             <div>
                                 <h5 class="alert-heading fw-bold mb-1">Không tìm thấy nội dung trang!</h5>
-                                <p class="mb-0 small text-muted">Vui lòng kiểm tra cấu hình thuộc tính <code>contentPage</code> truyền từ Servlet Controller.</p>
+                                <p class="mb-0 small text-muted">Vui lòng kiểm tra cấu hình thuộc tính <code>contentPage</code> truyền từ Servlet.</p>
                             </div>
                         </div>
                     </div>

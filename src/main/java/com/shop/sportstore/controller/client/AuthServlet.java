@@ -38,7 +38,7 @@ public class AuthServlet extends HttpServlet {
         session.setAttribute("userRole", user.getRole());
 
         if ("ADMIN".equals(user.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            response.sendRedirect(request.getContextPath() + "/admin/");
         } else {
             response.sendRedirect(request.getContextPath() + "/products");
         }
@@ -96,8 +96,6 @@ public class AuthServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/products");
         }
     }
-
-    // ================= LOGIN (XỬ LÝ ĐẾM SAI PASS VÀ KHÓA TÀI KHOẢN) =================
     private void handleLogin(HttpServletRequest request,
                              HttpServletResponse response,
                              HttpSession session)
@@ -106,21 +104,20 @@ public class AuthServlet extends HttpServlet {
         String email = request.getParameter("email");
         String pass = request.getParameter("password");
 
-        // 1. Kiểm tra xem tài khoản có đang bị khóa 15 phút không
         Long lockTime = (Long) session.getAttribute("lockTime");
         if (lockTime != null) {
             long currentTime = System.currentTimeMillis();
-            long unlockTime = lockTime + (15 * 60 * 1000); // 15 phút
+            long unlockTime = lockTime + (15 * 60 * 1000);
 
             if (currentTime < unlockTime) {
                 long remainingMinutes = (unlockTime - currentTime) / (60 * 1000);
-                if (remainingMinutes == 0) remainingMinutes = 1; // Hiển thị tối thiểu 1 phút
+                if (remainingMinutes == 0) remainingMinutes = 1;
 
                 session.setAttribute("errorLogin", "Tài khoản tạm khóa. Vui lòng thử lại sau " + remainingMinutes + " phút.");
                 response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
-                return; // Chặn luôn
+                return;
             } else {
-                // Đã hết 15 phút -> Xóa trạng thái khóa
+
                 session.removeAttribute("lockTime");
                 session.removeAttribute("loginAttempts");
             }
@@ -129,14 +126,11 @@ public class AuthServlet extends HttpServlet {
         User user = dao.checkLogin(email, pass);
 
         if (user != null) {
-            // 2. Kiểm tra xem tài khoản có bị khóa vĩnh viễn (do hủy đơn) trong Database không
             if (!user.isStatus()) {
                 session.setAttribute("errorLogin", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
                 response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
                 return;
             }
-
-            // Đăng nhập thành công -> Xóa đếm lỗi và Login
             session.removeAttribute("loginAttempts");
             loginUser(session, request, response, user);
 
@@ -156,8 +150,6 @@ public class AuthServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
         }
     }
-
-    // ================= REGISTER =================
     private void handleRegister(HttpServletRequest request,
                                 HttpServletResponse response,
                                 HttpSession session)
@@ -184,8 +176,6 @@ public class AuthServlet extends HttpServlet {
                     .forward(request, response);
         }
     }
-
-    /* ================= GOOGLE LOGIN ================= */
     private void handleGoogleLogin(HttpServletRequest request,
                                    HttpServletResponse response,
                                    HttpSession session)
@@ -214,8 +204,6 @@ public class AuthServlet extends HttpServlet {
                     googleUser.getName(),
                     "GOOGLE"
             );
-
-            // Chặn đăng nhập nếu account Google này đã bị khóa do hủy đơn
             if (!user.isStatus()) {
                 session.setAttribute("errorLogin", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
                 response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
@@ -230,7 +218,6 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-    /* ================= FACEBOOK LOGIN ================= */
     private void handleFacebookLogin(HttpServletRequest request,
                                      HttpServletResponse response,
                                      HttpSession session)

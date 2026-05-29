@@ -68,7 +68,7 @@ public class CategoryServlet extends HttpServlet {
         request.setAttribute("categories", categories);
         request.setAttribute("contentPage", "/WEB-INF/admin/categoryList.jsp");
 
-        request.getRequestDispatcher("/WEB-INF/admin/dlayout-admin.jsp")
+        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp")
                 .forward(request, response);
     }
 
