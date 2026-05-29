@@ -95,7 +95,7 @@ public class ProductServlet extends HttpServlet {
         request.setAttribute("categories", categories);
 
         request.setAttribute("contentPage", "/WEB-INF/admin/products.jsp");
-        request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
@@ -117,7 +117,7 @@ public class ProductServlet extends HttpServlet {
         request.setAttribute("categories", categories);
         request.setAttribute("imageList", imageList);
         request.setAttribute("contentPage", "/WEB-INF/admin/productCreate.jsp");
-        request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp")
+        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp")
                 .forward(request, response);
     }
 
@@ -220,7 +220,7 @@ public class ProductServlet extends HttpServlet {
             request.setAttribute("selectedVouchers", selectedVouchers);
             request.setAttribute("contentPage", "/WEB-INF/admin/productEdit.jsp");
 
-            request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp")
+            request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp")
                     .forward(request, response);
 
         } catch (Exception e) {

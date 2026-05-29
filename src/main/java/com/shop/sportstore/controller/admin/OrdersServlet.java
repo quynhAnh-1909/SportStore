@@ -14,6 +14,7 @@ import java.util.List;
 
 @WebServlet("/admin/orders")
 public class OrdersServlet extends HttpServlet {
+
     private static final String GHN_TOKEN = "2eb2d430-50e9-11f1-a973-aee5264794df";
     private static final String GHN_SHOP_ID = "200403";
     private OrderDAO orderDAO;
@@ -28,23 +29,24 @@ public class OrdersServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
+        response.setContentType("application/json;charset=UTF-8");
+
         try {
             if ("tracking".equals(action)) {
                 String trackingCode = request.getParameter("ghnCode");
                 if (trackingCode == null || trackingCode.isEmpty() || "null".equals(trackingCode)) {
-                    throw new RuntimeException("Đơn hàng này chưa được kích hoạt mã vận đơn GHN!");
+                    throw new RuntimeException("Đơn hàng chưa có mã vận đơn GHN!");
                 }
                 GhnOrderService trackingService = new GhnOrderService(GHN_TOKEN, GHN_SHOP_ID);
                 String jsonGHN = trackingService.getOrderTracking(trackingCode);
-
-                response.setContentType("application/json;charset=UTF-8");
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write(jsonGHN);
                 return;
             }
+
             String idParam = request.getParameter("id");
             if (idParam == null || idParam.isEmpty()) {
-                throw new RuntimeException("Thiếu ID đơn hàng để thực hiện thao tác!");
+                throw new RuntimeException("Thiếu ID đơn hàng!");
             }
             int id = Integer.parseInt(idParam);
 
@@ -52,38 +54,54 @@ public class OrdersServlet extends HttpServlet {
                 case "confirm":
                     orderDAO.confirmOrder(id);
                     break;
-
                 case "cancel":
                     orderDAO.cancelOrderByAdmin(id);
                     break;
-
                 case "shipping":
                     Order order = orderDAO.getOrderById(id);
+                    if (order == null) {
+                        throw new RuntimeException("Không tìm thấy đơn hàng!");
+                    }
                     GhnOrderService ghnService = new GhnOrderService(GHN_TOKEN, GHN_SHOP_ID);
                     String ghnCode = ghnService.createOrder(order);
-                    System.out.println("GHN CODE RETURN: " + ghnCode);
-
                     if (ghnCode == null || ghnCode.isEmpty()) {
-                        throw new RuntimeException("Hệ thống GHN đang bận hoặc thông tin địa chỉ đơn hàng không hợp lệ!");
+                        throw new RuntimeException("GHN đang bận hoặc địa chỉ không hợp lệ!");
                     }
                     orderDAO.updateGhnCode(id, ghnCode);
                     orderDAO.shippingOrder(id);
                     break;
-
                 case "complete":
                     orderDAO.completeOrder(id);
                     break;
-
+                case "approveRefund":
+                case "approve_refund":
+                    Order refundOrder = orderDAO.getOrderById(id);
+                    if (refundOrder == null) {
+                        throw new RuntimeException("Không tìm thấy đơn hàng cần phê duyệt hoàn tiền!");
+                    }
+                    orderDAO.approveRefund(id);
+                    orderDAO.updateOrderStatus(refundOrder.getOrderCode(), "REFUNDED");
+                    break;
+                case "rejectRefund":
+                case "reject_refund":
+                    Order rejectOrder = orderDAO.getOrderById(id);
+                    if (rejectOrder == null) {
+                        throw new RuntimeException("Không tìm thấy đơn hàng cần từ chối hoàn tiền!");
+                    }
+                    orderDAO.rejectRefund(id);
+                    orderDAO.updateOrderStatus(rejectOrder.getOrderCode(), "REFUND_REJECTED");
+                    break;
                 default:
-                    throw new RuntimeException("Thao tác hành động (Action) không hợp lệ!");
+                    throw new RuntimeException("Action không hợp lệ!");
             }
+
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("success");
+            response.getWriter().write("{\"success\":true,\"message\":\"Thao tác thành công!\"}");
 
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write(e.getMessage());
+            response.getWriter().write("{\"success\":false,\"message\":\"" + e.getMessage() + "\"}");
         }
     }
 
@@ -92,6 +110,7 @@ public class OrdersServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
+
         if ("sync".equals(action)) {
             try {
                 List<Order> shippingOrders = orderDAO.getOrdersByStatus("SHIPPING");
@@ -107,13 +126,15 @@ public class OrdersServlet extends HttpServlet {
 
                             if (result.has("code") && result.get("code").getAsInt() == 200) {
                                 String ghnStatus = result.getAsJsonObject("data").get("status").getAsString().toLowerCase();
+
                                 if ("delivered".equals(ghnStatus)) {
                                     orderDAO.updateStatusByGhnCode(ghnCode, "COMPLETED");
-                                    System.out.println("ĐỒNG BỘ THÀNH CÔNG: Đơn hàng " + ghnCode + " -> COMPLETED");
-                                }
-                                else if ("cancel".equals(ghnStatus) || ghnStatus.contains("return") || "damage".equals(ghnStatus) || "lost".equals(ghnStatus)) {
+                                } else if ("cancel".equals(ghnStatus)) {
                                     orderDAO.updateStatusByGhnCode(ghnCode, "CANCELLED");
-                                    System.out.println("ĐỒNG BỘ THẤT BẠI/HỦY: Đơn hàng " + ghnCode + " -> CANCELLED");
+                                } else if (ghnStatus.contains("return") || ghnStatus.contains("refund")
+                                        || "damage".equals(ghnStatus) || "lost".equals(ghnStatus)) {
+                                    orderDAO.requestRefund(order.getId(), "Đơn hàng bị trả về hoặc gặp sự cố từ đối tác giao hàng GHN.");
+                                    orderDAO.updateOrderStatus(order.getOrderCode(), "PENDING_REFUND");
                                 }
                             }
                         }
@@ -122,11 +143,10 @@ public class OrdersServlet extends HttpServlet {
                 response.setContentType("text/plain;charset=UTF-8");
                 response.getWriter().write("sync_success");
                 return;
-
             } catch (Exception e) {
                 e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("Lỗi trong quá trình xử lý đồng bộ từ ĐVVC: " + e.getMessage());
+                response.getWriter().write("Lỗi đồng bộ GHN: " + e.getMessage());
                 return;
             }
         }
@@ -153,6 +173,17 @@ public class OrdersServlet extends HttpServlet {
                 case "cancelled":
                     status = "CANCELLED";
                     break;
+                case "refund_pending":
+                case "refund":
+                case "pending_refund":
+                    status = "PENDING_REFUND";
+                    break;
+                case "refunded":
+                    status = "REFUNDED";
+                    break;
+                case "refund_rejected":
+                    status = "REFUND_REJECTED";
+                    break;
                 default:
                     status = "PENDING";
             }
@@ -161,6 +192,6 @@ public class OrdersServlet extends HttpServlet {
 
         request.setAttribute("orders", orders);
         request.setAttribute("contentPage", "/WEB-INF/admin/order.jsp");
-        request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
 }

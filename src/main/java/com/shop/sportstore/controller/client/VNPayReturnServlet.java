@@ -1,73 +1,56 @@
 package com.shop.sportstore.controller.client;
 
 import com.shop.sportstore.dao.OrderDAO;
-import com.shop.sportstore.model.Order;
-import com.shop.sportstore.model.OrderItem;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 
 @WebServlet("/vnpay-return")
 public class VNPayReturnServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        try {
+        HttpSession session = request.getSession();
 
-            // ===== 1. LẤY PARAM TỪ VNPay =====
+        try {
             String responseCode = request.getParameter("vnp_ResponseCode");
             String orderCode = request.getParameter("vnp_TxnRef");
 
             if (orderCode == null || orderCode.isEmpty()) {
-                throw new Exception("Missing orderCode from VNPay callback");
+                response.sendRedirect(request.getContextPath() + "/");
+                return;
             }
 
-            // ===== 2. DAO =====
             OrderDAO orderDAO = new OrderDAO();
-
-            // ===== 3. UPDATE STATUS =====
             String status;
+            boolean isPaymentSuccess = "00".equals(responseCode);
 
-            if ("00".equals(responseCode)) {
-                status = "PAID";
+            if (isPaymentSuccess) {
+                status = "PENDING";
+                orderDAO.updatePaymentStatus(orderCode, true);
+
+                session.setAttribute("cart", new ArrayList<>());
+                session.removeAttribute("checkoutItems");
+                session.removeAttribute("checkoutVoucherId");
             } else {
-                status = "FAILED";
+                status = "CANCELLED";
+                orderDAO.updatePaymentStatus(orderCode, false);
             }
 
             orderDAO.updateOrderStatus(orderCode, status);
 
-            // ===== 4. LOAD DATA FROM DB =====
-            Order order = orderDAO.getOrderByCode(orderCode);
-            List<OrderItem> items = orderDAO.getOrderItems(orderCode);
+            response.sendRedirect(request.getContextPath() + "/orderSuccess?orderCode=" + orderCode + "&vnp_ResponseCode=" + responseCode);
 
-            if (order == null) {
-                throw new Exception("Order not found: " + orderCode);
-            }
-
-            // ===== 5. SET ATTRIBUTE FOR JSP =====
-            request.setAttribute("order", order);
-            request.setAttribute("items", items);
-            request.setAttribute("status", status);
-
-            // ===== 6. FORWARD TO SUCCESS PAGE =====
-            request.getRequestDispatcher("/WEB-INF/client/orderSuccess.jsp")
-                    .forward(request, response);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            request.setAttribute("status", "FAILED");
-            request.setAttribute("message", "Lỗi xử lý thanh toán VNPay");
-
-            request.getRequestDispatcher("/WEB-INF/client/orderSuccess.jsp")
-                    .forward(request, response);
-        }
+        }  catch (Exception e) {
+        e.printStackTrace();
+        response.setContentType("text/html;charset=UTF-8");
+        response.getWriter().println("<h1>Hệ thống gặp lỗi tại VNPayReturn: " + e.getMessage() + "</h1>");
+        response.sendRedirect(request.getContextPath() + "/");
     }
-}
+        }
+        }

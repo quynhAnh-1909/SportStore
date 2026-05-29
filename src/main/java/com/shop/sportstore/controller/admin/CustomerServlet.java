@@ -27,7 +27,6 @@ public class CustomerServlet extends HttpServlet {
             Connection conn = DBConnection.getConnection();
             CustomerDAO dao = new CustomerDAO(conn);
 
-            // DELETE
             if (action != null && action.equals("delete")) {
                 int id = parseInt(request.getParameter("id"));
                 dao.delete(id);
@@ -35,41 +34,29 @@ public class CustomerServlet extends HttpServlet {
                 return;
             }
 
-            // EDIT
             if (action != null && action.equals("edit")) {
                 int id = parseInt(request.getParameter("id"));
                 Customer c = dao.findById(id);
                 request.setAttribute("customer", c);
 
                 request.setAttribute("contentPage", "/WEB-INF/admin/customerEdit.jsp");
-                request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
                 return;
             }
 
-            // CREATE PAGE
             if (action != null && action.equals("create")) {
                 request.setAttribute("contentPage", "/WEB-INF/admin/customerCreate.jsp");
-                request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
                 return;
             }
-
-            // VIEW (Xem chi tiết Profile & Lịch sử mua hàng)
             if (action != null && action.equals("view")) {
                 int id = parseInt(request.getParameter("id"));
-
-                // Lấy thông tin cơ bản
                 Customer c = dao.findById(id);
-                // Lấy thống kê (Tổng đơn, Tổng tiền)
                 double[] stats = dao.getCustomerStats(id);
-                // Lấy lịch sử đơn hàng
                 List<java.util.Map<String, Object>> orderHistory = dao.getOrderHistory(id);
-
-                // Xếp hạng khách hàng đơn giản dựa trên tổng chi tiêu (để JSP hiển thị Badge)
                 String rank = "Khách Mới";
                 if (stats[1] >= 10000000) rank = "Khách VIP 👑";
                 else if (stats[1] >= 2000000) rank = "Khách Thân Thiết 🌟";
-
-                // Đẩy data sang JSP
                 request.setAttribute("customer", c);
                 request.setAttribute("totalOrders", (int)stats[0]);
                 request.setAttribute("totalSpent", stats[1]);
@@ -77,12 +64,9 @@ public class CustomerServlet extends HttpServlet {
                 request.setAttribute("customerRank", rank); // Gửi rank sang JSP
 
                 request.setAttribute("contentPage", "/WEB-INF/admin/customerDetail.jsp");
-                request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
                 return;
             }
-
-
-            // LIST DEFAULT
             List<Customer> list = dao.getAll();
             request.setAttribute("customers", list);
 
@@ -91,7 +75,7 @@ public class CustomerServlet extends HttpServlet {
         }
 
         request.setAttribute("contentPage", "/WEB-INF/admin/customer.jsp");
-        request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
 
     @Override
@@ -106,16 +90,11 @@ public class CustomerServlet extends HttpServlet {
 
             String action = request.getParameter("action");
 
-            // ===== LẤY DATA =====
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
             String address = request.getParameter("address");
-
-            // Lấy status (từ checkbox hoặc select)
             boolean status = "true".equals(request.getParameter("status"));
-
-            // ===== VALIDATE =====
             if (fullName == null || fullName.trim().isEmpty() || email == null || email.trim().isEmpty()) {
                 request.setAttribute("error", "Vui lòng nhập đầy đủ Họ tên và Email");
                 doGet(request, response);
@@ -127,8 +106,6 @@ public class CustomerServlet extends HttpServlet {
                 doGet(request, response);
                 return;
             }
-
-            // ===== SET OBJECT =====
             Customer c = new Customer();
             c.setFullName(fullName);
             c.setEmail(email);
@@ -142,10 +119,7 @@ public class CustomerServlet extends HttpServlet {
 
             if ("update".equals(action)) {
                 int id = parseInt(request.getParameter("id"));
-                // Sửa thành setUserId để khớp với Model Customer mới
                 c.setUserId(id);
-
-                // Nếu sửa email, cần check xem email mới có bị trùng với user khác không
                 Customer oldCustomer = dao.findById(id);
                 if (!oldCustomer.getEmail().equals(email) && dao.checkEmail(email)) {
                     request.setAttribute("error", "Email đã tồn tại ở tài khoản khác");
@@ -155,8 +129,6 @@ public class CustomerServlet extends HttpServlet {
 
                 dao.update(c);
             }
-
-            // Xử lý xong thì trả về trang danh sách
             response.sendRedirect(request.getContextPath() + "/admin/customers");
 
         } catch (Exception e) {

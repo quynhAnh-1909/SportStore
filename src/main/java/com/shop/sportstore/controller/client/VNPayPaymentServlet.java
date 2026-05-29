@@ -15,7 +15,6 @@ import java.util.*;
 @WebServlet("/vnpayPayment")
 public class VNPayPaymentServlet extends HttpServlet {
 
-    // ===== CONFIG =====
     private static final String VNP_TMNCODE =
             "SKHL50DJ";
 

@@ -4,11 +4,11 @@
 
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
-<div class="container-fluid pt-4 px-4">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
+<div class="container-fluid pt-4 px-4">
     <div class="bg-light rounded p-4 shadow-sm">
 
-        <!-- HEADER -->
         <div class="d-flex align-items-center justify-content-between mb-4">
             <h4 class="mb-0 text-success fw-bold">
                 <i class="fas fa-box me-2"></i> Quản lý kho hàng
@@ -20,38 +20,29 @@
             </a>
         </div>
 
-        <!-- FILTER -->
-        <div class="row mb-3 gx-2">
+        <div class="row mb-3 gx-2 align-items-center">
+            <div class="col-md-4" id="searchContainer"></div>
 
             <div class="col-md-4">
-                <input type="text" id="searchInput"
-                       class="form-control"
-                       placeholder="🔍 Tìm tên sản phẩm...">
-            </div>
-
-            <div class="col-md-4">
-                <select id="categoryFilter" class="form-control">
+                <select id="categoryFilter" class="form-select">
                     <option value="">-- Tất cả danh mục --</option>
                     <c:forEach var="c" items="${categories}">
-                        <option value="${c.id}">${c.name}</option>
+                        <option value="${c.name}">${c.name}</option>
                     </c:forEach>
                 </select>
             </div>
 
             <div class="col-md-4">
-                <select id="stockFilter" class="form-control">
+                <select id="stockFilter" class="form-select">
                     <option value="">-- Trạng thái --</option>
-                    <option value="in">✅ Còn hàng</option>
-                    <option value="out">❌ Hết hàng</option>
+                    <option value="Còn hàng">✅ Còn hàng</option>
+                    <option value="Hết hàng">❌ Hết hàng</option>
                 </select>
             </div>
-
         </div>
 
-        <!-- TABLE -->
         <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle text-center">
-
+            <table id="productTable" class="table table-bordered table-hover align-middle text-center mb-0">
                 <thead class="table-dark">
                 <tr>
                     <th style="width: 80px;">Ảnh</th>
@@ -60,16 +51,13 @@
                     <th>Tồn</th>
                     <th>Mã Giảm</th>
                     <th>Danh mục</th>
-                    <th style="width: 220px;">Thao tác</th>
+                    <th style="width: 140px;">Thao tác</th>
                 </tr>
                 </thead>
 
                 <tbody>
                 <c:forEach var="item" items="${products}">
-
                     <tr class="${item.stockQuantity <= 0 ? 'table-danger' : ''}">
-
-                        <!-- IMAGE -->
                         <td>
                             <c:choose>
                                 <c:when test="${not empty item.imageUrl}">
@@ -85,102 +73,66 @@
                             </c:choose>
                         </td>
 
-                        <!-- NAME -->
-                        <td class="text-start fw-bold ps-3">
-                                ${item.name}
-                        </td>
+                        <td class="text-start fw-bold ps-3">${item.name}</td>
 
-                        <!-- PRICE -->
                         <td class="text-danger fw-bold">
                             <fmt:formatNumber value="${item.price}" groupingUsed="true"/> ₫
                         </td>
 
-                        <!-- STOCK -->
-                        <td>
+                        <td data-search="${item.stockQuantity <= 0 ? 'Hết hàng' : 'Còn hàng'}">
                             <c:choose>
                                 <c:when test="${item.stockQuantity <= 0}">
                                     <span class="badge bg-dark">Hết hàng</span>
                                 </c:when>
                                 <c:when test="${item.stockQuantity < 10}">
-                                    <span class="badge bg-warning text-dark">
-                                            ${item.stockQuantity}
-                                    </span>
+                                    <span class="badge bg-warning text-dark">${item.stockQuantity}</span>
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="badge bg-success">
-                                            ${item.stockQuantity}
-                                    </span>
+                                    <span class="badge bg-success">${item.stockQuantity}</span>
                                 </c:otherwise>
                             </c:choose>
                         </td>
 
-                        <!-- voucher-->
                         <td>
-
                             <c:choose>
-
                                 <c:when test="${not empty item.vouchers}">
-
                                     <c:forEach var="v" items="${item.vouchers}">
-
-                <span class="badge bg-warning text-dark me-1">
-                        ${v.code}
-                </span>
-
+                                        <span class="badge bg-warning text-dark me-1">${v.code}</span>
                                     </c:forEach>
-
                                 </c:when>
-
                                 <c:otherwise>
-
-            <span class="text-muted">
-                Không có
-            </span>
-
+                                    <span class="text-muted">Không có</span>
                                 </c:otherwise>
-
                             </c:choose>
-
                         </td>
 
-                        <!-- CATEGORY -->
                         <td>
-                            <span class="badge bg-info text-dark px-3">
-                                    ${item.categoryName}
-                            </span>
+                            <span class="badge bg-info text-dark px-3">${item.categoryName}</span>
                         </td>
 
-                        <!-- ACTION -->
                         <td>
                             <div class="btn-group">
-
                                 <a href="${root}/admin/products?action=edit&id=${item.id}"
                                    class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
-
                                 <a href="${root}/admin/products?action=detail&id=${item.id}"
                                    class="btn btn-sm btn-outline-info">
                                     <i class="fas fa-eye"></i>
                                 </a>
-
                                 <a href="${root}/admin/products?action=delete&id=${item.id}"
                                    class="btn btn-sm btn-outline-danger"
                                    onclick="return confirmDelete(event, this.href)">
                                     <i class="fas fa-trash"></i>
                                 </a>
-
                             </div>
                         </td>
-
                     </tr>
-
                 </c:forEach>
                 </tbody>
             </table>
         </div>
 
-        <!-- EMPTY -->
         <c:if test="${empty products}">
             <div class="text-center mt-4 p-5 border rounded">
                 <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
@@ -191,54 +143,83 @@
     </div>
 </div>
 
-<!-- STYLE -->
 <style>
     table tbody tr:hover {
         background-color: rgba(0, 123, 255, 0.05);
     }
-
     td, th {
         vertical-align: middle !important;
     }
-
     td img {
         border: 1px solid #dee2e6;
     }
-
     .table-danger {
         background-color: #f8d7da !important;
     }
+    .dataTables_wrapper .dataTables_filter {
+        float: left !important;
+        text-align: left !important;
+        width: 100%;
+    }
+    .dataTables_wrapper .dataTables_filter label {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+        width: 100% !important;
+        margin-left: 0 !important;
+        display: inline-block;
+        height: 38px;
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        padding: 0.375rem 0.75rem;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0px !important;
+        margin: 2px !important;
+    }
 </style>
 
-<!-- SIMPLE FILTER JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const table = $('#productTable').DataTable({
+            "pageLength": 10,
+            "lengthChange": false,
+            "ordering": false,
+            "info": true,
+            "dom": '<"row"<"col-12"f>>t<"d-flex justify-content-between align-items-center mt-3"ip>',
+            "language": {
+                "search": "",
+                "searchPlaceholder": "🔍 Tìm tên sản phẩm...",
+                "info": "Hiển thị dòng _START_ đến _END_ trên tổng số _TOTAL_ sản phẩm",
+                "paginate": {
+                    "next": '<i class="fas fa-chevron-right"></i>',
+                    "previous": '<i class="fas fa-chevron-left"></i>'
+                },
+                "zeroRecords": "Không tìm thấy dữ liệu khớp"
+            }
+        });
 
-        const searchInput = document.getElementById("searchInput");
-        const categoryFilter = document.getElementById("categoryFilter");
+        const filterInput = $('.dataTables_filter input').detach();
+        filterInput.appendTo('#searchContainer');
+        $('.dataTables_filter').remove();
 
-        if (searchInput) searchInput.addEventListener("keyup", filterTable);
-        if (categoryFilter) categoryFilter.addEventListener("change", filterTable);
+        $('#categoryFilter').on('change', function() {
+            const val = $.fn.dataTable.util.escapeRegex($(this).val());
+            table.column(5).search(val ? '^'+val+'$' : '', true, false).draw();
+        });
 
-        function filterTable() {
-            let keyword = searchInput.value.toLowerCase();
-            let category = categoryFilter.value;
-
-            let rows = document.querySelectorAll("tbody tr");
-
-            rows.forEach(row => {
-                let name = row.children[1].innerText.toLowerCase();
-                let catText = row.children[5].innerText;
-
-                let matchName = name.includes(keyword);
-                let matchCategory = !category || catText.includes(category);
-
-                row.style.display = (matchName && matchCategory) ? "" : "none";
-            });
-        }
-
+        $('#stockFilter').on('change', function() {
+            const val = $(this).val();
+            table.column(3).search(val).draw();
+        });
     });
 
     function confirmDelete(event, url) {

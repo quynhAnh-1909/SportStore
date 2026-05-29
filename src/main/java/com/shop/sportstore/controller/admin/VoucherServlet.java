@@ -46,13 +46,13 @@ public class VoucherServlet extends HttpServlet {
                 request.setAttribute("voucher", v);
 
                 request.setAttribute("contentPage", "/WEB-INF/admin/voucherEdit.jsp");
-                request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
                 return;
             }
             // CREATE PAGE
             if (action != null && action.equals("create")) {
                 request.setAttribute("contentPage", "/WEB-INF/admin/voucherCreate.jsp");
-                request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
                 return;
             }
 
@@ -65,7 +65,7 @@ public class VoucherServlet extends HttpServlet {
         }
 
         request.setAttribute("contentPage", "/WEB-INF/admin/voucher.jsp");
-        request.getRequestDispatcher("/WEB-INF/admin/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
 
     // ================== POST ==================
