@@ -27,7 +27,21 @@ public class CheckoutServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+
+        String type = request.getParameter("type");
+
+        List<CartItem> cart;
+
+        if ("buyNow".equals(type)) {
+
+            cart = (List<CartItem>)
+                    session.getAttribute("buyNowItems");
+
+        } else {
+
+            cart = (List<CartItem>)
+                    session.getAttribute("cart");
+        }
 
         if (cart == null || cart.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
@@ -73,7 +87,21 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        String type = request.getParameter("type");
+
+        List<CartItem> cart;
+
+        if ("buyNow".equals(type)) {
+
+            cart = (List<CartItem>)
+                    session.getAttribute("buyNowItems");
+
+        } else {
+
+            cart = (List<CartItem>)
+                    session.getAttribute("cart");
+        }
+
         String selectedIds = request.getParameter("selectedIds");
         List<CartItem> selectedCart = new ArrayList<>();
 
@@ -234,9 +262,18 @@ public class CheckoutServlet extends HttpServlet {
                     }
                 }
 
-                cart.removeAll(selectedCart);
-                session.setAttribute("cart", cart);
-                response.sendRedirect(request.getContextPath() + "/orderSuccess?orderCode=" + orderCode);
+                if ("buyNow".equals(type)) {
+
+                    session.removeAttribute("buyNowItems");
+
+                } else {
+
+                    cart.removeAll(selectedCart);
+                    session.setAttribute("cart", cart);
+                }
+                response.sendRedirect(
+                        request.getContextPath()
+                                + "/orderSuccess?orderCode=" + orderCode);
             }
         } catch (Exception e) {
             e.printStackTrace();

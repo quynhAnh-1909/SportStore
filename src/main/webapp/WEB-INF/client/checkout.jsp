@@ -242,8 +242,17 @@
                         Thông tin thanh toán
                     </h2>
 
-                    <form action="${root}/checkout" method="post" id="checkoutForm">
-                        <input type="hidden" name="selectedIds" value="${param.selectedIds}">
+                    <form action="${root}/checkout"
+                          method="post"
+                          id="checkoutForm">
+
+                        <input type="hidden"
+                               name="selectedIds"
+                               value="${param.selectedIds}">
+
+                        <input type="hidden"
+                               name="type"
+                               value="${param.type}">
 
                         <div class="row">
                             <div class="col-md-6 mb-3">

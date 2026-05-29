@@ -113,4 +113,38 @@ public class CategoryDAO {
 
         return buildTree(all);
     }
+
+    public List<Category> getChildCategories() {
+
+        List<Category> list = new ArrayList<>();
+
+        String sql =
+                "SELECT * " +
+                        "FROM category " +
+                        "WHERE parent_id IS NOT NULL " +
+                        "ORDER BY parent_id, id";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+
+            while(rs.next()){
+
+                Category c = new Category();
+
+                c.setId(rs.getInt("id"));
+                c.setName(rs.getString("name"));
+                c.setParentId(
+                        (Integer) rs.getObject("parent_id")
+                );
+
+                list.add(c);
+            }
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }

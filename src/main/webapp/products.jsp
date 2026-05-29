@@ -12,6 +12,8 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <style>
         body {
             background: #f4f6f9;
@@ -158,6 +160,60 @@
             padding:8px;
         }
 
+        /* BUTTON */
+        .bestSellerSwiper{
+            padding:20px 80px;
+        }
+
+        .bestSellerSwiper .swiper-button-prev{
+            left:10px;
+        }
+
+        .bestSellerSwiper .swiper-button-next{
+            right:10px;
+        }
+
+        .bestSellerSwiper .swiper-button-prev,
+        .bestSellerSwiper .swiper-button-next{
+
+            width:50px;
+            height:50px;
+
+            border-radius:50%;
+
+            background:#198754;
+            color:white;
+        }
+
+        .bestSellerSwiper .swiper-button-prev:after,
+        .bestSellerSwiper .swiper-button-next:after{
+            font-size:20px;
+            font-weight:bold;
+        }
+
+        .swiper-slide{
+            height:auto;
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev{
+            color:#198754;
+        }
+
+        .product-card{
+            position:relative;
+            z-index:1;
+        }
+
+        .product-card .card-body{
+            display:flex;
+            flex-direction:column;
+        }
+
+        .product-card .btn{
+            margin-top:auto;
+        }
+
     </style>
 
 </head>
@@ -167,7 +223,7 @@
 <jsp:include page="banner.jsp"/>
 
 
-<div class="container mt-4">
+<div class="container-fluid px-5 mt-4">
 
     <c:if test="${empty param.categoryId}">
 
@@ -178,205 +234,133 @@
                 Sản phẩm bán chạy
             </h2>
 
-            <a href="${root}/products"
-               class="btn btn-outline-success btn-sm">
-                Xem thêm
-            </a>
-
         </div>
 
-        <div class="row g-4">
+        <div class="swiper bestSellerSwiper">
 
-            <c:forEach items="${bestSellerProducts}" var="p">
+            <div class="swiper-wrapper">
 
-                <div class="col-md-3">
+                <c:forEach items="${bestSellerProducts}" var="p">
 
-                    <div class="card product-card h-100">
+                    <div class="swiper-slide">
 
-                        <a href="${root}/productDetail?id=${p.id}">
-                            <div class="product-img-area">
-                                <img src="${root}/resources/${p.imageUrl}"
-                                     class="product-img">
-                            </div>
-                        </a>
+                        <div class="card product-card h-100">
 
-                        <div class="card-body text-center">
-
-                            <a href="${root}/productDetail?id=${p.id}"
-                               class="product-link">
-
-                                <div>${p.name}</div>
-
+                            <a href="${root}/productDetail?id=${p.id}">
+                                <div class="product-img-area">
+                                    <img src="${root}/resources/${p.imageUrl}"
+                                         class="product-img">
+                                </div>
                             </a>
 
-                            <div class="price">
+                            <div class="card-body text-center">
 
-                                <fmt:formatNumber
-                                        value="${p.price}"
-                                        type="number"
-                                        groupingUsed="true"/>
+                                <a href="${root}/productDetail?id=${p.id}"
+                                   class="product-link">
 
-                                VNĐ
+                                    <div class="product-name">
+                                            ${p.name}
+                                    </div>
+
+                                </a>
+
+                                <div class="price">
+                                    <fmt:formatNumber
+                                            value="${p.price}"
+                                            type="number"
+                                            groupingUsed="true"/>
+                                    VNĐ
+                                </div>
+
+                                <button type="button"
+                                        onclick="addToCart(this, ${p.id})"
+                                        class="btn btn-success btn-sm mt-2 w-100">
+                                    🛒 Thêm vào giỏ hàng
+                                </button>
 
                             </div>
-
-                            <button type="button"
-                                    onclick="addToCart(this, ${p.id})"
-                                    class="btn btn-success btn-sm mt-2 w-100">
-
-                                🛒 Thêm vào giỏ hàng
-
-                            </button>
 
                         </div>
 
                     </div>
 
-                </div>
+                </c:forEach>
 
-            </c:forEach>
+            </div>
 
-        </div>
-
-
-        <!-- FOOTBALL -->
-        <div class="d-flex justify-content-between align-items-center section-header">
-
-            <h2 class="section-title">
-                Sản phẩm bóng đá
-            </h2>
-
-            <a href="${root}/products?categoryId=4"
-               class="btn btn-outline-success btn-sm">
-
-                Xem thêm
-
-            </a>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
 
         </div>
 
-        <div class="row g-4">
+        <c:forEach items="${categories}" var="c">
 
-            <c:forEach items="${footballProducts}" var="p">
+            <div class="d-flex justify-content-between align-items-center section-header">
 
-                <div class="col-md-3">
+                <h2 class="section-title">
+                        ${c.name}
+                </h2>
 
-                    <div class="card product-card h-100">
+                <a href="${root}/products?categoryId=${c.id}"
+                   class="btn btn-outline-success btn-sm">
+                    Xem thêm
+                </a>
 
-                        <a href="${root}/productDetail?id=${p.id}">
-                            <div class="product-img-area">
-                                <img src="${root}/resources/${p.imageUrl}"
-                                     class="product-img">
-                            </div>
-                        </a>
+            </div>
 
-                        <div class="card-body text-center">
+            <div class="row g-4">
 
-                            <a href="${root}/productDetail?id=${p.id}"
-                               class="product-link">
+                <c:forEach items="${categoryProducts[c.id]}" var="p">
 
-                                <div>${p.name}</div>
+                    <div class="col-md-3">
 
+                        <div class="card product-card h-100">
+
+                            <a href="${root}/productDetail?id=${p.id}">
+                                <div class="product-img-area">
+                                    <img src="${root}/resources/${p.imageUrl}"
+                                         class="product-img">
+                                </div>
                             </a>
 
-                            <div class="price">
+                            <div class="card-body text-center">
 
-                                <fmt:formatNumber
-                                        value="${p.price}"
-                                        type="number"
-                                        groupingUsed="true"/>
+                                <a href="${root}/productDetail?id=${p.id}"
+                                   class="product-link">
 
-                                VNĐ
+                                    <div class="product-name">
+                                            ${p.name}
+                                    </div>
+
+                                </a>
+
+                                <div class="price">
+                                    <fmt:formatNumber
+                                            value="${p.price}"
+                                            type="number"
+                                            groupingUsed="true"/>
+                                    VNĐ
+                                </div>
+
+                                <button type="button"
+                                        onclick="addToCart(this, ${p.id})"
+                                        class="btn btn-success btn-sm mt-2 w-100">
+
+                                    🛒 Thêm vào giỏ hàng
+
+                                </button>
 
                             </div>
-
-                            <button type="button"
-                                    onclick="addToCart(this, ${p.id})"
-                                    class="btn btn-success btn-sm mt-2 w-100">
-
-                                🛒 Thêm vào giỏ hàng
-
-                            </button>
 
                         </div>
 
                     </div>
 
-                </div>
+                </c:forEach>
 
-            </c:forEach>
+            </div>
 
-        </div>
-
-
-        <!-- BADMINTON -->
-        <div class="d-flex justify-content-between align-items-center section-header">
-
-            <h2 class="section-title">
-                Sản phẩm cầu lông
-            </h2>
-
-            <a href="${root}/products?categoryId=14"
-               class="btn btn-outline-success btn-sm">
-
-                Xem thêm
-
-            </a>
-
-        </div>
-
-        <div class="row g-4">
-
-            <c:forEach items="${badmintonProducts}" var="p">
-
-                <div class="col-md-3">
-
-                    <div class="card product-card h-100">
-
-                        <a href="${root}/productDetail?id=${p.id}">
-                            <div class="product-img-area">
-                                <img src="${root}/resources/${p.imageUrl}"
-                                     class="product-img">
-                            </div>
-                        </a>
-
-                        <div class="card-body text-center">
-
-                            <a href="${root}/productDetail?id=${p.id}"
-                               class="product-link">
-
-                                <div>${p.name}</div>
-
-                            </a>
-
-                            <div class="price">
-
-                                <fmt:formatNumber
-                                        value="${p.price}"
-                                        type="number"
-                                        groupingUsed="true"/>
-
-                                VNĐ
-
-                            </div>
-
-                            <button type="button"
-                                    onclick="addToCart(this, ${p.id})"
-                                    class="btn btn-success btn-sm mt-2 w-100">
-
-                                🛒 Thêm vào giỏ hàng
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </c:forEach>
-
-        </div>
+        </c:forEach>
 
     </c:if>
 
@@ -535,6 +519,7 @@
 
 <!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <jsp:include page="footer.jsp"/>
 
 <script>
@@ -549,7 +534,7 @@
 
     function addToCart(btn, productId) {
 
-        fetch("${root}/cart", {
+        fetch("${ROOT}/cart", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -604,7 +589,7 @@
     /* ================= UPDATE COUNT ================= */
 
     function updateCartCount() {
-        fetch("${root}/cart", {
+        fetch("${ROOT}/cart", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -633,6 +618,36 @@
                 });
     }
 
+    new Swiper(".bestSellerSwiper", {
+
+        slidesPerView: 4,
+
+        spaceBetween: 24,
+
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev"
+        },
+
+        breakpoints: {
+
+            0: {
+                slidesPerView: 1
+            },
+
+            768: {
+                slidesPerView: 2
+            },
+
+            992: {
+                slidesPerView: 3
+            },
+
+            1200: {
+                slidesPerView: 4
+            }
+        }
+    });
 
 </script>
 </body>

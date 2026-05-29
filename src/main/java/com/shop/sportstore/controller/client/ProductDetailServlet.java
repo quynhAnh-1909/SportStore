@@ -73,10 +73,46 @@ public class ProductDetailServlet extends HttpServlet {
 
             ReviewDAO reviewDAO = new ReviewDAO();
 
+            /* PAGINATION */
+            int page = 1;
+
+            String pageParam =
+                    request.getParameter("page");
+
+            if(pageParam != null){
+
+                page = Integer.parseInt(pageParam);
+            }
+
+            int pageSize = 3;
+
+            /* LẤY REVIEW THEO TRANG */
             List<Review> reviews =
-                    reviewDAO.getReviewsByProduct(id);
+                    reviewDAO.getReviewsByProductPaging(
+                            id,
+                            page,
+                            pageSize
+                    );
+
+            int totalReviews =
+                    reviewDAO.countReviewByProduct(id);
+
+            int totalPages =
+                    (int)Math.ceil(
+                            (double) totalReviews / pageSize
+                    );
 
             request.setAttribute("reviews", reviews);
+
+            request.setAttribute(
+                    "currentPage",
+                    page
+            );
+
+            request.setAttribute(
+                    "totalPages",
+                    totalPages
+            );
 
 
 //            request.setAttribute("showAll", showAll);

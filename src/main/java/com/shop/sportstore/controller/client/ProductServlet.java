@@ -11,7 +11,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/products")
 public class ProductServlet extends HttpServlet {
@@ -72,19 +75,7 @@ public class ProductServlet extends HttpServlet {
 
             // BEST SELLER
             List<Product> bestSellerProducts =
-                    productDAO.getBestSellerProducts(4);
-
-            // FOOTBALL
-            List<Product> footballProducts =
-                    productDAO.getProductsByCategory(4, 4);
-
-            // BASKETBALL
-            List<Product> basketballProducts =
-                    productDAO.getProductsByCategory(5, 4);
-
-            // BADMINTON
-            List<Product> badmintonProducts =
-                    productDAO.getProductsByCategory(14, 4);
+                    productDAO.getBestSellerProducts(10);
 
             // SEARCH PRODUCTS
             List<Product> productList =
@@ -101,19 +92,9 @@ public class ProductServlet extends HttpServlet {
             int totalPage =
                     (int) Math.ceil((double) totalProduct / LIMIT);
 
-            // CATEGORY TREE
-            List<Category> allCategories =
-                    categoryDAO.getAllCategories();
-            List<Category> categories =
-                    categoryDAO.buildTree(allCategories);
-
             // NULL SAFETY
             if (productList == null) {
                 productList = List.of();
-            }
-
-            if (categories == null) {
-                categories = List.of();
             }
 
             // SET ATTRIBUTES
@@ -124,22 +105,45 @@ public class ProductServlet extends HttpServlet {
                     bestSellerProducts
             );
 
+            List<Category> parentCategories =
+                    categoryDAO.getParentCategories();
+
+            List<Category> displayCategories =
+                    new ArrayList<>();
+
+            for(Category parent : parentCategories){
+
+                displayCategories.addAll(
+                        parent.getChildren()
+                );
+            }
+
+            Map<Integer, List<Product>> categoryProducts =
+                    new HashMap<>();
+
+            for(Category c : displayCategories){
+
+                List<Product> productsByCategory =
+                        productDAO.getProductsByCategory(
+                                c.getId(),
+                                4
+                        );
+
+                categoryProducts.put(
+                        c.getId(),
+                        productsByCategory
+                );
+            }
+
             request.setAttribute(
-                    "footballProducts",
-                    footballProducts
+                    "categoryProducts",
+                    categoryProducts
             );
 
             request.setAttribute(
-                    "basketballProducts",
-                    basketballProducts
+                    "categories",
+                    displayCategories
             );
-
-            request.setAttribute(
-                    "badmintonProducts",
-                    badmintonProducts
-            );
-
-            request.setAttribute("categories", categories);
 
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPage", totalPage);
