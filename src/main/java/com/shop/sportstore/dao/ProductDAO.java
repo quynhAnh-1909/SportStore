@@ -130,6 +130,15 @@ public class ProductDAO extends DBConnection {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
+
+                System.out.println(
+                        rs.getInt("id")
+                                + " | "
+                                + rs.getString("name")
+                                + " | "
+                                + rs.getInt("category_id")
+                );
+
                 list.add(mapResultSetToProduct(rs));
             }
 
@@ -501,8 +510,10 @@ public class ProductDAO extends DBConnection {
         List<Product> list = new ArrayList<>();
 
         String sql = """
-        SELECT * FROM products
+        SELECT *
+        FROM products
         WHERE category_id = ?
+        ORDER BY id DESC
         LIMIT ?
     """;
 

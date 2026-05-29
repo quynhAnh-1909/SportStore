@@ -12,6 +12,8 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <style>
         body {
             background: #f4f6f9;
@@ -158,94 +160,49 @@
             padding:8px;
         }
 
-        .best-seller-container{
-
-            position:relative;
-
-            overflow:hidden;
-
-            width:100%;
-
-            padding:0 40px;
-        }
-
-        /* TRACK */
-        .best-seller-track{
-
-            display:flex;
-
-            gap:24px;
-
-            transition:transform 0.5s ease;
-        }
-
-        /* ITEM */
-        .best-seller-item{
-
-            min-width:calc((100% - 72px) / 4);
-
-            flex-shrink:0;
-        }
-
         /* BUTTON */
-        .slider-btn{
-
-            position:absolute;
-
-            top:50%;
-
-            transform:translateY(-50%);
-
-            width:46px;
-            height:46px;
-
-            border:none;
-            border-radius:50%;
-
-            background:white;
-
-            box-shadow:0 4px 15px rgba(0,0,0,0.15);
-
-            z-index:20;
-
-            cursor:pointer;
-
-            font-size:24px;
-
-            transition:0.25s ease;
+        .bestSellerSwiper{
+            padding:20px 80px;
         }
 
-        .slider-btn:hover{
+        .bestSellerSwiper .swiper-button-prev{
+            left:10px;
+        }
+
+        .bestSellerSwiper .swiper-button-next{
+            right:10px;
+        }
+
+        .bestSellerSwiper .swiper-button-prev,
+        .bestSellerSwiper .swiper-button-next{
+
+            width:50px;
+            height:50px;
+
+            border-radius:50%;
 
             background:#198754;
             color:white;
-
-            transform:translateY(-50%) scale(1.08);
         }
 
-        .slider-prev{
-            left:-22px;
+        .bestSellerSwiper .swiper-button-prev:after,
+        .bestSellerSwiper .swiper-button-next:after{
+            font-size:20px;
+            font-weight:bold;
         }
 
-        .slider-next{
-            right:-22px;
+        .swiper-slide{
+            height:auto;
         }
 
-        .best-seller-container{
-            overflow:visible;
+        .swiper-button-next,
+        .swiper-button-prev{
+            color:#198754;
         }
 
         .product-card{
             position:relative;
             z-index:1;
-        }
-
-        .best-seller-container .slider-btn{
-            opacity:0;
-        }
-
-        .best-seller-container:hover .slider-btn{
-            opacity:1;
         }
 
     </style>
@@ -268,49 +225,23 @@
                 Sản phẩm bán chạy
             </h2>
 
-            <a href="${root}/products"
-               class="btn btn-outline-success btn-sm">
-                Xem thêm
-            </a>
-
         </div>
 
-        <div class="best-seller-container">
+        <div class="swiper bestSellerSwiper">
 
-            <!-- LEFT -->
-            <button class="slider-btn slider-prev"
-                    onclick="moveBestSeller(-1)">
-                ‹
-            </button>
+            <div class="swiper-wrapper">
 
-            <!-- RIGHT -->
-            <button class="slider-btn slider-next"
-                    onclick="moveBestSeller(1)">
-                ›
-            </button>
+                <c:forEach items="${bestSellerProducts}" var="p">
 
-            <!-- TRACK -->
-            <div class="best-seller-track"
-                 id="bestSellerTrack">
-
-                <c:forEach items="${bestSellerProducts}"
-                           var="p"
-                           begin="0"
-                           end="9">
-
-                    <div class="best-seller-item">
+                    <div class="swiper-slide">
 
                         <div class="card product-card h-100">
 
                             <a href="${root}/productDetail?id=${p.id}">
-
                                 <div class="product-img-area">
-
                                     <img src="${root}/resources/${p.imageUrl}"
                                          class="product-img">
-
                                 </div>
-
                             </a>
 
                             <div class="card-body text-center">
@@ -325,22 +256,17 @@
                                 </a>
 
                                 <div class="price">
-
                                     <fmt:formatNumber
                                             value="${p.price}"
                                             type="number"
                                             groupingUsed="true"/>
-
                                     VNĐ
-
                                 </div>
 
                                 <button type="button"
                                         onclick="addToCart(this, ${p.id})"
                                         class="btn btn-success btn-sm mt-2 w-100">
-
                                     🛒 Thêm vào giỏ hàng
-
                                 </button>
 
                             </div>
@@ -353,147 +279,71 @@
 
             </div>
 
-        </div>
-
-
-        <!-- FOOTBALL -->
-        <div class="d-flex justify-content-between align-items-center section-header">
-
-            <h2 class="section-title">
-                Sản phẩm bóng đá
-            </h2>
-
-            <a href="${root}/products?categoryId=4"
-               class="btn btn-outline-success btn-sm">
-
-                Xem thêm
-
-            </a>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
 
         </div>
 
-        <div class="row g-4">
+        <c:forEach items="${categories}" var="c">
 
-            <c:forEach items="${footballProducts}" var="p">
+            <div class="d-flex justify-content-between align-items-center section-header">
 
-                <div class="col-md-3">
+                <h2 class="section-title">
+                        ${c.name}
+                </h2>
 
-                    <div class="card product-card h-100">
+                <a href="${root}/products?categoryId=${c.id}"
+                   class="btn btn-outline-success btn-sm">
+                    Xem thêm
+                </a>
 
-                        <a href="${root}/productDetail?id=${p.id}">
-                            <div class="product-img-area">
-                                <img src="${root}/resources/${p.imageUrl}"
-                                     class="product-img">
-                            </div>
-                        </a>
+            </div>
 
-                        <div class="card-body text-center">
+            <div class="row g-4">
 
-                            <a href="${root}/productDetail?id=${p.id}"
-                               class="product-link">
+                <c:forEach items="${categoryProducts[c.id]}" var="p">
 
-                                <div>${p.name}</div>
+                    <div class="col-md-3">
 
+                        <div class="card product-card h-100">
+
+                            <a href="${root}/productDetail?id=${p.id}">
+                                <div class="product-img-area">
+                                    <img src="${root}/resources/${p.imageUrl}"
+                                         class="product-img">
+                                </div>
                             </a>
 
-                            <div class="price">
+                            <div class="card-body text-center">
 
-                                <fmt:formatNumber
-                                        value="${p.price}"
-                                        type="number"
-                                        groupingUsed="true"/>
+                                <a href="${root}/productDetail?id=${p.id}"
+                                   class="product-link">
 
-                                VNĐ
+                                    <div class="product-name">
+                                            ${p.name}
+                                    </div>
+
+                                </a>
+
+                                <div class="price">
+                                    <fmt:formatNumber
+                                            value="${p.price}"
+                                            type="number"
+                                            groupingUsed="true"/>
+                                    VNĐ
+                                </div>
 
                             </div>
-
-                            <button type="button"
-                                    onclick="addToCart(this, ${p.id})"
-                                    class="btn btn-success btn-sm mt-2 w-100">
-
-                                🛒 Thêm vào giỏ hàng
-
-                            </button>
 
                         </div>
 
                     </div>
 
-                </div>
+                </c:forEach>
 
-            </c:forEach>
+            </div>
 
-        </div>
-
-
-        <!-- BADMINTON -->
-        <div class="d-flex justify-content-between align-items-center section-header">
-
-            <h2 class="section-title">
-                Sản phẩm cầu lông
-            </h2>
-
-            <a href="${root}/products?categoryId=14"
-               class="btn btn-outline-success btn-sm">
-
-                Xem thêm
-
-            </a>
-
-        </div>
-
-        <div class="row g-4">
-
-            <c:forEach items="${badmintonProducts}" var="p">
-
-                <div class="col-md-3">
-
-                    <div class="card product-card h-100">
-
-                        <a href="${root}/productDetail?id=${p.id}">
-                            <div class="product-img-area">
-                                <img src="${root}/resources/${p.imageUrl}"
-                                     class="product-img">
-                            </div>
-                        </a>
-
-                        <div class="card-body text-center">
-
-                            <a href="${root}/productDetail?id=${p.id}"
-                               class="product-link">
-
-                                <div>${p.name}</div>
-
-                            </a>
-
-                            <div class="price">
-
-                                <fmt:formatNumber
-                                        value="${p.price}"
-                                        type="number"
-                                        groupingUsed="true"/>
-
-                                VNĐ
-
-                            </div>
-
-                            <button type="button"
-                                    onclick="addToCart(this, ${p.id})"
-                                    class="btn btn-success btn-sm mt-2 w-100">
-
-                                🛒 Thêm vào giỏ hàng
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </c:forEach>
-
-        </div>
+        </c:forEach>
 
     </c:if>
 
@@ -652,6 +502,7 @@
 
 <!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <jsp:include page="footer.jsp"/>
 
 <script>
@@ -666,7 +517,7 @@
 
     function addToCart(btn, productId) {
 
-        fetch("${root}/cart", {
+        fetch("${ROOT}/cart", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -721,7 +572,7 @@
     /* ================= UPDATE COUNT ================= */
 
     function updateCartCount() {
-        fetch("${root}/cart", {
+        fetch("${ROOT}/cart", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -750,47 +601,36 @@
                 });
     }
 
-    let currentBestSeller = 0;
+    new Swiper(".bestSellerSwiper", {
 
-    function moveBestSeller(direction){
+        slidesPerView: 4,
 
-        const track =
-                document.getElementById(
-                        "bestSellerTrack"
-                );
+        spaceBetween: 24,
 
-        const items =
-                document.querySelectorAll(
-                        ".best-seller-item"
-                );
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev"
+        },
 
-        const visibleItems = 4;
+        breakpoints: {
 
-        const totalItems = items.length;
+            0: {
+                slidesPerView: 1
+            },
 
-        const maxIndex =
-                totalItems - visibleItems;
+            768: {
+                slidesPerView: 2
+            },
 
-        currentBestSeller += direction;
+            992: {
+                slidesPerView: 3
+            },
 
-        if(currentBestSeller < 0){
-
-            currentBestSeller = 0;
+            1200: {
+                slidesPerView: 4
+            }
         }
-
-        if(currentBestSeller > maxIndex){
-
-            currentBestSeller = maxIndex;
-        }
-
-        const itemWidth =
-                items[0].offsetWidth + 24;
-
-        track.style.transform =
-                `translateX(-${
-                    currentBestSeller * itemWidth
-            }px)`;
-    }
+    });
 
 </script>
 </body>
