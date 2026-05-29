@@ -20,13 +20,14 @@ public class CancelOrderServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Đảm bảo đồng bộ hóa tiếng Việt chuẩn xác
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession();
-
         User loginUser = (User) session.getAttribute("user");
 
+        // 1. KIỂM TRA ĐĂNG NHẬP
         if (loginUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -35,120 +36,74 @@ public class CancelOrderServlet extends HttpServlet {
         String orderCode = request.getParameter("orderCode");
         String cancelReason = request.getParameter("cancelReason");
 
+        // Xử lý lý do hủy linh hoạt và gọn gàng hơn
         if ("Khác".equals(cancelReason)) {
-
             String otherReason = request.getParameter("otherReason");
-
             if (otherReason != null && !otherReason.trim().isEmpty()) {
                 cancelReason = otherReason.trim();
+            } else {
+                cancelReason = "Lý do khác (Người dùng không ghi rõ)";
             }
         }
 
         OrderDAO orderDAO = new OrderDAO();
-
         int userId = loginUser.getUserId();
 
-        // GIỚI HẠN HỦY ĐƠN
+        // 2. GIỚI HẠN TẦN SUẤT HỦY ĐƠN (Chống spam phá hoại hệ thống)
         int cancelCount = orderDAO.countCanceledOrdersInLastHour(userId);
-
         if (cancelCount >= 3) {
-
-            session.setAttribute(
-                    "errorMsg",
-                    "Bạn đã hủy quá nhiều đơn hàng. Vui lòng thử lại sau 1 giờ!"
-            );
-
+            session.setAttribute("errorMsg", "Bạn đã hủy quá nhiều đơn hàng trong vòng 1 giờ qua. Vui lòng thử lại sau!");
             response.sendRedirect(request.getContextPath() + "/order-history");
-
             return;
         }
 
-        // CHECK ĐƠN HÀNG
+        // 3. KIỂM TRA SỰ TỒN TẠI CỦA ĐƠN HÀNG
         Order order = orderDAO.getOrderByCode(orderCode);
-
         if (order == null) {
-
-            session.setAttribute(
-                    "errorMsg",
-                    "Đơn hàng không tồn tại!"
-            );
-
+            session.setAttribute("errorMsg", "Đơn hàng không tồn tại trên hệ thống!");
             response.sendRedirect(request.getContextPath() + "/order-history");
-
             return;
         }
 
-        // CHECK ĐÚNG USER
+        // 4. KIỂM TRA BẢO MẬT (Chống lỗi IDOR - Sửa tham số để hủy đơn người khác)
         if (order.getUserId() != userId) {
-
-            session.setAttribute(
-                    "errorMsg",
-                    "Bạn không có quyền hủy đơn này!"
-            );
-
+            session.setAttribute("errorMsg", "Bạn không có quyền thao tác trên đơn hàng này!");
             response.sendRedirect(request.getContextPath() + "/order-history");
-
             return;
         }
 
-        // CHỈ CHO HỦY PENDING / CONFIRMED
-        String status = order.getStatus();
+        // 5. ĐỒNG BỘ KIỂM TRA TRẠNG THÁI (Bọc chống Null và hỗ trợ cả mã số giống JSP)
+        String status = order.getStatus() != null ? order.getStatus().trim().toUpperCase() : "";
+        boolean isValidStatus = status.equals("PENDING")
+                || status.equals("CONFIRMED")
+                || status.equals("0")
+                || status.equals("CHỜ XÁC NHẬN");
 
-        if (
-                !status.equalsIgnoreCase("PENDING")
-                        && !status.equalsIgnoreCase("CONFIRMED")
-        ) {
-
-            session.setAttribute(
-                    "errorMsg",
-                    "Đơn hàng không thể hủy ở trạng thái hiện tại!"
-            );
-
+        if (!isValidStatus) {
+            session.setAttribute("errorMsg", "Đơn hàng đã được vận chuyển hoặc hoàn tất, không thể hủy!");
             response.sendRedirect(request.getContextPath() + "/order-history");
-
             return;
         }
 
-        // GIỚI HẠN THỜI GIAN HỦY (30 PHÚT)
+        // 6. GIỚI HẠN THỜI GIAN HỦY ĐƠN (Giả sử thống nhất chọn mốc 30 phút giống Back-end của bạn)
         Timestamp createdAt = order.getCreatedAt();
-
         if (createdAt != null) {
-
-            long diffMillis =
-                    System.currentTimeMillis() - createdAt.getTime();
-
+            long diffMillis = System.currentTimeMillis() - createdAt.getTime();
             long diffMinutes = diffMillis / (1000 * 60);
 
             if (diffMinutes > 30) {
-
-                session.setAttribute(
-                        "errorMsg",
-                        "Đơn hàng đã quá thời gian cho phép hủy (30 phút)!"
-                );
-
+                session.setAttribute("errorMsg", "Đơn hàng đã quá thời gian cho phép hủy (Tối đa 30 phút kể từ lúc đặt)!");
                 response.sendRedirect(request.getContextPath() + "/order-history");
-
                 return;
             }
         }
 
-        // HỦY ĐƠN
-        boolean isSuccess =
-                orderDAO.cancelOrder(orderCode, userId, cancelReason);
-
+        // 7. THỰC HIỆN HỦY ĐƠN TRONG DATABASE
+        boolean isSuccess = orderDAO.cancelOrder(orderCode, userId, cancelReason);
         if (isSuccess) {
-
-            session.setAttribute(
-                    "successMsg",
-                    "Hủy đơn hàng #" + orderCode + " thành công!"
-            );
-
+            session.setAttribute("successMsg", "Hủy đơn hàng #" + orderCode + " thành công!");
         } else {
-
-            session.setAttribute(
-                    "errorMsg",
-                    "Hủy thất bại!"
-            );
+            session.setAttribute("errorMsg", "Hệ thống gặp sự cố, hủy đơn hàng thất bại!");
         }
 
         response.sendRedirect(request.getContextPath() + "/order-history");
