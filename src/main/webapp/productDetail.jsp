@@ -559,9 +559,8 @@
                                        value="${product.id}">
 
                                 <input type="hidden"
-                                       id="buyQty"
                                        name="quantity"
-                                       value="1">
+                                       id="buyQty">
 
                                 <button type="submit"
                                         class="btn btn-warning">
@@ -1123,7 +1122,7 @@
 
                 if (count > 0) {
                     badge.style.display = "block";
-                } else {
+                    } else {
                     badge.style.display = "none";
                 }
 
@@ -1256,6 +1255,14 @@
 
         alert("Đã copy link để gửi Messenger!");
     }
+
+    document.querySelector('form[action$="buy-now"]')
+            .addEventListener('submit', function () {
+
+                document.getElementById("buyQty").value =
+                        document.getElementById("quantity").value;
+
+            });
 
     window.addEventListener("load", () => {
 
