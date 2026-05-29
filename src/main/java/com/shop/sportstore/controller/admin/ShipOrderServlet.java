@@ -47,9 +47,6 @@ public class ShipOrderServlet extends HttpServlet {
             json.addProperty("required_note", "KHONGCHOXEMHANG");
             json.addProperty("client_order_code", order.getOrderCode() + "_" + System.currentTimeMillis());
 
-            /* =========================
-               NGƯỜI NHẬN (Cấu hình chuẩn Sandbox)
-            ========================= */
             String phone = order.getReceiverPhone().replaceAll("[^0-9]", "");
             json.addProperty("to_name", order.getReceiverName());
             json.addProperty("to_phone", phone);

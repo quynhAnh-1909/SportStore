@@ -1,5 +1,7 @@
 package com.shop.sportstore.dao;
 
+import com.shop.sportstore.enums.OrderStatus;
+import com.shop.sportstore.enums.RefundStatus;
 import com.shop.sportstore.model.*;
 import com.shop.sportstore.untils.DBConnection;
 
@@ -12,6 +14,91 @@ import java.util.Map;
 import static com.shop.sportstore.untils.DBConnection.getConnection;
 
 public class OrderDAO extends DBConnection {
+
+
+
+    private Order mapOrder(ResultSet rs) throws SQLException {
+
+        Order o = new Order();
+
+        o.setId(rs.getInt("Id"));
+        o.setUserId(rs.getInt("UserId"));
+
+        o.setOrderCode(rs.getString("OrderCode"));
+
+        o.setTotalPrice(rs.getDouble("TotalPrice"));
+
+        o.setPaymentMethod(rs.getString("PaymentMethod"));
+
+        o.setStatus(rs.getString("Status"));
+
+        o.setReceiverName(rs.getString("ReceiverName"));
+
+        o.setReceiverPhone(rs.getString("ReceiverPhone"));
+
+        o.setAddress(rs.getString("Address"));
+
+        o.setNote(rs.getString("Note"));
+
+        o.setVoucherId(
+                rs.getObject("VoucherId") != null
+                        ? rs.getInt("VoucherId")
+                        : null
+        );
+
+        o.setDistrictId(rs.getInt("district_id"));
+
+        o.setWardCode(rs.getString("ward_code"));
+
+        o.setShippingFee(rs.getDouble("shipping_fee"));
+
+        o.setDiscountAmount(rs.getDouble("DiscountAmount"));
+
+        o.setGhnCode(rs.getString("ghn_code"));
+
+        o.setCreatedAt(rs.getTimestamp("CreatedAt"));
+
+        o.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+
+        o.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
+
+        o.setShippingAt(rs.getTimestamp("ShippingAt"));
+
+        o.setCompletedAt(rs.getTimestamp("CompletedAt"));
+
+        o.setCancelledAt(rs.getTimestamp("CancelledAt"));
+
+        o.setCancelReason(rs.getString("CancelReason"));
+
+        // REFUND
+        try {
+            o.setRefundStatus(rs.getString("refund_status"));
+        } catch (Exception ignored) {}
+
+        try {
+            o.setRefundReason(rs.getString("refund_reason"));
+        } catch (Exception ignored) {}
+
+        try {
+            o.setRefundRequestedAt(rs.getTimestamp("refund_requested_at"));
+        } catch (Exception ignored) {}
+
+        try {
+            o.setRefundedAt(rs.getTimestamp("refunded_at"));
+        } catch (Exception ignored) {}
+
+        try {
+            o.setRefundRejectedAt(rs.getTimestamp("refund_rejected_at"));
+        } catch (Exception ignored) {}
+
+        // USER FULL NAME
+        try {
+            o.setUserFullName(rs.getString("userFullName"));
+        } catch (Exception ignored) {}
+
+        return o;
+    }
+
 
     public void updateOrderStatus(String orderCode, String status) throws SQLException {
         String sql = "UPDATE orders SET Status = ?, UpdatedAt = NOW() WHERE OrderCode = ?";
@@ -195,34 +282,7 @@ public class OrderDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Order order = new Order();
-                order.setId(rs.getInt("Id"));
-                order.setUserId(rs.getInt("UserId"));
-                order.setOrderCode(rs.getString("OrderCode"));
-                order.setTotalPrice(rs.getDouble("TotalPrice"));
-                order.setStatus(rs.getString("Status"));
-                order.setPaymentMethod(rs.getString("PaymentMethod"));
-
-                order.setReceiverName(rs.getString("ReceiverName"));
-                order.setReceiverPhone(rs.getString("ReceiverPhone"));
-                order.setAddress(rs.getString("Address"));
-                order.setNote(rs.getString("Note"));
-
-                order.setDistrictId(rs.getInt("district_id"));
-                order.setWardCode(rs.getString("ward_code"));
-
-                order.setShippingFee(rs.getDouble("shipping_fee"));
-                order.setDiscountAmount(rs.getDouble("DiscountAmount"));
-
-
-                order.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                order.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-                order.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
-                order.setShippingAt(rs.getTimestamp("ShippingAt"));
-                order.setCompletedAt(rs.getTimestamp("CompletedAt"));
-                order.setCancelledAt(rs.getTimestamp("CancelledAt"));
-                order.setCancelReason(rs.getString("CancelReason"));
-                order.setUserFullName(rs.getString("userFullName"));
+                Order order = mapOrder(rs);
                 orders.add(order);
             }
         } catch (Exception e) {
@@ -265,17 +325,57 @@ public class OrderDAO extends DBConnection {
     }
 
     public boolean cancelOrder(String orderCode, int userId, String cancelReason) {
-        String sql = "UPDATE orders SET Status = 'CANCELLED', CancelReason = ?, CancelledAt = NOW(), " +
-                "UpdatedAt = NOW() WHERE OrderCode = ? AND UserId = ? AND Status IN ('PENDING', 'CONFIRMED')";
+
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = ?, " +
+                        "CancelReason = ?, " +
+                        "refund_reason = ?, " +
+                        "refund_status = ?, " +
+                        "refund_requested_at = NOW(), " +
+                        "CancelledAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE OrderCode = ? " +
+                        "AND UserId = ? " +
+                        "AND Status IN ('PENDING', 'CONFIRMED')";
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, cancelReason);
-            ps.setString(2, orderCode);
-            ps.setInt(3, userId);
+
+            Order order = getOrderByCode(orderCode);
+
+            if (order == null) {
+                return false;
+            }
+
+            boolean paid =
+                    "VNPAY".equalsIgnoreCase(order.getPaymentMethod())
+                            || order.isPaid();
+            if (paid) {
+
+                ps.setString(1, "REFUND");
+
+                ps.setString(4, "PENDING_REFUND");
+
+            } else {
+
+                ps.setString(1, "CANCELLED");
+
+                ps.setNull(4, Types.VARCHAR);
+            }
+
+            ps.setString(2, cancelReason);
+            ps.setString(3, cancelReason);
+
+            ps.setString(5, orderCode);
+            ps.setInt(6, userId);
+
             return ps.executeUpdate() > 0;
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return false;
     }
 
@@ -300,21 +400,31 @@ public class OrderDAO extends DBConnection {
         String timeColumn = "";
         String dbStatus = status;
 
-        switch (status) {
-            case "CONFIRMED":
+        switch (status.toLowerCase()) {
+
+            case "ready_to_pick":
+            case "picking":
+            case "picked":
+                dbStatus = "CONFIRMED";
                 timeColumn = ", ConfirmedAt = NOW()";
                 break;
 
-            case "SHIPPING":
+            case "delivering":
+            case "transporting":
+            case "sorting":
+                dbStatus = "SHIPPING";
                 timeColumn = ", ShippingAt = NOW()";
                 break;
 
-            case "DELIVERED":
+            case "delivered":
                 dbStatus = "COMPLETED";
                 timeColumn = ", CompletedAt = NOW()";
                 break;
 
-            case "CANCELLED":
+            case "cancel":
+            case "delivery_fail":
+            case "returned":
+                dbStatus = "CANCELLED";
                 timeColumn = ", CancelledAt = NOW()";
                 break;
         }
@@ -348,42 +458,9 @@ public class OrderDAO extends DBConnection {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Order order = new Order();
-                    order.setId(rs.getInt("Id"));
-                    order.setUserId(rs.getInt("UserId"));
-                    order.setOrderCode(rs.getString("OrderCode"));
-                    order.setTotalPrice(rs.getDouble("TotalPrice"));
-                    order.setStatus(rs.getString("Status"));
-                    order.setPaymentMethod(rs.getString("PaymentMethod"));
-
-
-                    order.setReceiverName(rs.getString("ReceiverName"));
-                    order.setReceiverPhone(rs.getString("ReceiverPhone"));
-                    order.setAddress(rs.getString("Address"));
-                    order.setNote(rs.getString("Note"));
-
-
-                    order.setDistrictId(rs.getInt("district_id"));
-                    order.setWardCode(rs.getString("ward_code"));
-
-
-                    order.setShippingFee(rs.getDouble("shipping_fee"));
-                    order.setDiscountAmount(rs.getDouble("DiscountAmount"));
-
-
-                    order.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                    order.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-                    order.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
-                    order.setShippingAt(rs.getTimestamp("ShippingAt"));
-                    order.setCompletedAt(rs.getTimestamp("CompletedAt"));
-                    order.setCancelledAt(rs.getTimestamp("CancelledAt"));
-                    order.setCancelReason(rs.getString("CancelReason"));
-
-                    order.setGhnCode(rs.getString("ghn_code")); // THÊM DÒNG NÀY: Để không bị lỗi trống mã vận đơn khi bấm xem Lịch trình
-
-                    order.setUserFullName(rs.getString("userFullName"));
-
+                    Order order = mapOrder(rs);
                     orders.add(order);
+
                 }
             }
         } catch (Exception e) {
@@ -405,27 +482,14 @@ public class OrderDAO extends DBConnection {
             OrderDetailDAO detailDAO = new OrderDetailDAO();
 
             while (rs.next()) {
-                Order o = new Order();
-                o.setId(rs.getInt("Id"));
-                o.setOrderCode(rs.getString("OrderCode"));
-                o.setTotalPrice(rs.getDouble("TotalPrice"));
-                o.setStatus(rs.getString("Status"));
-                o.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                o.setAddress(rs.getString("Address"));
-                o.setReceiverName(rs.getString("ReceiverName"));
-                o.setReceiverPhone(rs.getString("ReceiverPhone"));
-                o.setDistrictId(rs.getInt("district_id"));
-                o.setWardCode(rs.getString("ward_code"));
-                o.setNote(rs.getString("Note"));
-                o.setPaymentMethod(rs.getString("PaymentMethod"));
+                Order order = mapOrder(rs);
 
-                o.setShippingFee(rs.getDouble("shipping_fee"));
-                o.setDiscountAmount(rs.getDouble("DiscountAmount"));
+                List<OrderDetail> details =
+                        detailDAO.getOrderDetailsByOrderId(order.getId());
 
-                List<OrderDetail> details = detailDAO.getOrderDetailsByOrderId(o.getId());
-                o.setOrderDetails(details);
+                order.setOrderDetails(details);
 
-                orders.add(o);
+                orders.add(order);
             }
         } catch (Exception e) { e.printStackTrace(); }
         return orders;
@@ -443,27 +507,9 @@ public class OrderDAO extends DBConnection {
             OrderDetailDAO detailDAO = new OrderDetailDAO();
 
             while (rs.next()) {
-                Order o = new Order();
-                o.setId(rs.getInt("Id"));
-                o.setOrderCode(rs.getString("OrderCode"));
-                o.setTotalPrice(rs.getDouble("TotalPrice"));
-                o.setStatus(rs.getString("Status"));
-                o.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                o.setAddress(rs.getString("Address"));
-                o.setReceiverName(rs.getString("ReceiverName"));
-                o.setReceiverPhone(rs.getString("ReceiverPhone"));
-                o.setDistrictId(rs.getInt("district_id"));
-                o.setWardCode(rs.getString("ward_code"));
-                o.setNote(rs.getString("Note"));
-                o.setPaymentMethod(rs.getString("PaymentMethod"));
+                Order order = mapOrder(rs);
 
-                o.setShippingFee(rs.getDouble("shipping_fee"));
-                o.setDiscountAmount(rs.getDouble("DiscountAmount"));
-
-                List<OrderDetail> details = detailDAO.getOrderDetailsByOrderId(o.getId());
-                o.setOrderDetails(details);
-
-                orders.add(o);
+                orders.add(order);
             }
         } catch (Exception e) { e.printStackTrace(); }
         return orders;
@@ -478,40 +524,12 @@ public class OrderDAO extends DBConnection {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                Order o = new Order();
-
-                o.setId(rs.getInt("Id"));
-                o.setUserId(rs.getInt("UserId"));
-                o.setOrderCode(rs.getString("OrderCode"));
-                o.setTotalPrice(rs.getDouble("TotalPrice"));
-                o.setPaymentMethod(rs.getString("PaymentMethod"));
-                o.setStatus(rs.getString("Status"));
-
-                o.setReceiverName(rs.getString("ReceiverName"));
-                o.setReceiverPhone(rs.getString("ReceiverPhone"));
-                o.setAddress(rs.getString("Address"));
-                o.setNote(rs.getString("Note"));
-
-                o.setDistrictId(rs.getInt("district_id"));
-                o.setWardCode(rs.getString("ward_code"));
-
-
-                o.setShippingFee(rs.getDouble("shipping_fee"));
-                o.setDiscountAmount(rs.getDouble("DiscountAmount"));
-
-                o.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                o.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-                o.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
-                o.setShippingAt(rs.getTimestamp("ShippingAt"));
-                o.setCompletedAt(rs.getTimestamp("CompletedAt"));
-                o.setCancelledAt(rs.getTimestamp("CancelledAt"));
-                o.setCancelReason(rs.getString("CancelReason"));
-
+                Order order = mapOrder(rs);
                 OrderDetailDAO detailDAO = new OrderDetailDAO();
                 List<OrderDetail> details = detailDAO.getOrderDetailsByOrderId(id);
-                o.setOrderDetails(details);
+                order.setOrderDetails(details);
 
-                return o;
+                return order;
             }
         } catch (Exception e) {
             System.out.println("Lỗi tại getOrderById: " + e.getMessage());
@@ -521,7 +539,7 @@ public class OrderDAO extends DBConnection {
     }
 
     public boolean confirmOrder(int id) {
-        String sql = "UPDATE orders SET Status = 'CONFIRMED', ConfirmedAt = NOW(), UpdatedAt = NOW() WHERE Id = ?";
+        String sql = "UPDATE orders SET Status = 'CONFIRMED', ConfirmedAt = NOW(), UpdatedAt = NOW() WHERE Id = ? AND Status = 'PENDING'";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -533,29 +551,53 @@ public class OrderDAO extends DBConnection {
     }
 
     public boolean shippingOrder(int id) {
-        String sql = "UPDATE orders SET Status = 'SHIPPING', ShippingAt = NOW(), UpdatedAt = NOW() WHERE Id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = 'SHIPPING', " +
+                        "ShippingAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE Id = ? " +
+                        "AND Status = 'CONFIRMED'";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
             ps.setInt(1, id);
+
             return ps.executeUpdate() > 0;
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return false;
     }
-
     public boolean completeOrder(int id) {
-        String sql = "UPDATE orders SET Status = 'DELIVERED', CompletedAt = NOW(), UpdatedAt = NOW() WHERE Id = ?";
+
+        String sql =
+                "UPDATE orders " +
+                        "SET Status = ?, " +
+                        "CompletedAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE Id = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+
+            ps.setString(1, OrderStatus.COMPLETED.name());
+            ps.setInt(2, id);
+
             return ps.executeUpdate() > 0;
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return false;
     }
-
     public boolean updateCancelReason(int orderId, String reason) {
         String sql = "UPDATE orders SET CancelReason = ?, CancelledAt = NOW(), UpdatedAt = NOW(), Status = 'CANCELLED' WHERE Id = ?";
         try (Connection conn = getConnection();
@@ -605,7 +647,6 @@ public class OrderDAO extends DBConnection {
             ps.setString(1, cleanKeyword);
             ps.setString(2, cleanKeyword);
 
-
             int idSearch = 0;
             try {
                 idSearch = Integer.parseInt(cleanKeyword);
@@ -616,60 +657,7 @@ public class OrderDAO extends DBConnection {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-
-                    Order o = new Order();
-
-                    o.setId(rs.getInt("Id"));
-                    o.setUserId(rs.getInt("UserId"));
-
-                    o.setOrderCode(rs.getString("OrderCode"));
-
-                    o.setTotalPrice(rs.getDouble("TotalPrice"));
-
-                    o.setPaymentMethod(rs.getString("PaymentMethod"));
-
-                    o.setStatus(rs.getString("Status"));
-
-                    o.setNote(rs.getString("Note"));
-
-                    o.setVoucherId(
-                            rs.getObject("VoucherId") != null
-                                    ? rs.getInt("VoucherId")
-                                    : null
-                    );
-
-                    o.setDiscountAmount(rs.getDouble("DiscountAmount"));
-
-                    o.setReceiverName(rs.getString("ReceiverName"));
-
-                    o.setReceiverPhone(rs.getString("ReceiverPhone"));
-
-                    o.setAddress(rs.getString("Address"));
-
-
-                    o.setDistrictId(rs.getInt("district_id"));
-
-                    o.setWardCode(rs.getString("ward_code"));
-
-                    o.setGhnCode(rs.getString("ghn_code"));
-
-                    o.setShippingFee(rs.getDouble("shipping_fee"));
-
-                    o.setCreatedAt(rs.getTimestamp("CreatedAt"));
-
-                    o.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-
-                    o.setConfirmedAt(rs.getTimestamp("ConfirmedAt"));
-
-                    o.setShippingAt(rs.getTimestamp("ShippingAt"));
-
-                    o.setCompletedAt(rs.getTimestamp("CompletedAt"));
-
-                    o.setCancelledAt(rs.getTimestamp("CancelledAt"));
-
-                    o.setCancelReason(rs.getString("CancelReason"));
-
-                    return o;
+                    return mapOrder(rs);
                 }
 
             }
@@ -692,28 +680,7 @@ public class OrderDAO extends DBConnection {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-
-                Order o = new Order();
-
-                o.setId(rs.getInt("Id"));
-                o.setUserId(rs.getInt("UserId"));
-                o.setOrderCode(rs.getString("OrderCode"));
-                o.setTotalPrice(rs.getDouble("TotalPrice"));
-                o.setPaymentMethod(rs.getString("PaymentMethod"));
-                o.setStatus(rs.getString("Status"));
-                o.setReceiverName(rs.getString("ReceiverName"));
-                o.setReceiverPhone(rs.getString("ReceiverPhone"));
-                o.setAddress(rs.getString("Address"));
-                o.setNote(rs.getString("Note"));
-                o.setDistrictId(rs.getInt("district_id"));
-                o.setWardCode(rs.getString("ward_code"));
-                o.setDiscountAmount(rs.getDouble("DiscountAmount"));
-
-                o.setShippingFee(rs.getDouble("shipping_fee"));
-
-                o.setCreatedAt(rs.getTimestamp("CreatedAt"));
-
-                return o;
+                return mapOrder(rs);
             }
 
         } catch (Exception e) {
@@ -728,8 +695,10 @@ public class OrderDAO extends DBConnection {
         String sql =
                 "UPDATE orders " +
                         "SET Status = 'CANCELLED', " +
-                        "CancelledAt = NOW() " +
-                        "WHERE Id = ?";
+                        "CancelledAt = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE Id = ?"+
+                        "AND Status IN ('PENDING','CONFIRMED')";
 
         try (
                 Connection conn = getConnection();
@@ -760,5 +729,118 @@ public class OrderDAO extends DBConnection {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    //YÊU CẦU HOÀN TIỀN
+    public boolean requestRefund(int orderId, String reason) {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET refund_status = ?, " +
+                        "refund_reason = ?, " +
+                        "refund_requested_at = NOW(), " +
+                        "UpdatedAt = NOW() " +
+                        "WHERE Id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, RefundStatus.PENDING_REFUND.name());
+            ps.setString(2, reason);
+            ps.setInt(3, orderId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+//XÁC NHẬN HOÀN TIỀN
+    public boolean approveRefund(int id) {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET refund_status = 'REFUNDED', " +
+                        "refunded_at = NOW(), " +
+                        "updatedAt = NOW() " +
+                        "WHERE Id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    // HỦY YÊU CẦU HOÀN TIỀN
+    public boolean rejectRefund(int id) {
+
+        String sql =
+                "UPDATE orders " +
+                        "SET refund_status = 'REJECTED', " +
+                        "refund_rejected_at = NOW(), " +
+                        "updatedAt = NOW() " +
+                        "WHERE Id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+
+    public List<Order> getOrdersByRefundStatus(String refundStatus) {
+
+        List<Order> orders = new ArrayList<>();
+
+        String sql =
+                "SELECT o.*, u.full_name AS userFullName " +
+                        "FROM orders o " +
+                        "JOIN users u ON o.UserId = u.user_id " +
+                        "WHERE o.refund_status = ? " +
+                        "ORDER BY o.CreatedAt DESC";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, refundStatus);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Order order = mapOrder(rs);
+                orders.add(order);
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return orders;
     }
 }

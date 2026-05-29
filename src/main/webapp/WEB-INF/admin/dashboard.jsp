@@ -376,14 +376,15 @@
             </a>
 
             <c:set var="isOrderMenuOpen" value="${
-                param.status == 'pending' or
-                param.status == 'pickup' or
-                param.status == 'shipping' or
-                param.status == 'completed' or
-                param.status == 'cancelled' or
-                param.status == 'refund_request' or
-                param.status == 'refunded'
-            }" />
+    param.status == 'pending' or
+    param.status == 'pickup' or
+    param.status == 'shipping' or
+    param.status == 'completed' or
+    param.status == 'cancelled' or
+    param.status == 'refund_pending' or
+    param.status == 'refunded' or
+    param.status == 'refund_rejected'
+}" />
 
             <a class="menu-item d-flex justify-content-between align-items-center ${isOrderMenuOpen ? '' : 'collapsed'}"
                data-bs-toggle="collapse"
@@ -425,23 +426,37 @@
                    class="sub-menu-item ${param.status == 'cancelled' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
                     <i class="fas fa-times-circle me-2"></i>Đã hủy
                 </a>
-                <c:if test="${param.status == 'cancelled' or param.status == 'refund_request' or param.status == 'refunded'}">
-                    <div class="ps-4 border-start ms-4 border-2 mb-2 mt-1" style="border-color: rgba(255,255,255,0.3) !important;">
+                <div class="ps-4 border-start ms-4 border-2 mb-2 mt-1"
+                     style="border-color: rgba(255,255,255,0.3) !important;">
 
-                        <a href="${root}/admin/orders?status=refund_request"
-                           class="sub-menu-item ${param.status == 'refund_request' ? 'fw-bold bg-white text-danger shadow-sm' : ''} py-2 mb-1" style="padding-left: 15px !important;">
-                            <i class="fas fa-money-bill-wave text-warning" style="font-size: 0.9em;"></i>
-                            Yêu cầu hoàn tiền
-                        </a>
+                    <a href="${root}/admin/orders?status=refund_pending"
+                       class="sub-menu-item ${param.status == 'refund_pending' ? 'fw-bold bg-white text-danger shadow-sm' : ''} py-2">
 
-                        <a href="${root}/admin/orders?status=refunded"
-                           class="sub-menu-item ${param.status == 'refunded' ? 'fw-bold bg-white text-danger shadow-sm' : ''} py-2" style="padding-left: 15px !important;">
-                            <i class="fas fa-undo text-info" style="font-size: 0.9em;"></i>
-                            Đã hoàn tiền
-                        </a>
+                        <i class="fas fa-money-bill-wave text-warning"
+                           style="font-size: 0.9em;"></i>
 
-                    </div>
-                </c:if>
+                        Yêu cầu hoàn tiền
+                    </a>
+
+                    <a href="${root}/admin/orders?status=refunded"
+                       class="sub-menu-item ${param.status == 'refunded' ? 'fw-bold bg-white text-danger shadow-sm' : ''} py-2">
+
+                        <i class="fas fa-check-circle text-success"
+                           style="font-size: 0.9em;"></i>
+
+                        Đã hoàn tiền
+                    </a>
+
+                    <a href="${root}/admin/orders?status=refund_rejected"
+                       class="sub-menu-item ${param.status == 'refund_rejected' ? 'fw-bold bg-white text-danger shadow-sm' : ''} py-2">
+
+                        <i class="fas fa-times-circle text-danger"
+                           style="font-size: 0.9em;"></i>
+
+                        Từ chối hoàn tiền
+                    </a>
+
+                </div>
 
             </div>
             <a href="${root}/admin/products" class="menu-item">
