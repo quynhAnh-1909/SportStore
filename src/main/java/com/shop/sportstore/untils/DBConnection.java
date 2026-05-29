@@ -12,8 +12,7 @@ public class DBConnection {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             String url =
-                    "jdbc:mysql://mysql8:3306/sportstore?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&useUnicode=true&characterEncoding=UTF-8";
-
+            "jdbc:mysql://mysql8:3306/sportstore?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8";
             String user = "root";
             String password = "123456";
 

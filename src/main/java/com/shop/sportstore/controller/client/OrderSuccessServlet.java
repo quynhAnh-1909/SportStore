@@ -21,6 +21,7 @@ public class OrderSuccessServlet extends HttpServlet {
 
         try {
             String orderCode = request.getParameter("orderCode");
+            String vnpResponseCode = request.getParameter("vnp_ResponseCode");
 
             if (orderCode == null || orderCode.isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/");
@@ -29,17 +30,31 @@ public class OrderSuccessServlet extends HttpServlet {
 
             OrderDAO orderDAO = new OrderDAO();
             Order order = orderDAO.getOrderByCode(orderCode);
+
+            if (order == null) {
+                response.sendRedirect(request.getContextPath() + "/");
+                return;
+            }
+
             List<OrderItem> items = orderDAO.getOrderItems(orderCode);
 
             request.setAttribute("order", order);
             request.setAttribute("items", items);
+
+            if (vnpResponseCode != null) {
+                request.setAttribute("status", "00".equals(vnpResponseCode) ? "PAID" : "FAILED");
+            } else {
+                if ("COD".equalsIgnoreCase(order.getPaymentMethod())) {
+                    request.setAttribute("status", "COD");
+                }
+            }
 
             request.getRequestDispatcher("/WEB-INF/client/orderSuccess.jsp")
                     .forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.getWriter().println("Lỗi xử lý trang order success");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi xử lý hóa đơn");
         }
     }
 }

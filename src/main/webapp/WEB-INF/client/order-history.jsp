@@ -13,7 +13,6 @@
 
     <style>
         body { background-color: #f8f9fa; }
-
         .text-danger-custom { color: #d81f19 !important; }
         .btn-danger-custom {
             background-color: #d81f19 !important;
@@ -30,14 +29,12 @@
         }
         .bg-danger-subtle-custom { background-color: #fce8e6 !important; }
         .border-danger-custom { border-color: #f5c2c0 !important; }
-
         .bg-warning-subtle { background-color: #fff3cd !important; }
         .bg-primary-subtle { background-color: #cfe2ff !important; }
         .bg-info-subtle { background-color: #cff4fc !important; }
     </style>
 </head>
 <body>
-
 
 <div class="container my-5 py-4">
 
@@ -87,11 +84,13 @@
                     <th class="text-center">Thanh toán</th>
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
-                    <th>Hủy đơn</th>
+                    <th>Hành động</th>
                 </tr>
                 </thead>
                 <tbody>
                 <c:forEach var="item" items="${orders}">
+                    <c:set var="statusLower" value="${not empty item.status ? fn:toLowerCase(item.status) : 'pending'}" />
+
                     <tr>
                         <td class="fw-bold">#<c:out value="${item.orderCode}" default="0000" /></td>
                         <td class="small text-muted">
@@ -118,7 +117,7 @@
                                 <c:choose>
                                     <c:when test="${item.paid}">
                                         <span class="badge rounded-pill bg-danger-subtle-custom text-danger-custom border border-danger-custom px-2">
-                                            <i class="fas fa-check-circle me-1"></i>Đã xong
+                                            <i class="fas fa-check-circle me-1"></i>Đã thanh toán
                                         </span>
                                     </c:when>
                                     <c:when test="${item.paymentMethod eq 'VNPAY'}">
@@ -137,37 +136,31 @@
                         </td>
 
                         <td>
-                            <c:catch var="errStatus">
-                                <c:set var="statusLower" value="${not empty item.status ? fn:toLowerCase(item.status) : 'pending'}" />
-                                <c:choose>
-                                    <c:when test="${statusLower eq 'pending' or statusLower eq '0' or statusLower eq 'chờ xác nhận'}">
-                                        <span class="badge bg-primary-subtle text-primary px-2 py-1">
-                                            <i class="fas fa-sync-alt fa-spin me-1"></i>Chờ xác nhận
-                                        </span>
-                                    </c:when>
-                                    <c:when test="${statusLower eq 'shipping' or statusLower eq '1' or statusLower eq 'đang giao'}">
-                                        <span class="badge bg-info-subtle text-info px-2 py-1">
-                                            <i class="fas fa-truck me-1"></i>Đang giao
-                                        </span>
-                                    </c:when>
-                                    <c:when test="${statusLower eq 'delivered' or statusLower eq '2' or statusLower eq 'hoàn tất' or statusLower eq 'đã giao'}">
-                                        <span class="badge bg-danger text-white px-2 py-1">
-                                            <i class="fas fa-check me-1"></i>Hoàn tất
-                                        </span>
-                                    </c:when>
-                                    <c:when test="${statusLower eq 'cancelled' or statusLower eq '3' or statusLower eq 'cancel' or statusLower eq 'đã hủy'}">
-                                        <span class="badge bg-light text-secondary border px-2 py-1 text-decoration-line-through">
-                                            <i class="fas fa-ban me-1"></i>Đã hủy
-                                        </span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="badge bg-secondary px-2 py-1"><c:out value="${item.status}" /></span>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:catch>
-                            <c:if test="${not empty errStatus}">
-                                <span class="badge bg-secondary px-2 py-1">Chờ xác nhận</span>
-                            </c:if>
+                            <c:choose>
+                                <c:when test="${statusLower eq 'pending' or statusLower eq '0' or statusLower eq 'chờ xác nhận'}">
+                                    <span class="badge bg-primary-subtle text-primary px-2 py-1">
+                                        <i class="fas fa-sync-alt fa-spin me-1"></i>Chờ xác nhận
+                                    </span>
+                                </c:when>
+                                <c:when test="${statusLower eq 'shipping' or statusLower eq '1' or statusLower eq 'đang giao'}">
+                                    <span class="badge bg-info-subtle text-info px-2 py-1">
+                                        <i class="fas fa-truck me-1"></i>Đang giao
+                                    </span>
+                                </c:when>
+                                <c:when test="${statusLower eq 'delivered' or statusLower eq 'completed' or statusLower eq '2' or statusLower eq 'hoàn tất' or statusLower eq 'đã giao'}">
+                                    <span class="badge bg-danger text-white px-2 py-1">
+                                        <i class="fas fa-check me-1"></i>Hoàn tất
+                                    </span>
+                                </c:when>
+                                <c:when test="${statusLower eq 'cancelled' or statusLower eq '3' or statusLower eq 'cancel' or statusLower eq 'đã hủy'}">
+                                    <span class="badge bg-light text-secondary border px-2 py-1 text-decoration-line-through">
+                                        <i class="fas fa-ban me-1"></i>Đã hủy
+                                    </span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge bg-secondary px-2 py-1"><c:out value="${item.status}" /></span>
+                                </c:otherwise>
+                            </c:choose>
                         </td>
 
                         <td>
@@ -175,32 +168,54 @@
                                class="btn btn-sm btn-info text-white shadow-sm" title="Xem chi tiết">
                                 <i class="fas fa-eye"></i>
                             </a>
-
                             <c:if test="${not empty item.ghnCode}">
                                 <a href="https://donhang.ghn.vn/?order_code=${item.ghnCode}"
                                    target="_blank"
-                                   class="btn btn-sm btn-warning text-dark shadow-sm ms-1" title="Theo dõi hành trình thực tế trên GHN">
-                                    <i class="fas fa-truck"></i> </a>
+                                   class="btn btn-sm btn-warning text-dark shadow-sm ms-1" title="Theo dõi hành trình trên GHN">
+                                    <i class="fas fa-truck"></i>
+                                </a>
                             </c:if>
                         </td>
 
-
                         <td>
-                            <jsp:useBean id="now" class="java.util.Date" />
+                            <jsp:useBean id="now" class="java.util.Date"/>
                             <c:set var="timeDiff" value="${now.time - item.createdAt.time}" />
-                            <c:set var="isUnder24h" value="${timeDiff < (24 * 60 * 60 * 1000)}" />
+                            <c:set var="isUnder30Mins" value="${timeDiff < (30 * 60 * 1000)}" />
 
                             <c:choose>
-                                <c:when test="${isUnder24h && (statusLower eq 'pending' or statusLower eq '0' or statusLower eq 'chờ xác nhận')}">
-                                    <button type="button" class="btn btn-sm btn-danger shadow-sm fw-bold px-2 py-1"
-                                            onclick="openCancelModal('${item.orderCode}')" title="Yêu cầu hủy đơn">
-                                        <i class="fas fa-times me-1"></i> Hủy
+                                <%-- KIỂM TRA 1: Nếu đơn dưới 30 phút và ở trạng thái chờ xác nhận -> Cho phép hủy đơn bình thường --%>
+                                <c:when test="${isUnder30Mins && (statusLower eq 'pending' or statusLower eq 'confirmed' or statusLower eq '0' or statusLower eq 'chờ xác nhận')}">
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="openCancelModal('${item.orderCode}')">
+                                        <i class="fas fa-times"></i> Hủy đơn
                                     </button>
                                 </c:when>
+
+                                <%-- KIỂM TRA 2: LOGIC MỚI - Nếu đơn hàng ở trạng thái ĐÃ HỦY nhưng phương thức thanh toán là VNPAY và ĐÃ THANH TOÁN THÀNH CÔNG --%>
+                                <c:when test="${(statusLower eq 'cancelled' or statusLower eq '3' or statusLower eq 'đã hủy') && item.paymentMethod eq 'VNPAY' && item.paid}">
+                                    <c:choose>
+                                        <%-- Nếu chưa làm đơn gửi yêu cầu hoàn tiền --%>
+                                        <c:when test="${empty item.refundStatus}">
+                                            <button type="button" class="btn btn-sm btn-warning" onclick="openRefundModal('${item.id}')">
+                                                <i class="fas fa-rotate-left"></i> Hoàn tiền
+                                            </button>
+                                        </c:when>
+                                        <%-- Các trạng thái xử lý sau khi nộp đơn hoàn tiền --%>
+                                        <c:when test="${item.refundStatus eq 'PENDING_REFUND'}">
+                                            <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Chờ duyệt</span>
+                                        </c:when>
+                                        <c:when test="${item.refundStatus eq 'REFUNDED'}">
+                                            <span class="badge bg-success"><i class="fas fa-check"></i> Đã hoàn tiền</span>
+                                        </c:when>
+                                        <c:when test="${item.refundStatus eq 'REJECTED'}">
+                                            <span class="badge bg-danger"><i class="fas fa-times"></i> Từ chối</span>
+                                        </c:when>
+                                    </c:choose>
+                                </c:when>
+
+                                <%-- KIỂM TRA 3: Mọi trường hợp COD hủy hoặc đơn hàng thanh toán VNPAY chưa thanh toán sẽ bị Khóa hành động --%>
                                 <c:otherwise>
-                                    <button type="button" class="btn btn-sm btn-light border text-muted px-2 py-1" disabled
-                                            title="Không thể hủy (Quá 24h hoặc đơn hàng đã xử lý)">
-                                        <i class="fas fa-ban me-1"></i> Khóa
+                                    <button type="button" class="btn btn-sm btn-light border text-muted" disabled>
+                                        <i class="fas fa-ban"></i> Khóa
                                     </button>
                                 </c:otherwise>
                             </c:choose>
@@ -211,6 +226,28 @@
             </table>
         </div>
     </c:if>
+</div>
+
+<div class="modal fade" id="refundModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="${pageContext.request.contextPath}/request-refund" method="post">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Yêu cầu hoàn tiền qua cổng VNPAY</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="refundOrderId" name="orderId">
+                    <label class="form-label fw-bold">Lý do hoàn tiền</label>
+                    <textarea class="form-control" name="reason" rows="4" placeholder="Vui lòng nhập số tài khoản hoặc lý do hoàn trả cụ thể..." required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-warning fw-bold">Gửi yêu cầu</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
@@ -227,7 +264,6 @@
                     <p class="fs-6 text-secondary mb-3">
                         Bạn đang thực hiện hủy đơn hàng: <span id="displayOrderCode" class="text-danger fw-bold"></span>
                     </p>
-
                     <input type="hidden" name="orderCode" id="cancelOrderCode">
 
                     <div class="mb-3">
@@ -261,7 +297,6 @@
     function openCancelModal(orderCode) {
         document.getElementById('cancelOrderCode').value = orderCode;
         document.getElementById('displayOrderCode').innerText = '#' + orderCode;
-
         document.getElementById('cancelReason').value = "";
         document.getElementById('otherReason').value = "";
         document.getElementById('otherReasonFieldWrapper').classList.add('d-none');
@@ -284,6 +319,12 @@
             wrapper.classList.add('d-none');
             textarea.removeAttribute('required');
         }
+    }
+
+    function openRefundModal(orderId) {
+        document.getElementById('refundOrderId').value = orderId;
+        var refundModal = new bootstrap.Modal(document.getElementById('refundModal'));
+        refundModal.show();
     }
 </script>
 
