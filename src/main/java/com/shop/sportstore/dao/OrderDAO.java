@@ -14,7 +14,43 @@ import java.util.Map;
 import static com.shop.sportstore.untils.DBConnection.getConnection;
 
 public class OrderDAO extends DBConnection {
+    public int countOrdersByStatus(String status) {
+        int count = 0;
+        String sql = "SELECT COUNT(*) FROM orders WHERE Status = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            ps.setString(1, status.trim().toUpperCase());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+    public double calculateMonthlyRevenue(int month, int year) {
+        double total = 0;
+        String sql = "SELECT SUM(TotalPrice) FROM orders WHERE Status = 'COMPLETED' AND MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, month);
+            ps.setInt(2, year);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getDouble(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return total;
+    }
     private Order mapOrder(ResultSet rs) throws SQLException {
         Order o = new Order();
         o.setId(rs.getInt("Id"));
