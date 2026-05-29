@@ -61,12 +61,19 @@ public class OrderDAO extends DBConnection {
     }
 
     public void updateOrderStatus(String orderCode, String status) throws SQLException {
+        if (orderCode == null || status == null) {
+            throw new IllegalArgumentException("Mã đơn hàng hoặc trạng thái không được để trống!");
+        }
+
         String sql = "UPDATE orders SET Status = ?, UpdatedAt = ? WHERE OrderCode = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, status);
+
+            ps.setString(1, status.trim().toUpperCase());
             ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-            ps.setString(3, orderCode);
+            ps.setString(3, orderCode.trim());
+
             ps.executeUpdate();
         }
     }

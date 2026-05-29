@@ -53,61 +53,33 @@
                             <td><span class="badge bg-light text-dark border">${order.paymentMethod}</span></td>
                             <td>
                                 <c:choose>
-
                                     <c:when test="${order.status eq 'PENDING'}">
-            <span class="badge bg-warning text-dark">
-                Chờ xử lý
-            </span>
+                                        <span class="badge bg-warning text-dark">Chờ xử lý</span>
                                     </c:when>
-
                                     <c:when test="${order.status eq 'CONFIRMED'}">
-            <span class="badge bg-info text-white">
-                Chờ lấy hàng
-            </span>
+                                        <span class="badge bg-info text-white">Chờ lấy hàng</span>
                                     </c:when>
-
                                     <c:when test="${order.status eq 'SHIPPING'}">
-            <span class="badge bg-primary text-white">
-                Đang giao
-            </span>
+                                        <span class="badge bg-primary text-white">Đang giao</span>
                                     </c:when>
-
                                     <c:when test="${order.status eq 'COMPLETED'}">
-            <span class="badge bg-success text-white">
-                Hoàn tất
-            </span>
+                                        <span class="badge bg-success text-white">Hoàn tất</span>
                                     </c:when>
-
                                     <c:when test="${order.status eq 'CANCELLED'}">
-            <span class="badge bg-danger text-white">
-                Đã hủy
-            </span>
+                                        <span class="badge bg-danger text-white">Đã hủy</span>
                                     </c:when>
-
-                                    <c:when test="${order.status eq 'REFUND_PENDING'}">
-    <span class="badge bg-warning text-dark">
-        Chờ hoàn tiền
-    </span>
+                                    <c:when test="${order.status eq 'PENDING_REFUND' || order.status eq 'REFUND_PENDING'}">
+                                        <span class="badge bg-warning text-dark">Chờ hoàn tiền</span>
                                     </c:when>
-
                                     <c:when test="${order.status eq 'REFUNDED'}">
-    <span class="badge bg-success text-white">
-        Đã hoàn tiền
-    </span>
+                                        <span class="badge bg-success text-white">Đã hoàn tiền</span>
                                     </c:when>
-
                                     <c:when test="${order.status eq 'REFUND_REJECTED'}">
-    <span class="badge bg-danger text-white">
-        Từ chối hoàn
-    </span>
+                                        <span class="badge bg-danger text-white">Từ chối hoàn</span>
                                     </c:when>
-
                                     <c:otherwise>
-            <span class="badge bg-dark text-white">
-                    ${order.status}
-            </span>
+                                        <span class="badge bg-secondary text-white">${order.status}</span>
                                     </c:otherwise>
-
                                 </c:choose>
                             </td>
                             <td class="text-truncate" style="max-width:150px;" title="${order.note}">
@@ -117,7 +89,6 @@
                                 <div class="d-flex flex-column gap-1">
                                     <div class="d-flex justify-content-center gap-2 flex-wrap">
 
-                                            <%-- 1. TRẠNG THÁI CHỜ XỬ LÝ --%>
                                         <c:if test="${order.status eq 'PENDING'}">
                                             <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
                                                   data-success-msg="Xác nhận đơn hàng! Đã chuyển sang danh mục Chờ lấy hàng." data-success-color="#198754">
@@ -134,7 +105,6 @@
                                             </form>
                                         </c:if>
 
-                                            <%-- 2. TRẠNG THÁI CHỜ LẤY HÀNG  --%>
                                         <c:if test="${order.status eq 'CONFIRMED'}">
                                             <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
                                                   data-success-msg="Đã đẩy thông tin sang GHN! Đơn hàng chuyển sang danh mục Đang giao." data-success-color="#0d6efd">
@@ -146,7 +116,6 @@
                                             </form>
                                         </c:if>
 
-                                            <%-- 3. TRẠNG THÁI ĐANG GIAO HÀNG --%>
                                         <c:if test="${order.status eq 'SHIPPING'}">
                                             <button type="button" class="btn btn-sm btn-warning text-dark fw-bold btn-tracking" data-ghncode="${order.ghnCode}">
                                                 <i class="fas fa-route me-1"></i> Lịch trình
@@ -159,48 +128,27 @@
                                                 <button type="submit" class="btn btn-sm btn-success">Hoàn thành</button>
                                             </form>
                                         </c:if>
-                                                    <%--3. ĐƠN CHỜ DUYỆT HOÀN TIỀN --%>
-                                                <c:if test="${order.status eq 'REFUND_PENDING'}">
 
-                                                    <form action="${pageContext.request.contextPath}/admin/orders"
-                                                          method="post"
-                                                          class="d-inline ajax-form"
-                                                          data-success-msg="Đã xác nhận hoàn tiền cho khách!"
-                                                          data-success-color="#198754">
+                                        <c:if test="${order.status eq 'PENDING_REFUND' || order.status eq 'REFUND_PENDING'}">
+                                            <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
+                                                  data-success-msg="Đã phê duyệt và thực hiện hoàn tiền!" data-success-color="#198754">
+                                                <input type="hidden" name="action" value="approveRefund">
+                                                <input type="hidden" name="id" value="${order.id}">
+                                                <button type="submit" class="btn btn-sm btn-success">Hoàn tiền</button>
+                                            </form>
 
-                                                        <input type="hidden" name="action" value="approve_refund">
-                                                        <input type="hidden" name="id" value="${order.id}">
-
-                                                        <button type="submit"
-                                                                class="btn btn-sm btn-success">
-                                                            <i class="fas fa-check me-1"></i>
-                                                            Hoàn tiền
-                                                        </button>
-                                                    </form>
-
-                                                    <form action="${pageContext.request.contextPath}/admin/orders"
-                                                          method="post"
-                                                          class="d-inline ajax-form"
-                                                          data-success-msg="Đã từ chối yêu cầu hoàn tiền!"
-                                                          data-success-color="#dc3545">
-
-                                                        <input type="hidden" name="action" value="reject_refund">
-                                                        <input type="hidden" name="id" value="${order.id}">
-
-                                                        <button type="submit"
-                                                                class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-times me-1"></i>
-                                                            Từ chối
-                                                        </button>
-                                                    </form>
-
-                                                </c:if>
+                                            <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
+                                                  data-success-msg="Đã từ chối yêu cầu hoàn tiền!" data-success-color="#dc3545">
+                                                <input type="hidden" name="action" value="rejectRefund">
+                                                <input type="hidden" name="id" value="${order.id}">
+                                                <button type="submit" class="btn btn-sm btn-danger">Từ chối</button>
+                                            </form>
+                                        </c:if>
 
                                     </div>
 
                                     <div>
-                                        <a href="${pageContext.request.contextPath}/admin/orders/details?orderCode=${order.orderCode}"
-                                           class="btn btn-sm btn-outline-info w-100">
+                                        <a href="${pageContext.request.contextPath}/admin/orders/details?orderCode=${order.orderCode}" class="btn btn-sm btn-outline-info w-100">
                                             <i class="fas fa-eye"></i> Chi tiết đơn
                                         </a>
                                     </div>
@@ -237,95 +185,32 @@
 </div>
 
 <style>
-    .compact-table{
-        table-layout: fixed;
-        font-size: 13px;
-    }
-    .compact-table th,
-    .compact-table td{
-        padding: 12px 8px !important;
-        vertical-align: middle;
-        word-wrap: break-word;
-    }
-    .compact-table .btn{
-        font-size: 12px;
-        padding: 5px 10px;
-    }
-    .compact-table .badge{
-        font-size: 11px;
-        padding: 6px 10px;
-    }
-
-    .timeline-list {
-        list-style-type: none;
-        position: relative;
-        padding-left: 30px;
-        margin: 0;
-    }
-    .timeline-list:before {
-        content: ' ';
-        background: #ced4da;
-        display: inline-block;
-        position: absolute;
-        left: 11px;
-        width: 2px;
-        height: 100%;
-        z-index: 400;
-    }
-    .timeline-item {
-        margin: 20px 0;
-        position: relative;
-    }
-
-    .timeline-marker {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: #6c757d;
-        position: absolute;
-        left: -24px;
-        top: 5px;
-        z-index: 400;
-        border: 2px solid #fff;
-    }
-    .timeline-item:first-child .timeline-marker {
-        background: #198754;
-        box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.3);
-    }
-    .timeline-date {
-        font-size: 11px;
-        color: #6c757d;
-        font-weight: bold;
-    }
-    .timeline-content {
-        font-size: 13px;
-        color: #212529;
-        margin-top: 2px;
-    }
+    .compact-table{ table-layout: fixed; font-size: 13px; }
+    .compact-table th, .compact-table td{ padding: 12px 8px !important; vertical-align: middle; word-wrap: break-word; }
+    .compact-table .btn{ font-size: 12px; padding: 5px 10px; }
+    .compact-table .badge{ font-size: 11px; padding: 6px 10px; }
+    .timeline-list { list-style-type: none; position: relative; padding-left: 30px; margin: 0; }
+    .timeline-list:before { content: ' '; background: #ced4da; display: inline-block; position: absolute; left: 11px; width: 2px; height: 100%; z-index: 400; }
+    .timeline-item { margin: 20px 0; position: relative; }
+    .timeline-marker { width: 12px; height: 12px; border-radius: 50%; background: #6c757d; position: absolute; left: -24px; top: 5px; z-index: 400; border: 2px solid #fff; }
+    .timeline-item:first-child .timeline-marker { background: #198754; box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.3); }
+    .timeline-date { font-size: 11px; color: #6c757d; font-weight: bold; }
+    .timeline-content { font-size: 13px; color: #212529; margin-top: 2px; }
 </style>
 
 <div id="toast" style="position: fixed; top: 20px; right: 20px; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-weight: bold;"></div>
 
-
 <script>
-
     function showToast(message, color) {
-
         const toast = document.getElementById("toast");
-
         toast.innerText = message;
         toast.style.background = color;
         toast.style.display = "block";
-
-        setTimeout(() => {
-            toast.style.display = "none";
-        }, 3500);
+        setTimeout(() => { toast.style.display = "none"; }, 3500);
     }
 
     function translateGhnStatus(status) {
-
         const mapping = {
-
             'ready_to_pick': 'Mới tạo đơn - Chờ lấy hàng',
             'picking': 'Bưu tá đang đi lấy hàng',
             'cancel': 'Đơn hàng đã hủy',
@@ -343,388 +228,124 @@
             'damage': 'Hàng hóa bị hư hỏng',
             'lost': 'Hàng hóa bị thất lạc'
         };
-
         return mapping[status] || status;
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-
-        /*
-        =========================================
-            AJAX FORM ACTION
-        =========================================
-        */
-
+    document.addEventListener("DOMContentLoaded", function() {
         const ajaxForms = document.querySelectorAll('.ajax-form');
-
         ajaxForms.forEach(form => {
-
-            form.addEventListener('submit', function (event) {
-
+            form.addEventListener('submit', function(event) {
                 event.preventDefault();
 
                 const formData = new FormData(this);
-
                 const actionUrl = this.getAttribute('action');
-
-                const successMsg =
-                        this.getAttribute('data-success-msg')
-                        || 'Thao tác thành công!';
-
-                const successColor =
-                        this.getAttribute('data-success-color')
-                        || '#198754';
-
-                const submitBtn =
-                        this.querySelector('button[type="submit"]');
-
-                const originalBtnText =
-                        submitBtn.innerHTML;
-
-                const rowElement =
-                        this.closest('tr');
-
-                /*
-                =========================================
-                    LOADING BUTTON
-                =========================================
-                */
+                const successMsg = this.getAttribute('data-success-msg') || 'Thao tác thành công!';
+                const successColor = this.getAttribute('data-success-color') || '#198754';
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
 
                 submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
-                submitBtn.innerHTML = `
-                    <span class="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true">
-                    </span>
-                `;
-
-                /*
-                =========================================
-                    FETCH API
-                =========================================
-                */
+                const rowElement = this.closest('tr');
 
                 fetch(actionUrl, {
                     method: 'POST',
                     body: new URLSearchParams(formData)
                 })
-
                         .then(response => {
-
-                            if (!response.ok) {
-                                throw new Error("HTTP ERROR");
-                            }
-
-                            return response.json();
-                        })
-
-                        .then(data => {
-
-                            /*
-                            =========================================
-                                SUCCESS
-                            =========================================
-                            */
-
-                            if (data.success) {
-
-                                showToast(
-                                        data.message || successMsg,
-                                        successColor
-                                );
-
+                            if (response.ok) {
+                                showToast(successMsg, successColor);
                                 if (rowElement) {
-
-                                    rowElement.style.transition =
-                                            "opacity 0.4s ease";
-
+                                    rowElement.style.transition = "opacity 0.4s ease";
                                     rowElement.style.opacity = "0";
-
                                     setTimeout(() => {
-
                                         rowElement.remove();
-
-                                        const tbody =
-                                                document.querySelector('table tbody');
-
-                                        if (
-                                                tbody &&
-                                                tbody.children.length === 0
-                                        ) {
-
-                                            tbody.innerHTML = `
-                                        <tr>
-                                            <td colspan="9"
-                                                class="text-center text-muted py-4">
-                                                Đã xử lý hết đơn hàng trong mục này.
-                                            </td>
-                                        </tr>
-                                    `;
+                                        const tbody = document.querySelector('table tbody');
+                                        if (tbody && tbody.children.length === 0) {
+                                            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Đã xử lý hết đơn hàng trong mục này.</td></tr>';
                                         }
-
                                     }, 400);
                                 }
-
-                            }
-
-                            /*
-                            =========================================
-                                FAILED
-                            =========================================
-                            */
-
-                            else {
-
-                                showToast(
-                                        data.message || 'Thao tác thất bại!',
-                                        '#dc3545'
-                                );
-
-                                submitBtn.disabled = false;
-
-                                submitBtn.innerHTML =
-                                        originalBtnText;
+                            } else {
+                                throw new Error('Yêu cầu xử lý thất bại.');
                             }
                         })
-
                         .catch(error => {
-
-                            console.error("AJAX ERROR:", error);
-
-                            showToast(
-                                    'Có lỗi xảy ra trong quá trình kết nối dữ liệu!',
-                                    '#dc3545'
-                            );
-
+                            console.error('Error:', error);
+                            showToast('Có lỗi xảy ra trong quá trình kết nối dữ liệu!', '#dc3545');
                             submitBtn.disabled = false;
-
-                            submitBtn.innerHTML =
-                                    originalBtnText;
+                            submitBtn.innerHTML = originalBtnText;
                         });
-
             });
-
         });
 
-        /*
-        =========================================
-            TRACKING MODAL
-        =========================================
-        */
-
-        const trackingModalElement =
-                document.getElementById('trackingModal');
-
+        const trackingModalElement = document.getElementById('trackingModal');
         if (trackingModalElement) {
+            const trackingModal = new bootstrap.Modal(trackingModalElement);
+            const timelineContainer = document.getElementById('trackingTimeline');
+            const modalGhnCode = document.getElementById('modalGhnCode');
 
-            const trackingModal =
-                    new bootstrap.Modal(trackingModalElement);
-
-            const timelineContainer =
-                    document.getElementById('trackingTimeline');
-
-            const modalGhnCode =
-                    document.getElementById('modalGhnCode');
-
-            const trackingButtons =
-                    document.querySelectorAll('.btn-tracking');
-
-            trackingButtons.forEach(btn => {
-
-                btn.addEventListener('click', function () {
-
-                    const ghnCode =
-                            this.getAttribute('data-ghncode');
-
-                    /*
-                    =========================================
-                        CHECK EMPTY GHN CODE
-                    =========================================
-                    */
-
-                    if (
-                            !ghnCode ||
-                            ghnCode === "null" ||
-                            ghnCode.trim() === ""
-                    ) {
-
-                        showToast(
-                                'Đơn hàng chưa được kích hoạt mã vận đơn vận chuyển!',
-                                '#dc3545'
-                        );
-
+            document.querySelectorAll('.btn-tracking').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const ghnCode = this.getAttribute('data-ghncode');
+                    if(!ghnCode || ghnCode === "null" || ghnCode.trim() === "") {
+                        showToast('Đơn hàng chưa được kích hoạt mã vận đơn vận chuyển!', '#dc3545');
                         return;
                     }
 
-                    /*
-                    =========================================
-                        OPEN MODAL
-                    =========================================
-                    */
-
                     modalGhnCode.innerText = ghnCode;
-
-                    timelineContainer.innerHTML = `
-                        <div class="text-center py-4">
-                            <span class="spinner-border spinner-border-sm text-secondary"></span>
-                            Đang tải hành trình từ hệ thống GHN...
-                        </div>
-                    `;
-
+                    timelineContainer.innerHTML = '<div class="text-center py-4"><span class="spinner-border spinner-border-sm text-secondary"></span> Đang tải hành trình từ hệ thống GHN...</div>';
                     trackingModal.show();
 
-                    /*
-                    =========================================
-                        SEND REQUEST
-                    =========================================
-                    */
-
-                    const formData =
-                            new URLSearchParams();
-
+                    const formData = new URLSearchParams();
                     formData.append('action', 'tracking');
-
                     formData.append('ghnCode', ghnCode);
 
-                    fetch(
-                            '${pageContext.request.contextPath}/admin/orders',
-                            {
-                                method: 'POST',
-
-                                headers: {
-                                    'Content-Type':
-                                            'application/x-www-form-urlencoded'
-                                },
-
-                                body: formData
-                            }
-                    )
-
+                    fetch('${pageContext.request.contextPath}/admin/orders', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    })
                             .then(response => {
-
-                                if (!response.ok) {
-                                    throw new Error("Lỗi kết nối API");
-                                }
-
+                                if(!response.ok) throw new Error("Lỗi kết nối API");
                                 return response.json();
                             })
-
                             .then(res => {
-
-                                /*
-                                =========================================
-                                    HAS TRACKING DATA
-                                =========================================
-                                */
-
-                                if (
-                                        res &&
-                                        res.code === 200 &&
-                                        res.data &&
-                                        res.data.log &&
-                                        res.data.log.length > 0
-                                ) {
-
+                                if(res && res.code === 200 && res.data && res.data.log && res.data.log.length > 0) {
                                     let htmlContent = "";
-
                                     res.data.log.forEach(item => {
-
                                         let formattedTime = "---";
-
-                                        if (item.updated_date) {
-
-                                            const d =
-                                                    new Date(item.updated_date);
-
-                                            formattedTime =
-                                                    d.toLocaleDateString('vi-VN')
-                                                    + " "
-                                                    + d.toLocaleTimeString(
-                                                            'vi-VN',
-                                                            {
-                                                                hour: '2-digit',
-                                                                minute: '2-digit'
-                                                            }
-                                                    );
+                                        if(item.updated_date) {
+                                            const d = new Date(item.updated_date);
+                                            formattedTime = d.toLocaleDateString('vi-VN') + " " + d.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
                                         }
-
-                                        const statusVietnamese =
-                                                translateGhnStatus(item.status);
-
+                                        const statusVietnamese = translateGhnStatus(item.status);
                                         htmlContent += `
                                     <li class="timeline-item">
-
                                         <div class="timeline-marker"></div>
-
-                                        <div class="timeline-date">
-                                            ${formattedTime}
-                                        </div>
-
-                                        <div class="timeline-content fw-semibold">
-                                            ${statusVietnamese}
-                                        </div>
-
+                                        <div class="timeline-date">${formattedTime}</div>
+                                        <div class="timeline-content fw-semibold">${statusVietnamese}</div>
                                     </li>
                                 `;
                                     });
-
-                                    timelineContainer.innerHTML =
-                                            htmlContent;
-                                }
-
-                                /*
-                                =========================================
-                                    NO TRACKING DATA
-                                =========================================
-                                */
-
-                                else {
-
+                                    timelineContainer.innerHTML = htmlContent;
+                                } else {
                                     timelineContainer.innerHTML = `
                                 <li class="timeline-item">
-
                                     <div class="timeline-marker bg-success"></div>
-
-                                    <div class="timeline-date">
-                                        Hệ thống
-                                    </div>
-
-                                    <div class="timeline-content fw-semibold text-success">
-                                        Đã xác nhận tạo đơn hàng thành công trên hệ thống GHN.
-                                        Đang chờ bưu tá đến lấy hàng.
-                                    </div>
-
+                                    <div class="timeline-date">Hệ thống</div>
+                                    <div class="timeline-content fw-semibold text-success">Đã xác nhận tạo đơn hàng thành công trên hệ thống GHN. Đang chờ bưu tá đến lấy hàng.</div>
                                 </li>
                             `;
                                 }
                             })
-
                             .catch(error => {
-
-                                console.error(
-                                        "Tracking Error:",
-                                        error
-                                );
-
-                                timelineContainer.innerHTML = `
-                            <li class="text-center text-danger py-3">
-
-                                <i class="fas fa-exclamation-triangle me-1"></i>
-
-                                Không thể tải hành trình vận chuyển lúc này.
-                                Vui lòng thử lại!
-
-                            </li>
-                        `;
+                                console.error("Tracking Error:", error);
+                                timelineContainer.innerHTML = '<li class="text-center text-danger py-3"><i class="fas fa-exclamation-triangle me-1"></i> Không thể tải hành trình vận chuyển lúc này. Vui lòng thử lại!</li>';
                             });
-
                 });
-
             });
-
         }
-
     });
-
 </script>

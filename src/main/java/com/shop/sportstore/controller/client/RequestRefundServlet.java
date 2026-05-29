@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 @WebServlet("/request-refund")
 public class RequestRefundServlet extends HttpServlet {
@@ -28,6 +29,7 @@ public class RequestRefundServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+
         int orderId;
         try {
             orderId = Integer.parseInt(request.getParameter("orderId"));
@@ -48,7 +50,6 @@ public class RequestRefundServlet extends HttpServlet {
         OrderDAO orderDAO = new OrderDAO();
         int userId = loginUser.getUserId();
 
-        // LẤY THÔNG TIN ĐƠN HÀNG ĐỂ KIỂM TRA CHÉO (BẢO MẬT)
         Order order = orderDAO.getOrderById(orderId);
 
         if (order == null) {
@@ -57,14 +58,12 @@ public class RequestRefundServlet extends HttpServlet {
             return;
         }
 
-        // CHỐNG LỖI IDOR: Kiểm tra đơn hàng có đúng của User đang đăng nhập không
         if (order.getUserId() != userId) {
             session.setAttribute("errorMsg", "Bạn không có quyền yêu cầu hoàn tiền cho đơn hàng này!");
             response.sendRedirect(request.getContextPath() + "/order-history");
             return;
         }
 
-        // KIỂM TRA TRẠNG THÁI ĐƠN HÀNG (Chỉ cho phép hoàn tiền khi đã giao thành công)
         String status = order.getStatus() != null ? order.getStatus().trim().toUpperCase() : "";
         boolean isDelivered = status.equals("DELIVERED")
                 || status.equals("COMPLETED")
@@ -78,20 +77,24 @@ public class RequestRefundServlet extends HttpServlet {
             return;
         }
 
-        //  KIỂM TRA TRÙNG LẶP YÊU CẦU HOÀN TIỀN
-        if (order.getRefundStatus() != null && !order.getRefundStatus().isEmpty()) {
+        if ("PENDING_REFUND".equals(status) || "REFUNDED".equals(status) || "REFUND_REJECTED".equals(status)) {
             session.setAttribute("errorMsg", "Đơn hàng này đã gửi yêu cầu hoặc đã được xử lý hoàn tiền trước đó!");
             response.sendRedirect(request.getContextPath() + "/order-history");
             return;
         }
 
-        // THỰC HIỆN CẬP NHẬT TRẠNG THÁI HOÀN TIỀN
-        boolean success = orderDAO.requestRefund(orderId, reason);
+        try {
+            boolean success = orderDAO.requestRefund(orderId, reason);
 
-        if (success) {
-            session.setAttribute("successMsg", "Đã gửi yêu cầu hoàn tiền thành công! Vui lòng chờ Admin duyệt.");
-        } else {
-            session.setAttribute("errorMsg", "Hệ thống gặp sự cố. Không thể gửi yêu cầu hoàn tiền!");
+            if (success) {
+                orderDAO.updateOrderStatus(order.getOrderCode(), "PENDING_REFUND");
+                session.setAttribute("successMsg", "Đã gửi yêu cầu hoàn tiền thành công! Vui lòng chờ Admin duyệt.");
+            } else {
+                session.setAttribute("errorMsg", "Hệ thống gặp sự cố. Không thể gửi yêu cầu hoàn tiền!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            session.setAttribute("errorMsg", "Lỗi kết nối cơ sở dữ liệu khi cập nhật trạng thái đơn hàng!");
         }
 
         response.sendRedirect(request.getContextPath() + "/order-history");
