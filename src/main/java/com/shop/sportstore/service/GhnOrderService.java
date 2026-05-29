@@ -6,7 +6,12 @@ import com.google.gson.JsonObject;
 import com.shop.sportstore.model.Order;
 import com.shop.sportstore.model.OrderDetail;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -327,5 +332,36 @@ public class GhnOrderService {
         }
 
         return null;
+    }
+
+    public String getOrderTracking(String ghnCode) throws Exception {
+        String apiUrl = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail";
+
+        URL url = new URL(apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Token", this.token);
+        conn.setDoOutput(true);
+        String jsonInputString = "{\"order_code\": \"" + ghnCode + "\"}";
+
+        try (OutputStream os = conn.getOutputStream()) {
+            byte[] input = jsonInputString.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+        int responseCode = conn.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            return response.toString();
+        } else {
+            throw new RuntimeException("Lỗi khi tra cứu GHN, HTTP Code: " + responseCode);
+        }
     }
 }

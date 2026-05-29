@@ -173,13 +173,17 @@
                         <td>
                             <a href="${pageContext.request.contextPath}/order-detail?id=${item.id}"
                                class="btn btn-sm btn-info text-white shadow-sm" title="Xem chi tiết">
-                                👁️
+                                <i class="fas fa-eye"></i>
                             </a>
-                            <a href="${pageContext.request.contextPath}/tracking.jsp?keyword=${item.orderCode}"
-                               class="btn btn-sm btn-warning text-dark shadow-sm ms-1" title="Theo dõi hành trình">
-                                🚚
-                            </a>
+
+                            <c:if test="${not empty item.ghnCode}">
+                                <a href="https://donhang.ghn.vn/?order_code=${item.ghnCode}"
+                                   target="_blank"
+                                   class="btn btn-sm btn-warning text-dark shadow-sm ms-1" title="Theo dõi hành trình thực tế trên GHN">
+                                    <i class="fas fa-truck"></i> </a>
+                            </c:if>
                         </td>
+
 
                         <td>
                             <jsp:useBean id="now" class="java.util.Date" />
@@ -251,8 +255,6 @@
         </div>
     </div>
 </div>
-
-<jsp:include page="/footer.jsp" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
