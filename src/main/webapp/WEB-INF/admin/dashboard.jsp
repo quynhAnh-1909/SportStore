@@ -401,48 +401,42 @@
 
             <div class="collapse ${isOrderMenuOpen ? 'show' : ''}" id="orderMenu">
 
-                <a href="${root}/admin/orders?status=pending"
-                   class="sub-menu-item ${param.status == 'pending' ? 'active' : ''}">
-                    <i class="fas fa-clock text-warning"></i>
-                    Chờ xác nhận
+                <a href="${pageContext.request.contextPath}/admin/orders?status=pending"
+                   class="sub-menu-item ${param.status == 'pending' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
+                    <i class="fas fa-clock me-2"></i>Chờ xử lý
                 </a>
 
-                <a href="${root}/admin/orders?status=pickup"
-                   class="sub-menu-item ${param.status == 'pickup' ? 'active' : ''}">
-                    <i class="fas fa-box text-info"></i>
-                    Chờ lấy hàng
+                <a href="${pageContext.request.contextPath}/admin/orders?status=pickup"
+                   class="sub-menu-item ${param.status == 'pickup' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
+                    <i class="fas fa-boxes me-2"></i>Chờ lấy hàng
                 </a>
 
-                <a href="${root}/admin/orders?status=shipping"
-                   class="sub-menu-item ${param.status == 'shipping' ? 'active' : ''}">
-                    <i class="fas fa-truck text-primary"></i>
-                    Đang giao
+                <a href="${pageContext.request.contextPath}/admin/orders?status=shipping"
+                   class="sub-menu-item ${param.status == 'shipping' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
+                    <i class="fas fa-truck me-2"></i>Đang giao
                 </a>
 
-                <a href="${root}/admin/orders?status=completed"
-                   class="sub-menu-item ${param.status == 'completed' ? 'active' : ''}">
-                    <i class="fas fa-check-circle text-success"></i>
-                    Đã giao
+                <a href="${pageContext.request.contextPath}/admin/orders?status=completed"
+                   class="sub-menu-item ${param.status == 'completed' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
+                    <i class="fas fa-check-circle me-2"></i>Đã giao (Hoàn tất)
                 </a>
 
-                <a href="${root}/admin/orders?status=cancelled"
-                   class="sub-menu-item ${param.status == 'cancelled' ? 'active' : ''}">
-                    <i class="fas fa-times-circle text-dark"></i>
-                    Đã hủy
+                <a href="${pageContext.request.contextPath}/admin/orders?status=cancelled"
+                   class="sub-menu-item ${param.status == 'cancelled' ? 'fw-bold bg-white text-danger shadow-sm' : ''}">
+                    <i class="fas fa-times-circle me-2"></i>Đã hủy
                 </a>
-
                 <c:if test="${param.status == 'cancelled' or param.status == 'refund_request' or param.status == 'refunded'}">
-                    <div class="ps-4 border-start ms-3 border-2 mb-2 mt-1">
+                    <div class="ps-4 border-start ms-4 border-2 mb-2 mt-1" style="border-color: rgba(255,255,255,0.3) !important;">
 
                         <a href="${root}/admin/orders?status=refund_request"
-                           class="sub-menu-item ${param.status == 'refund_request' ? 'fw-bold text-danger' : ''} d-block mb-1">
-                            <i class="fas fa-money-bill-wave text-danger" style="font-size: 0.9em;"></i>
+                           class="sub-menu-item ${param.status == 'refund_request' ? 'fw-bold bg-white text-danger shadow-sm' : ''} py-2 mb-1" style="padding-left: 15px !important;">
+                            <i class="fas fa-money-bill-wave text-warning" style="font-size: 0.9em;"></i>
                             Yêu cầu hoàn tiền
                         </a>
 
                         <a href="${root}/admin/orders?status=refunded"
-                           class="sub-menu-item ${param.status == 'refunded' ? 'fw-bold text-secondary' : ''} d-block">
-                            <i class="fas fa-undo text-secondary" style="font-size: 0.9em;"></i>
+                           class="sub-menu-item ${param.status == 'refunded' ? 'fw-bold bg-white text-danger shadow-sm' : ''} py-2" style="padding-left: 15px !important;">
+                            <i class="fas fa-undo text-info" style="font-size: 0.9em;"></i>
                             Đã hoàn tiền
                         </a>
 
@@ -450,7 +444,6 @@
                 </c:if>
 
             </div>
-
             <a href="${root}/admin/products" class="menu-item">
                 <i class="fas fa-box"></i>
                 Quản lý sản phẩm

@@ -290,14 +290,12 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Địa chỉ nhận hàng</label>
-                            <input type="text" name="specificAddress" class="form-control"
-                                   value="${sessionScope.user.address}" placeholder="VD: 123 Lê Lợi..." required>
-                            <div class="default-address-box">
-                                <input type="checkbox" name="saveDefaultAddress" id="saveDefaultAddress">
-                                <label for="saveDefaultAddress" class="default-address-label">
-                                    Đặt làm địa chỉ mặc định
-                                </label>
-                            </div>
+                            <input type="text"
+                                   name="shippingAddress"
+                                   value="${not empty user.address ? user.address : ''}"
+                                   class="form-control"
+                                   required
+                                   placeholder="Nhập số nhà, tên đường, phường/xã...">
                         </div>
 
                         <div class="mb-3">
@@ -413,16 +411,13 @@
     const shippingFeeDisplay = document.getElementById("shippingFeeDisplay");
     const finalPrice = document.getElementById("finalPrice");
     const shippingFeeInput = document.getElementById("shippingFeeInput");
-
     const provinceSelect = document.getElementById('province');
     const districtSelect = document.getElementById('district');
     const wardSelect = document.getElementById('ward');
-
     let selectedDistrictId = null;
     let selectedWardCode = null;
     let shipTimeout = null;
 
-    // ================= TẠO HIDDEN INPUTS =================
     const form = document.getElementById("checkoutForm");
 
     const districtInput = document.createElement("input");
@@ -435,7 +430,7 @@
     wardInput.name = "wardCode";
     form.appendChild(wardInput);
 
-    // Hàm reset select
+
     function resetSelect(select, text) {
         select.innerHTML = "";
         const opt = new Option("-- " + text + " --", "");
@@ -444,7 +439,7 @@
         select.add(opt);
     }
 
-    // ================= 1. LOAD PROVINCES (TỪ GHN) =================
+
     fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province", {
         headers: { "Token": GHN_TOKEN }
     })
@@ -459,7 +454,6 @@
             })
             .catch(err => console.error("Lỗi tải Tỉnh thành:", err));
 
-    // ================= 2. PROVINCE CHANGE =================
     provinceSelect.addEventListener("change", function () {
         resetSelect(districtSelect, "Quận/Huyện");
         resetSelect(wardSelect, "Phường/Xã");
@@ -481,7 +475,6 @@
                 });
     });
 
-    // ================= 3. DISTRICT CHANGE =================
     districtSelect.addEventListener("change", function () {
         resetSelect(wardSelect, "Phường/Xã");
 
@@ -505,14 +498,13 @@
                 });
     });
 
-    // ================= 4. WARD CHANGE =================
     wardSelect.addEventListener("change", function () {
         selectedWardCode = this.value;
         wardInput.value = selectedWardCode;
         triggerShipping();
     });
 
-    // ================= 5. SHIPPING API (DEBOUNCE) =================
+    // . SHIPPING API
     function triggerShipping() {
         if (!selectedDistrictId || !selectedWardCode) return;
 
@@ -537,10 +529,10 @@
                         shippingFee = 30000;
                         updateTotal();
                     });
-        }, 400); // debounce 400ms
+        }, 400);
     }
 
-    // ================= 6. UPDATE TOTAL =================
+    //  UPDATE TOTAL
     function updateTotal() {
         discount = 0;
         const voucherId = voucherSelect.value;
@@ -572,7 +564,7 @@
         shippingFeeInput.value = shippingFee;
     }
 
-    // ================= SỰ KIỆN VOUCHER CHANGE =================
+
     voucherSelect.addEventListener("change", updateTotal);
 
 

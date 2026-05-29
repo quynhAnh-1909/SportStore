@@ -136,13 +136,14 @@ public class UserDAO extends DBConnection {
     }
 
 
-    public boolean updateBasicInfo(int userId, String fullName, String phone) {
-        String sql = "UPDATE users SET full_name = ?, phone_number = ? WHERE user_id = ?";
+    public boolean updateBasicInfo(int userId, String fullName, String phone, String address) {
+        String sql = "UPDATE users SET full_name = ?, phone_number = ?, address = ? WHERE user_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fullName);
             ps.setString(2, phone);
-            ps.setInt(3, userId);
+            ps.setString(3, address);
+            ps.setInt(4, userId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
