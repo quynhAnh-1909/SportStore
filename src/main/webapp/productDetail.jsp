@@ -553,10 +553,21 @@
                                 🛒 Thêm vào giỏ hàng
                             </button>
 
-                            <button type="button" class="btn-buy"
-                                    onclick="buyNow(${product.id})">
-                                ⚡ Mua ngay
-                            </button>
+                            <form action="${root}/buy-now" method="post">
+                                <input type="hidden"
+                                       name="productId"
+                                       value="${product.id}">
+
+                                <input type="hidden"
+                                       id="buyQty"
+                                       name="quantity"
+                                       value="1">
+
+                                <button type="submit"
+                                        class="btn btn-warning">
+                                     Mua ngay
+                                </button>
+                            </form>
 
                         </div>
 

@@ -295,6 +295,18 @@
             height: 42px;
         }
 
+        .product-image{
+            width:70px;
+            height:70px;
+            object-fit:contain;
+            transition:0.3s;
+            cursor:pointer;
+        }
+
+        .product-image:hover{
+            transform:scale(1.08);
+        }
+
     </style>
 
 </head>
@@ -346,12 +358,19 @@
                             </div>
 
                             <div class="cart-product product-col">
-                                <img src="${root}/resources/${item.product.imageUrl}"
-                                     class="product-image">
+
+                                <a href="${root}/productDetail?id=${item.product.id}">
+                                    <img src="${root}/resources/${item.product.imageUrl}"
+                                         class="product-image">
+                                </a>
 
                                 <div class="ms-3 product-name">
-                                        ${item.product.name}
+                                    <a href="${root}/productDetail?id=${item.product.id}"
+                                       class="text-decoration-none text-dark">
+                                            ${item.product.name}
+                                    </a>
                                 </div>
+
                             </div>
 
                             <div class="cart-price cart-col text-danger fw-bold">

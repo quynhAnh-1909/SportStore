@@ -205,6 +205,15 @@
             z-index:1;
         }
 
+        .product-card .card-body{
+            display:flex;
+            flex-direction:column;
+        }
+
+        .product-card .btn{
+            margin-top:auto;
+        }
+
     </style>
 
 </head>
@@ -214,7 +223,7 @@
 <jsp:include page="banner.jsp"/>
 
 
-<div class="container mt-4">
+<div class="container-fluid px-5 mt-4">
 
     <c:if test="${empty param.categoryId}">
 
@@ -332,6 +341,14 @@
                                             groupingUsed="true"/>
                                     VNĐ
                                 </div>
+
+                                <button type="button"
+                                        onclick="addToCart(this, ${p.id})"
+                                        class="btn btn-success btn-sm mt-2 w-100">
+
+                                    🛒 Thêm vào giỏ hàng
+
+                                </button>
 
                             </div>
 
