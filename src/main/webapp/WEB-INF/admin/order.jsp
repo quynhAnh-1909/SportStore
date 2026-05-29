@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
 <div class="container-fluid pt-4 px-4">
     <div class="bg-white rounded p-4 shadow-sm border">
 
@@ -23,7 +25,7 @@
 
         <c:if test="${not empty orders}">
             <div class="table-responsive">
-                <table class="table compact-table table-bordered table-hover align-middle text-center mb-0">
+                <table id="orderTable" class="table compact-table table-bordered table-hover align-middle text-center mb-0">
                     <thead class="table-dark">
                     <tr>
                         <th style="width: 50px;">#</th>
@@ -38,11 +40,9 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <c:set var="stt" value="1"/>
                     <c:forEach var="order" items="${orders}">
                         <tr>
-                            <td>${stt}</td>
-                            <c:set var="stt" value="${stt + 1}"/>
+                            <td class="stt-column"></td>
 
                             <td class="fw-bold">${order.orderCode}</td>
                             <td class="fw-semibold text-success">${order.userFullName}</td>
@@ -196,9 +196,15 @@
     .timeline-item:first-child .timeline-marker { background: #198754; box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.3); }
     .timeline-date { font-size: 11px; color: #6c757d; font-weight: bold; }
     .timeline-content { font-size: 13px; color: #212529; margin-top: 2px; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 0px !important; margin: 2px !important; }
+    .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter { margin-bottom: 15px; font-size: 13px; }
 </style>
 
 <div id="toast" style="position: fixed; top: 20px; right: 20px; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-weight: bold;"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
     function showToast(message, color) {
@@ -232,6 +238,30 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
+        const table = $('#orderTable').DataTable({
+            "pageLength": 10,
+            "lengthChange": false,
+            "ordering": false,
+            "info": true,
+            "dom": '<"d-flex justify-content-between align-items-center mb-3"f>t<"d-flex justify-content-between align-items-center mt-3"ip>',
+            "language": {
+                "search": "Tìm kiếm nhanh:",
+                "info": "Hiển thị dòng _START_ đến _END_ trên tổng số _TOTAL_ đơn hàng",
+                "paginate": {
+                    "next": '<i class="fas fa-chevron-right"></i>',
+                    "previous": '<i class="fas fa-chevron-left"></i>'
+                },
+                "zeroRecords": "Không tìm thấy dữ liệu khớp"
+            }
+        });
+
+        table.on('order.dt search.dt', function () {
+            let i = 1;
+            table.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
+                this.data(i++);
+            });
+        }).draw();
+
         const ajaxForms = document.querySelectorAll('.ajax-form');
         ajaxForms.forEach(form => {
             form.addEventListener('submit', function(event) {
@@ -260,11 +290,8 @@
                                     rowElement.style.transition = "opacity 0.4s ease";
                                     rowElement.style.opacity = "0";
                                     setTimeout(() => {
-                                        rowElement.remove();
-                                        const tbody = document.querySelector('table tbody');
-                                        if (tbody && tbody.children.length === 0) {
-                                            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Đã xử lý hết đơn hàng trong mục này.</td></tr>';
-                                        }
+                                        var tableInstance = $('#orderTable').DataTable();
+                                        tableInstance.row($(rowElement)).remove().draw(false);
                                     }, 400);
                                 }
                             } else {
