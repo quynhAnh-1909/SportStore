@@ -59,15 +59,12 @@ public class AccountServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
-
-
         String action = getParamFromMultipart(request, "action");
-
 
         if ("editProfile".equals(action)) {
             String fullName = getParamFromMultipart(request, "fullName");
             String phone = getParamFromMultipart(request, "phone");
-
+            String address = getParamFromMultipart(request, "address"); // Đọc địa chỉ từ form
 
             if (fullName == null || fullName.trim().isEmpty()) {
                 fullName = user.getFullName();
@@ -84,18 +81,23 @@ public class AccountServlet extends HttpServlet {
                 return;
             }
 
+
+            String finalAddress = (address != null && !address.trim().isEmpty()) ? address.trim() : null;
+
             try {
 
-                boolean isUpdated = userDAO.updateBasicInfo(user.getUserId(), fullName, phone);
+                boolean isUpdated = userDAO.updateBasicInfo(user.getUserId(), fullName, phone, finalAddress);
 
                 if (isUpdated) {
 
                     user.setFullName(fullName);
                     user.setPhoneNumber(phone);
+                    user.setAddress(finalAddress);
+
                     session.setAttribute("user", user);
-                    session.setAttribute("successMsg", "Cập nhật thông tin cá nhân và số điện thoại thành công!");
+                    session.setAttribute("successMsg", "Cập nhật thông tin cá nhân thành công!");
                 } else {
-                    session.setAttribute("errorMsg", "Cập nhật thất bại! Không tìm thấy tài khoản để thay đổi.");
+                    session.setAttribute("errorMsg", "Cập nhật thất bại! Vui lòng kiểm tra lại dữ liệu.");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -105,7 +107,6 @@ public class AccountServlet extends HttpServlet {
 
         response.sendRedirect(request.getContextPath() + "/account");
     }
-
 
     private String getParamFromMultipart(HttpServletRequest request, String paramName) throws ServletException, IOException {
         try {

@@ -118,6 +118,20 @@
 
 <div class="container py-5">
 
+    <c:if test="${not empty sessionScope.successMsg}">
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
+            <i class="fas fa-check-circle me-2"></i> ${sessionScope.successMsg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <c:remove var="successMsg" scope="session"/>
+    </c:if>
+    <c:if test="${not empty sessionScope.errorMsg}">
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> ${sessionScope.errorMsg}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <c:remove var="errorMsg" scope="session"/>
+    </c:if>
 
     <div class="profile-card mb-5">
 
@@ -175,7 +189,8 @@
 
                         <form action="${pageContext.request.contextPath}/account"
                               method="post"
-                              enctype="multipart/form-data">
+                              enctype="multipart/form-data"
+                              onsubmit="return validateForm()">
 
                             <input type="hidden" name="action" value="editProfile">
 
@@ -212,12 +227,23 @@
                                 </label>
 
                                 <input type="text"
+                                       id="phoneInput"
                                        name="phone"
                                        value="${user.phoneNumber}"
                                        class="form-control">
 
+                                <div id="phoneError" class="text-danger small mt-1 fw-bold"></div>
+
                             </div>
 
+                            <div class="mb-4">
+                                <label class="info-label">Địa chỉ của bạn</label>
+                                <input type="text"
+                                       name="address"
+                                       value="${sessionScope.user.address}"
+                                       class="form-control"
+                                       placeholder="Ví dụ: 123 Nguyễn Trãi, Quận 1, TP. Hồ Chí Minh">
+                            </div>
 
                             <div class="mb-4">
 
@@ -231,7 +257,6 @@
 
                             </div>
 
-
                             <button type="submit"
                                     class="btn-save">
 
@@ -239,19 +264,12 @@
                                 Lưu thay đổi
 
                             </button>
-
                         </form>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 
     <div class="divider"></div>
 
@@ -261,6 +279,32 @@
 
 <jsp:include page="/footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function validateForm() {
+
+        const phoneInput = document.getElementById("phoneInput") ? document.getElementById("phoneInput").value.trim() : "";
+        const errorDiv = document.getElementById("phoneError");
+
+        if (errorDiv) {
+            errorDiv.innerText = "";
+        }
+
+        if (phoneInput === "") {
+            return true;
+        }
+
+        const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+        if (!phoneRegex.test(phoneInput)) {
+            if (errorDiv) {
+                errorDiv.innerText = "Số điện thoại không hợp lệ! Phải gồm 10 chữ số và bắt đầu bằng các đầu số VN (03, 05, 07, 08, 09).";
+            }
+            return false;
+        }
+
+        return true;
+    }
+</script>
 
 </body>
 </html>
