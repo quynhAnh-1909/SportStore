@@ -899,7 +899,7 @@
             return;
         }
 
-        fetch("${root}/updateReview", {
+        fetch("${ROOT}/updateReview", {
 
             method: "POST",
 
@@ -931,7 +931,7 @@
             return;
         }
 
-        fetch("${root}/deleteReview", {
+        fetch("${ROOT}/deleteReview", {
 
             method: "POST",
 
@@ -1139,7 +1139,7 @@
                                 'input[name="productId"]'
                         ).value;
 
-                fetch("${root}/review", {
+                fetch("${ROOT}/review", {
 
                     method: "POST",
 
@@ -1188,7 +1188,7 @@
                                 );
 
                                 window.location.href =
-                                        "${root}/login";
+                                        "${ROOT}/login";
 
                                 return null;
                             }
@@ -1322,24 +1322,21 @@
 
         currentReviewPage = page;
 
-        const productId =
-                ${product.id};
+        const productId = ${product.id};
 
-        fetch(
-                `${ROOT}/productDetail?id=${
-                    productId
-            }&page=${
-                    page
-            }`
-        )
+        const url =
+                "${root}/productDetail?id="
+                + productId
+                + "&page="
+                + page;
+
+        fetch(url)
 
                 .then(res => res.text())
 
                 .then(html => {
 
-                    // parse html mới
-                    const parser =
-                            new DOMParser();
+                    const parser = new DOMParser();
 
                     const doc =
                             parser.parseFromString(
@@ -1347,61 +1344,23 @@
                                     "text/html"
                             );
 
-                    // lấy review mới
                     const newReviewList =
-                            doc.getElementById(
-                                    "reviewList"
-                            );
+                            doc.getElementById("reviewList");
 
-                    // lấy pagination mới
                     const newPagination =
-                            doc.getElementById(
-                                    "reviewPagination"
-                            );
+                            doc.getElementById("reviewPagination");
 
-                    // replace
-                    document.getElementById(
-                            "reviewList"
-                    ).innerHTML =
+                    document.getElementById("reviewList").innerHTML =
                             newReviewList.innerHTML;
 
-                    const paginationContainer =
-                            document.getElementById(
-                                    "reviewPagination"
-                            );
+                    const currentPagination =
+                            document.getElementById("reviewPagination");
 
-                    if(paginationContainer){
+                    if(currentPagination && newPagination){
 
-                        if(newPagination){
-
-                            paginationContainer.innerHTML =
-                                    newPagination.innerHTML;
-
-                        }else{
-
-                            paginationContainer.remove();
-                        }
-
-                    }else if(newPagination){
-
-                        document
-                                .getElementById("reviewList")
-                                .insertAdjacentHTML(
-                                        "afterend",
-                                        newPagination.outerHTML
-                                );
+                        currentPagination.innerHTML =
+                                newPagination.innerHTML;
                     }
-                    bindReviewEvents();
-
-                    // scroll nhẹ tới review
-                    window.scrollTo({
-                        top:
-                                document.getElementById(
-                                        "reviewList"
-                                ).offsetTop - 120,
-
-                        behavior:"instant"
-                    });
 
                 });
     }
