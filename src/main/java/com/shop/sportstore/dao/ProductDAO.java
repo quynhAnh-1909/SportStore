@@ -64,25 +64,39 @@ public class ProductDAO extends DBConnection {
     }
 
     //get product by id
-
     public Product getProductById(int id) {
 
         String sql = """
-            SELECT p.*, c.name AS categoryName
-            FROM products p
-            LEFT JOIN category c ON p.category_id = c.id
-            WHERE p.id=?
-        """;
+        SELECT p.*, c.name AS categoryName
+        FROM products p
+        LEFT JOIN category c ON p.category_id = c.id
+        WHERE p.id=?
+    """;
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
+
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+
                 Product p = mapResultSetToProduct(rs);
-                p.setCategoryName(rs.getString("categoryName"));
+
+                p.setCategoryName(
+                        rs.getString("categoryName")
+                );
+
+                VoucherDAO voucherDAO =
+                        new VoucherDAO(conn);
+
+                p.setVouchers(
+                        voucherDAO.getByProductId(
+                                p.getId()
+                        )
+                );
+
                 return p;
             }
 
@@ -92,8 +106,6 @@ public class ProductDAO extends DBConnection {
 
         return null;
     }
-
-
     //search
     public List<Product> searchProducts(String keyword, int categoryId, int offset, int limit) {
 
