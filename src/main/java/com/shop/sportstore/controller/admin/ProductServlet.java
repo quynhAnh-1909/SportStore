@@ -315,21 +315,34 @@ public class ProductServlet extends HttpServlet {
     }
 
     //DETAIL PRODUCT
-
-
-    private void showDetail(HttpServletRequest request, HttpServletResponse response)
+    private void showDetail(HttpServletRequest request,
+                            HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
 
             int id = Integer.parseInt(request.getParameter("id"));
 
+            System.out.println("DETAIL ID = " + id);
+
             Product product = dao.getProductById(id);
+
+            System.out.println("PRODUCT = " + product);
+
+            if(product != null){
+                System.out.println("NAME = " + product.getName());
+            }
 
             request.setAttribute("product", product);
 
-            request.getRequestDispatcher("/WEB-INF/admin/productDetail.jsp")
-                    .forward(request, response);
+            request.setAttribute(
+                    "contentPage",
+                    "/WEB-INF/admin/productDetail.jsp"
+            );
+
+            request.getRequestDispatcher(
+                    "/WEB-INF/admin/layout-admin.jsp"
+            ).forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
