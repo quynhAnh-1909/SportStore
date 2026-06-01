@@ -533,42 +533,57 @@
 
                     <c:when test="${product.stockQuantity > 0}">
 
-                        <!-- SỐ LƯỢNG -->
-                        <div class="d-flex align-items-center mt-3" style="gap:20px;">
-                            <div class="label">Số lượng</div>
+                        <c:if test="${empty sessionScope.user || sessionScope.user.role != 'ADMIN'}">
 
-                            <div class="quantity-box">
-                                <button type="button" class="qty-btn" onclick="decrease()">-</button>
-                                <input type="text" id="quantity" value="1">
-                                <button type="button" class="qty-btn"
-                                        onclick="increase(${product.stockQuantity})">+</button>
+                            <!-- SỐ LƯỢNG -->
+                            <div class="d-flex align-items-center mt-3" style="gap:20px;">
+                                <div class="label">Số lượng</div>
+
+                                <div class="quantity-box">
+                                    <button type="button" class="qty-btn" onclick="decrease()">-</button>
+                                    <input type="text" id="quantity" value="1">
+                                    <button type="button"
+                                            class="qty-btn"
+                                            onclick="increase(${product.stockQuantity})">+</button>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- BUTTON -->
-                        <div class="action-buttons mt-3">
+                            <!-- BUTTON -->
+                            <div class="action-buttons mt-3">
 
-                            <button type="button" class="btn-cart"
-                                    onclick="addToCart(${product.id})">
-                                🛒 Thêm vào giỏ hàng
-                            </button>
-
-                            <form action="${root}/buy-now" method="post">
-                                <input type="hidden"
-                                       name="productId"
-                                       value="${product.id}">
-
-                                <input type="hidden"
-                                       name="quantity"
-                                       id="buyQty">
-
-                                <button type="submit"
-                                        class="btn btn-warning">
-                                     Mua ngay
+                                <button type="button"
+                                        class="btn-cart"
+                                        onclick="addToCart(${product.id})">
+                                    🛒 Thêm vào giỏ hàng
                                 </button>
-                            </form>
 
-                        </div>
+                                <form action="${root}/buy-now" method="post">
+                                    <input type="hidden"
+                                           name="productId"
+                                           value="${product.id}">
+
+                                    <input type="hidden"
+                                           name="quantity"
+                                           id="buyQty">
+
+                                    <button type="submit"
+                                            class="btn btn-warning">
+                                        Mua ngay
+                                    </button>
+                                </form>
+
+                            </div>
+
+                        </c:if>
+
+                        <c:if test="${not empty sessionScope.user && sessionScope.user.role == 'ADMIN'}">
+
+                            <div class="alert alert-info mt-3">
+                                <strong>Tài khoản Admin</strong> chỉ dùng để quản trị hệ thống,
+                                không được phép mua hàng.
+                            </div>
+
+                        </c:if>
 
                     </c:when>
 
