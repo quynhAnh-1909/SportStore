@@ -395,8 +395,8 @@
             <a href="${root}/admin/banners" class="menu-item ${currentURI.contains('banners') ? 'active-menu' : ''}">
                 <i class="fas fa-image"></i> Quản lý banner
             </a>
-            <a href="${root}/admin/chat" class="menu-item ${currentURI.contains('chat') ? 'active-menu' : ''}">
-                <i class="fas fa-comments text-warning"></i> Tư vấn trực tuyến
+            <a href="${pageContext.request.contextPath}/api/chat-admin" class="menu-item ${currentURI.contains('chat') ? 'active-menu' : ''}">
+                <i class="fas fa-comments text-white"></i> Tư vấn trực tuyến
             </a>
 
             <hr class="text-white">

@@ -18,10 +18,22 @@ public class ChatAdminController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("application/json; charset=UTF-8");
-        response.setCharacterEncoding("UTF-8");
 
         String action = request.getParameter("action");
+
+        if (action == null || action.trim().isEmpty()) {
+            response.setContentType("text/html; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+
+
+            request.setAttribute("contentPage", "/WEB-INF/admin/admin_chat.jsp");
+            request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
+            return;
+        }
+
+
+        response.setContentType("application/json; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
         if ("getChatList".equals(action)) {
@@ -34,7 +46,6 @@ public class ChatAdminController extends HttpServlet {
             json.append("]");
             out.print(json.toString());
         }
-
         else if ("getDetail".equals(action)) {
             String customerId = request.getParameter("customerId");
             if (customerId != null) {
