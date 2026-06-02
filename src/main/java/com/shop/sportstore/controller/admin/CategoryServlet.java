@@ -32,6 +32,9 @@ public class CategoryServlet extends HttpServlet {
             case "create":
                 showCreateForm(request, response);
                 break;
+            case "edit":
+                showEditForm(request, response);
+                break;
 
             case "delete":
                 deleteCategory(request, response);
@@ -42,10 +45,10 @@ public class CategoryServlet extends HttpServlet {
                 break;
         }
     }
-
     // POST
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
@@ -53,10 +56,14 @@ public class CategoryServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if ("create".equals(action)) {
+
             insertCategory(request, response);
+
+        } else if ("edit".equals(action)) {
+
+            updateCategory(request, response);
         }
     }
-
     // LIST
 
     private void listCategories(HttpServletRequest request, HttpServletResponse response)
@@ -120,5 +127,84 @@ public class CategoryServlet extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + "/admin/categories");
+    }
+    //edit
+    private void showEditForm(HttpServletRequest request,
+                              HttpServletResponse response)
+            throws ServletException, IOException {
+
+        try {
+
+            int id = Integer.parseInt(
+                    request.getParameter("id")
+            );
+
+            Category category =
+                    dao.getCategoryById(id);
+
+            List<Category> categories =
+                    dao.buildTree(
+                            dao.getAllCategories()
+                    );
+
+            request.setAttribute(
+                    "category",
+                    category
+            );
+
+            request.setAttribute(
+                    "categories",
+                    categories
+            );
+
+            request.setAttribute(
+                    "contentPage",
+                    "/WEB-INF/admin/categoryEdit.jsp"
+            );
+
+            request.getRequestDispatcher(
+                    "/WEB-INF/admin/layout-admin.jsp"
+            ).forward(request, response);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            response.sendRedirect(
+                    request.getContextPath()
+                            + "/admin/categories"
+            );
+        }
+    }
+    private void updateCategory(HttpServletRequest request,
+                                HttpServletResponse response)
+            throws IOException {
+
+        try {
+
+            int id = Integer.parseInt(
+                    request.getParameter("id")
+            );
+
+            String name =
+                    request.getParameter("name");
+
+            String parentId =
+                    request.getParameter("parentId");
+
+            dao.updateCategory(
+                    id,
+                    name,
+                    parentId
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        response.sendRedirect(
+                request.getContextPath()
+                        + "/admin/categories"
+        );
     }
 }

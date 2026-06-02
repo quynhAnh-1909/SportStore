@@ -61,7 +61,7 @@ public class CartServlet extends HttpServlet {
             json.append("]");
 
             response.getWriter().write(json.toString());
-            return; // 🔥 QUAN TRỌNG
+            return;
         }
 
         if ("count".equals(action)) {
