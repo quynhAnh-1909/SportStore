@@ -505,26 +505,31 @@
                 </c:forEach>
             </c:if>
 
-            <div class="cart-wrapper">
+            <c:if test="${sessionScope.userRole != 'ADMIN'}">
 
-                <a href="${root}/cart" class="cart-icon">🛒</a>
+                <div class="cart-wrapper">
 
-                <span class="cart-badge" style="${cartCount == 0 ? 'display:none' : ''}">
-                    ${cartCount}
-                </span>
+                    <a href="${root}/cart" class="cart-icon">🛒</a>
 
-                <div class="cart-dropdown">
-                    <div id="cart-items"></div>
+                    <span class="cart-badge"
+                          style="${cartCount == 0 ? 'display:none' : ''}">
+                            ${cartCount}
+                    </span>
 
-                    <div class="cart-footer">
-                        <a href="${root}/cart" class="btn btn-danger w-100">
-                            Xem giỏ hàng
-                        </a>
+                    <div class="cart-dropdown">
+                        <div id="cart-items"></div>
+
+                        <div class="cart-footer">
+                            <a href="${root}/cart"
+                               class="btn btn-danger w-100">
+                                Xem giỏ hàng
+                            </a>
+                        </div>
                     </div>
+
                 </div>
 
-            </div>
-
+            </c:if>
             <c:choose>
                 <c:when test="${not empty sessionScope.user}">
                     <div class="dropdown">
