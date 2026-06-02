@@ -395,12 +395,16 @@
             <a href="${root}/admin/banners" class="menu-item ${currentURI.contains('banners') ? 'active-menu' : ''}">
                 <i class="fas fa-image"></i> Quản lý banner
             </a>
+            <a href="${root}/admin/chat" class="menu-item ${currentURI.contains('chat') ? 'active-menu' : ''}">
+                <i class="fas fa-comments text-warning"></i> Tư vấn trực tuyến
+            </a>
 
             <hr class="text-white">
 
             <a href="${root}/products" class="menu-item text-warning">
                 <i class="fas fa-external-link-alt"></i> Xem trang khách
             </a>
+
         </div>
     </div>
 

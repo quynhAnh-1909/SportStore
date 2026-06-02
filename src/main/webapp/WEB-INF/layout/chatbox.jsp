@@ -1,0 +1,359 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<c:set var="root" value="${pageContext.request.contextPath}" />
+
+<style>
+    .bot-chat-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 99999;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+    }
+    .chat-btn-circle {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .chat-btn-circle:hover {
+        transform: scale(1.08) translateY(-2px);
+    }
+    .zalo-btn {
+        background: #0068ff;
+        color: white;
+        font-weight: bold;
+        font-size: 13px;
+        text-align: center;
+        line-height: 55px;
+    }
+    .bot-chat-bubble {
+        background: #198754;
+        color: white;
+        font-size: 24px;
+    }
+    .bot-chat-window {
+        width: 340px;
+        height: 450px;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        position: absolute;
+        bottom: 135px;
+        right: 0;
+        animation: botChatSlideUp 0.3s ease;
+    }
+    @keyframes botChatSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .bot-chat-header {
+        background: #198754;
+        color: white;
+        padding: 14px 16px;
+        font-weight: 600;
+        font-size: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .bot-chat-header .close-bot-chat {
+        cursor: pointer;
+        opacity: 0.8;
+        font-size: 18px;
+    }
+    .bot-chat-header .close-bot-chat:hover {
+        opacity: 1;
+    }
+    .bot-chat-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        scroll-behavior: smooth;
+    }
+    .bot-msg {
+        padding: 10px 14px;
+        border-radius: 16px;
+        max-width: 85%;
+        font-size: 13.5px;
+        line-height: 1.45;
+        word-wrap: break-word;
+    }
+    .bot-msg.user-sent {
+        background: #198754;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 2px 4px rgba(25, 135, 84, 0.15);
+    }
+    .bot-msg.bot-reply {
+        background: #ffffff;
+        color: #333333;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        border: 1px solid #f0f0f0;
+    }
+    .bot-chat-input-area {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        background: #ffffff;
+        border-top: 1px solid #eeeeee;
+    }
+    .bot-chat-input-area input {
+        flex: 1;
+        border: 1px solid #e0e0e0;
+        padding: 10px 16px;
+        border-radius: 24px;
+        outline: none;
+        font-size: 13.5px;
+        background: #f8f9fa;
+        transition: all 0.2s;
+    }
+    .bot-chat-input-area input:focus {
+        border-color: #198754;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+    }
+    .bot-chat-input-area button {
+        background: none;
+        border: none;
+        color: #198754;
+        font-size: 20px;
+        margin-left: 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s;
+    }
+    .bot-chat-input-area button:hover {
+        transform: scale(1.1);
+    }
+</style>
+
+<div class="bot-chat-container">
+    <div class="bot-chat-window" id="botChatWindow">
+        <div class="bot-chat-header">
+            <span>Cửa Hàng SportStore</span>
+            <span class="close-bot-chat" onclick="toggleBotChat()">✕</span>
+        </div>
+        <div class="bot-chat-messages" id="botChatMessages">
+            <div class="bot-msg bot-reply">
+                Xin chào! Em là trợ lý tư vấn tự động của SportStore. 🌸<br/><br/>
+                Anh/Chị có thể gõ các từ khóa sau để được trả lời nhanh nhất:<br/>
+                👉 <b>giá</b>, <b>ship</b>, <b>địa chỉ</b>, <b>đổi trả</b>, <b>khuyến mãi</b>, <b>thanh toán</b>, <b>bảo hành</b>.
+            </div>
+        </div>
+        <div class="bot-chat-input-area">
+            <input type="text" id="botChatInput" placeholder="Nhập tin nhắn..." onkeypress="handleBotChatPress(event)"/>
+            <button onclick="sendBotMessage()">➔</button>
+        </div>
+    </div>
+
+    <a href="https://zalo.me/0987735239" target="_blank" class="chat-btn-circle zalo-btn" title="Chat qua Zalo">Zalo</a>
+    <div class="chat-btn-circle bot-chat-bubble" onclick="toggleBotChat()" id="botChatBubble" title="Trợ lý tự động">💬</div>
+</div>
+
+<script>
+    const CHAT_ROOT = "${pageContext.request.contextPath}";
+
+    const loggedUser = "${sessionScope.user.email}";
+
+    const customerId =
+            (loggedUser && loggedUser.trim() !== "")
+                    ? loggedUser
+                    : (localStorage.getItem("chat_guest_id")
+                            || "GUEST_" + Date.now());
+
+    if (!loggedUser || loggedUser.trim() === "") {
+        localStorage.setItem("chat_guest_id", customerId);
+    }
+
+    const botBrain = {
+        "hi": "Chào anh/chị! Chúc anh/chị một ngày mua sắm vui vẻ tại SportStore 🥰",
+        "hello": "Xin chào! Em có thể hỗ trợ gì cho anh/chị?",
+        "giá": "💰 Giá sản phẩm được niêm yết trực tiếp trên website.",
+        "ship": "🚚 Freeship đơn từ 500.000 VNĐ. Đơn dưới 500.000 VNĐ phí vận chuyển 30.000 VNĐ.",
+        "địa chỉ": "📍 SportStore - TP.HCM. Thời gian hoạt động 08:00 - 22:00.",
+        "đổi trả": "🔄 Hỗ trợ đổi trả trong vòng 7 ngày nếu sản phẩm còn nguyên tem.",
+        "khuyến mãi": "🎁 Khách hàng mới được giảm 10% đơn hàng đầu tiên.",
+        "thanh toán": "💳 Hỗ trợ COD và chuyển khoản.",
+        "bảo hành": "🛡️ Bảo hành lỗi sản phẩm trong vòng 6 tháng."
+    };
+
+    function toggleBotChat() {
+
+        const chatWindow =
+                document.getElementById("botChatWindow");
+
+        if (chatWindow.style.display === "flex") {
+
+            chatWindow.style.display = "none";
+
+        } else {
+
+            chatWindow.style.display = "flex";
+
+            loadCustomerMessages();
+        }
+    }
+
+    function handleBotChatPress(event) {
+
+        if (event.key === "Enter") {
+            sendBotMessage();
+        }
+    }
+
+    function sendBotMessage() {
+
+        const input =
+                document.getElementById("botChatInput");
+
+        const text = input.value.trim();
+
+        if (text === "") return;
+
+        input.value = "";
+
+        fetch(CHAT_ROOT + "/api/chat-client", {
+            method: "POST",
+            headers: {
+                "Content-Type":
+                        "application/x-www-form-urlencoded;charset=UTF-8"
+            },
+            body:
+                    "customerId=" + encodeURIComponent(customerId)
+                    + "&message=" + encodeURIComponent(text)
+        })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (!data.success) return;
+
+                    loadCustomerMessages();
+
+                    let reply = null;
+
+                    const lower = text.toLowerCase();
+
+                    for (let key in botBrain) {
+
+                        if (lower.includes(key)) {
+
+                            reply = botBrain[key];
+                            break;
+                        }
+                    }
+
+                    if (reply) {
+
+                        setTimeout(() => {
+
+                            appendLocalBotMessage(reply);
+
+                        }, 500);
+                    }
+
+                })
+                .catch(err => console.error(err));
+    }
+
+    function loadCustomerMessages() {
+
+        fetch(
+                CHAT_ROOT +
+                "/api/chat-client?customerId=" +
+                encodeURIComponent(customerId)
+        )
+                .then(res => res.json())
+                .then(messages => {
+
+                    const box =
+                            document.getElementById("botChatMessages");
+
+                    box.innerHTML = "";
+
+                    const welcome = document.createElement("div");
+
+                    welcome.className = "bot-msg bot-reply";
+
+                    welcome.innerHTML =
+                            "Xin chào! Em là trợ lý SportStore 🌸<br><br>" +
+                            "Từ khóa hỗ trợ:<br>" +
+                            "<b>giá</b>, <b>ship</b>, <b>địa chỉ</b>, " +
+                            "<b>đổi trả</b>, <b>khuyến mãi</b>, " +
+                            "<b>thanh toán</b>, <b>bảo hành</b>";
+
+                    box.appendChild(welcome);
+
+                    messages.forEach(msg => {
+
+                        const div =
+                                document.createElement("div");
+
+                        div.className =
+                                "bot-msg " +
+                                (msg.sender === "CUSTOMER"
+                                        ? "user-sent"
+                                        : "bot-reply");
+
+                        div.textContent = msg.text;
+
+                        box.appendChild(div);
+                    });
+
+                    box.scrollTop = box.scrollHeight;
+                })
+                .catch(err => console.error(err));
+    }
+
+    function appendLocalBotMessage(text) {
+
+        const box =
+                document.getElementById("botChatMessages");
+
+        const div =
+                document.createElement("div");
+
+        div.className = "bot-msg bot-reply";
+
+        div.innerHTML = text;
+
+        box.appendChild(div);
+
+        box.scrollTop = box.scrollHeight;
+    }
+
+    setInterval(() => {
+
+        const win =
+                document.getElementById("botChatWindow");
+
+        if (win.style.display === "flex") {
+
+            loadCustomerMessages();
+        }
+
+    }, 3000);
+</script>
