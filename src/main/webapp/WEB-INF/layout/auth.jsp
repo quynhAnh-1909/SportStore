@@ -29,14 +29,8 @@
     }
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .close-btn {
@@ -48,9 +42,7 @@
         color: #999;
     }
 
-    .close-btn:hover {
-        color: #d81f19;
-    }
+    .close-btn:hover { color: #d81f19; }
 
     .auth-box .logo img {
         height: 60px;
@@ -77,32 +69,59 @@
 
     .form-group {
         margin-bottom: 15px;
+        text-align: left;
     }
 
     label {
         font-weight: 600;
         font-size: 14px;
+        display: block;
+        margin-bottom: 5px;
     }
 
-    .required {
-        color: #d81f19;
-    }
+    .required { color: #d81f19; }
 
     input {
         width: 100%;
         padding: 12px;
         border: 1px solid #ddd;
         border-radius: 6px;
-        margin-top: 5px;
-        position: relative;
-        z-index: 1001;
+        box-sizing: border-box;
         background-color: white !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+
+    .input-success {
+        border-color: #2ed573 !important;
+        box-shadow: 0 0 5px rgba(46, 213, 115, 0.3);
     }
 
     .error {
         color: #d81f19;
         font-size: 13px;
-        margin-top: 3px;
+        margin-top: 4px;
+    }
+
+    .success-text {
+        color: #2ed573;
+        font-size: 13px;
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    .server-error-msg {
+        background-color: #fff5f5;
+        border: 1px solid #ebccd1;
+        color: #d81f19;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        text-align: center;
+        font-weight: 600;
+        display: block;
     }
 
     .btn-submit {
@@ -135,23 +154,18 @@
         cursor: pointer;
     }
 
-    .social-btn img {
-        width: 20px;
-    }
+    .social-btn img { width: 20px; }
 
     .link {
         text-align: center;
         margin-top: 15px;
     }
 
-
     .password-wrapper {
         position: relative;
-        margin-top: 5px;
     }
 
     .password-wrapper input {
-        margin-top: 0;
         padding-right: 40px;
     }
 
@@ -166,12 +180,10 @@
         user-select: none;
     }
 
-
     .gender-group {
         display: flex;
         gap: 30px;
-        margin-top: 10px;
-        margin-bottom: 5px;
+        margin-top: 5px;
     }
 
     .gender-option {
@@ -181,8 +193,6 @@
 
     input[type="radio"] {
         width: auto;
-        padding: 0;
-        margin: 0;
         margin-right: 8px;
         cursor: pointer;
     }
@@ -192,12 +202,33 @@
         cursor: pointer;
         margin: 0;
     }
-</style>
 
+
+    .password-requirements {
+        background-color: #f9f9f9;
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin-top: 8px;
+        font-size: 12px;
+        color: #777;
+        border: 1px solid #eee;
+    }
+
+    .requirement-item {
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: color 0.2s ease;
+    }
+
+
+    .req-invalid { color: #ea3838; }
+    .req-valid { color: #2ed573; font-weight: 500; }
+</style>
 
 <div class="overlay" id="authOverlay">
     <div class="auth-box">
-
         <div class="close-btn" onclick="closeAuth()">✖</div>
 
         <div class="logo">
@@ -212,11 +243,8 @@
         <form id="loginForm" action="${root}/login" method="post" onsubmit="return validateLogin()">
             <div class="form-group">
                 <label>Email <span class="required">*</span></label>
-                <input type="email" name="email" id="loginEmail"
-                       value="${oldUser!=null?oldUser.email:''}">
-                <div class="error" id="loginEmailError">
-                    ${errorMessage != null && activeTab=='login'? errorMessage : ''}
-                </div>
+                <input type="email" name="email" id="loginEmail" value="${activeTab == 'login' && oldUser != null ? oldUser.email : ''}">
+                <div class="error" id="loginEmailError"></div>
             </div>
 
             <div class="form-group">
@@ -228,46 +256,62 @@
                 <div class="error" id="loginPassError"></div>
             </div>
 
+            <c:if test="${not empty errorMessage && activeTab == 'login'}">
+                <div class="server-error-msg">${errorMessage}</div>
+            </c:if>
+
             <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
         </form>
 
-        <form id="registerForm" action="${root}/register" method="post"
-              onsubmit="return validateRegister()" style="display:none;">
-
+        <form id="registerForm" action="${root}/register" method="post" onsubmit="return validateRegister()" style="display:none;">
             <div class="form-group">
                 <label>Họ tên <span class="required">*</span></label>
-                <input type="text" name="hoTen" id="regName"
-                       value="${oldUser!=null?oldUser.fullName:''}">
-                <div class="error" id="regNameError">
-                    ${errorMessage != null && activeTab=='register'? errorMessage : ''}
-                </div>
+                <input type="text" name="hoTen" id="regName" value="${activeTab == 'register' && oldUser != null ? oldUser.fullName : ''}">
+                <div class="error" id="regNameError"></div>
             </div>
 
             <div class="form-group">
                 <label>Email <span class="required">*</span></label>
-                <input type="email" name="email" id="regEmail"
-                       value="${oldUser!=null?oldUser.email:''}">
+                <input type="email" name="email" id="regEmail" value="${activeTab == 'register' && oldUser != null ? oldUser.email : ''}">
                 <div class="error" id="regEmailError"></div>
             </div>
 
             <div class="form-group">
                 <label>Mật khẩu <span class="required">*</span></label>
                 <div class="password-wrapper">
-                    <input type="password" name="matKhau" id="regPass">
+                    <input type="password" name="matKhau" id="regPass" oninput="validatePasswordFormat(this.value); matchConfirmPassword();">
                     <span class="toggle-eye" onclick="togglePassword('regPass', this)">👁️</span>
                 </div>
+
+                <div class="password-requirements" id="passRequirementsBlock" style="display: none;">
+                    <div class="requirement-item req-invalid" id="reqLength"> Tối thiểu 6 ký tự</div>
+                    <div class="requirement-item req-invalid" id="reqUppercase"> Ít nhất 1 chữ hoa (A-Z)</div>
+                    <div class="requirement-item req-invalid" id="reqLowercase"> Ít nhất 1 chữ thường (a-z)</div>
+                    <div class="requirement-item req-invalid" id="reqNumber">Ít nhất 1 chữ số (0-9)</div>
+                    <div class="requirement-item req-invalid" id="reqSpecial">Ít nhất 1 ký tự đặc biệt (@, $, !, ...)</div>
+                </div>
+
                 <div class="error" id="regPassError"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Xác nhận mật khẩu <span class="required">*</span></label>
+                <div class="password-wrapper">
+                    <input type="password" id="regConfirmPass" oninput="matchConfirmPassword()">
+                    <span class="toggle-eye" onclick="togglePassword('regConfirmPass', this)">👁️</span>
+                </div>
+                <div id="regConfirmPassError"></div>
             </div>
 
             <div class="form-group">
                 <label>Giới tính <span class="required">*</span></label>
                 <div class="gender-group">
                     <div class="gender-option">
-                        <input type="radio" name="gioiTinh" id="genderMale" value="Nam" ${oldUser!=null && oldUser.gioiTinh=='Nam' ? 'checked' : ''}>
+                        <input type="radio" name="gioiTinh" id="genderMale" value="Nam" ${activeTab == 'register' && oldUser != null && oldUser.gioiTinh == 'Nam' ? 'checked' : ''}>
                         <label class="gender-label" for="genderMale">Nam</label>
                     </div>
                     <div class="gender-option">
-                        <input type="radio" name="gioiTinh" id="genderFemale" value="Nữ" ${oldUser!=null && oldUser.gioiTinh=='Nữ' ? 'checked' : ''}>
+                        <input type="radio" name="gioiTinh" id="genderFemale" value="Nữ" ${activeTab == 'register' && oldUser != null && oldUser.gioiTinh == 'Nữ' ? 'checked' : ''}>
                         <label class="gender-label" for="genderFemale">Nữ</label>
                     </div>
                 </div>
@@ -276,10 +320,13 @@
 
             <div class="form-group">
                 <label>Số điện thoại</label>
-                <input type="text" name="soDienThoai" id="regPhone"
-                       value="${oldUser!=null?oldUser.phoneNumber:''}">
+                <input type="text" name="soDienThoai" id="regPhone" value="${activeTab == 'register' && oldUser != null ? oldUser.phoneNumber : ''}">
                 <div class="error" id="regPhoneError"></div>
             </div>
+
+            <c:if test="${not empty errorMessage && activeTab == 'register'}">
+                <div class="server-error-msg">${errorMessage}</div>
+            </c:if>
 
             <button type="submit" class="btn-submit">ĐĂNG KÝ</button>
         </form>
@@ -288,17 +335,14 @@
             <div class="social-btn" onclick="location.href='${root}/login-google'">
                 <img src="${root}/resources/gg.jpg"> Google
             </div>
-
             <div class="social-btn" onclick="location.href='${root}/login-facebook'">
                 <img src="${root}/resources/fb.jpg"> Facebook
             </div>
         </div>
 
         <div class="link" id="linkSwitch">
-            Chưa có tài khoản?
-            <a href="#" onclick="switchTab('register');return false;">Đăng ký</a>
+            Chưa có tài khoản? <a href="#" onclick="switchTab('register');return false;">Đăng ký</a>
         </div>
-
     </div>
 </div>
 
@@ -310,6 +354,12 @@
 
     function closeAuth() {
         document.getElementById('authOverlay').style.display = 'none';
+        clearServerErrors();
+    }
+
+    function clearServerErrors() {
+        let errors = document.querySelectorAll('.server-error-msg');
+        errors.forEach(el => el.style.display = 'none');
     }
 
     function switchTab(type) {
@@ -318,6 +368,8 @@
         let tabLogin = document.getElementById('tabLogin');
         let tabRegister = document.getElementById('tabRegister');
         let link = document.getElementById('linkSwitch');
+
+        clearServerErrors();
 
         if (type === 'login') {
             login.style.display = 'block';
@@ -331,6 +383,75 @@
             tabLogin.classList.remove('active');
             tabRegister.classList.add('active');
             link.innerHTML = 'Đã có tài khoản? <a href="#" onclick="switchTab(\'login\');return false;">Đăng nhập</a>';
+        }
+    }
+
+
+    function validatePasswordFormat(password) {
+        let inputField = document.getElementById("regPass");
+        let block = document.getElementById("passRequirementsBlock");
+
+        if (password === "") {
+            block.style.display = "none";
+            inputField.classList.remove("input-success");
+            return;
+        }
+
+        block.style.display = "block";
+
+
+        let hasLength = password.length >= 6;
+        let hasUpper = /[A-Z]/.test(password);
+        let hasLower = /[a-z]/.test(password);
+        let hasNumber = /[0-9]/.test(password);
+        let hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+
+        updateRequirementStatus("reqLength", hasLength, "✓ Tối thiểu 6 ký tự", "Tối thiểu 6 ký tự");
+        updateRequirementStatus("reqUppercase", hasUpper, "✓ Có chữ hoa (A-Z)", "Thiếu chữ hoa (A-Z)");
+        updateRequirementStatus("reqLowercase", hasLower, "✓ Có chữ thường (a-z)", "Thiếu chữ thường (a-z)");
+        updateRequirementStatus("reqNumber", hasNumber, "✓ Có chữ số (0-9)", " Thiếu chữ số (0-9)");
+        updateRequirementStatus("reqSpecial", hasSpecial, "✓ Có ký tự đặc biệt", " Thiếu ký tự đặc biệt (@, $, !, ...)");
+
+
+        if (hasLength && hasUpper && hasLower && hasNumber && hasSpecial) {
+            inputField.classList.add("input-success");
+        } else {
+            inputField.classList.remove("input-success");
+        }
+    }
+
+    function updateRequirementStatus(elementId, isValid, validText, invalidText) {
+        let item = document.getElementById(elementId);
+        if (isValid) {
+            item.className = "requirement-item req-valid";
+            item.innerHTML = validText;
+        } else {
+            item.className = "requirement-item req-invalid";
+            item.innerHTML = invalidText;
+        }
+    }
+
+    function matchConfirmPassword() {
+        let pass = document.getElementById("regPass").value;
+        let confirmPass = document.getElementById("regConfirmPass").value;
+        let displayArea = document.getElementById("regConfirmPassError");
+        let confirmInputField = document.getElementById("regConfirmPass");
+
+        if (confirmPass === "") {
+            displayArea.innerHTML = "";
+            confirmInputField.classList.remove("input-success");
+            return;
+        }
+
+        if (pass === confirmPass) {
+            displayArea.className = "success-text";
+            displayArea.innerHTML = "✓ Mật khẩu chính xác";
+            confirmInputField.classList.add("input-success");
+        } else {
+            displayArea.className = "error";
+            displayArea.innerHTML = "✘ Mật khẩu xác nhận không trùng khớp!";
+            confirmInputField.classList.remove("input-success");
         }
     }
 
@@ -350,29 +471,27 @@
             document.getElementById("loginEmailError").innerText = "Email không hợp lệ";
             valid = false;
         }
-
         if (pass === "") {
             document.getElementById("loginPassError").innerText = "Vui lòng nhập mật khẩu";
             valid = false;
         }
-
         return valid;
     }
 
     function validateRegister() {
         let valid = true;
-
         document.getElementById("regNameError").innerText = "";
         document.getElementById("regEmailError").innerText = "";
         document.getElementById("regPassError").innerText = "";
+        document.getElementById("regConfirmPassError").innerHTML = "";
         document.getElementById("regGenderError").innerText = "";
         document.getElementById("regPhoneError").innerText = "";
 
         let name = document.getElementById("regName").value.trim();
         let email = document.getElementById("regEmail").value.trim();
         let pass = document.getElementById("regPass").value.trim();
+        let confirmPass = document.getElementById("regConfirmPass").value.trim();
         let phone = document.getElementById("regPhone").value.trim();
-
         let isMaleChecked = document.getElementById("genderMale").checked;
         let isFemaleChecked = document.getElementById("genderFemale").checked;
 
@@ -383,7 +502,6 @@
             document.getElementById("regNameError").innerText = "Vui lòng nhập họ tên";
             valid = false;
         }
-
         if (email === "") {
             document.getElementById("regEmailError").innerText = "Vui lòng nhập email";
             valid = false;
@@ -392,22 +510,34 @@
             valid = false;
         }
 
-        if (pass.length < 6) {
-            document.getElementById("regPassError").innerText = "Mật khẩu tối thiểu 6 ký tự";
+
+        let hasLength = pass.length >= 6;
+        let hasUpper = /[A-Z]/.test(pass);
+        let hasLower = /[a-z]/.test(pass);
+        let hasNumber = /[0-9]/.test(pass);
+        let hasSpecial = /[^A-Za-z0-9]/.test(pass);
+
+        if (!hasLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+            document.getElementById("regPassError").innerText = "Mật khẩu chưa đạt yêu cầu bảo mật định dạng!";
             valid = false;
         }
-
-
+        if (confirmPass === "") {
+            document.getElementById("regConfirmPassError").className = "error";
+            document.getElementById("regConfirmPassError").innerText = "Vui lòng xác nhận lại mật khẩu";
+            valid = false;
+        } else if (pass !== confirmPass) {
+            document.getElementById("regConfirmPassError").className = "error";
+            document.getElementById("regConfirmPassError").innerText = "Mật khẩu xác nhận không trùng khớp!";
+            valid = false;
+        }
         if (!isMaleChecked && !isFemaleChecked) {
             document.getElementById("regGenderError").innerText = "Vui lòng chọn giới tính";
             valid = false;
         }
-
         if (phone !== "" && !phoneRegex.test(phone)) {
             document.getElementById("regPhoneError").innerText = "Số điện thoại không hợp lệ";
             valid = false;
         }
-
         return valid;
     }
 
@@ -422,7 +552,10 @@
         }
     }
 
-    <c:if test="${not empty errorMessage}">
-    openAuth('${activeTab != null ? activeTab : "login"}');
-    </c:if>
+    window.onload = function() {
+        <c:if test="${not empty errorMessage}">
+        let targetTab = '${activeTab != null ? activeTab : "login"}';
+        openAuth(targetTab);
+        </c:if>
+    };
 </script>
