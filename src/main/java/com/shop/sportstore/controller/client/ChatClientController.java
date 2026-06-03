@@ -29,7 +29,6 @@ public class ChatClientController extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-
             String customerId = request.getParameter("customerId");
 
             if (customerId == null || customerId.trim().isEmpty()) {
@@ -37,15 +36,11 @@ public class ChatClientController extends HttpServlet {
                 return;
             }
 
-            List<ChatMessage> messages =
-                    chatDAO.getMessagesByCustomer(customerId);
-
+            List<ChatMessage> messages = chatDAO.getMessagesByCustomer(customerId);
             out.print(convertToJson(messages));
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
             out.print("{\"success\":false,\"message\":\"Server Error\"}");
         }
 
@@ -58,67 +53,55 @@ public class ChatClientController extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
         PrintWriter out = response.getWriter();
 
         try {
-
             String customerId = request.getParameter("customerId");
             String message = request.getParameter("message");
+
+
+            String senderParam = request.getParameter("sender");
+            String sender = (senderParam != null && !senderParam.trim().isEmpty())
+                    ? senderParam.trim()
+                    : "customer";
 
             if (customerId == null || customerId.trim().isEmpty()
                     || message == null || message.trim().isEmpty()) {
 
-                out.print(
-                        "{\"success\":false,\"message\":\"Invalid data\"}"
-                );
+                out.print("{\"success\":false,\"message\":\"Invalid data\"}");
                 return;
             }
 
-            ChatMessage chatMessage =
-                    new ChatMessage(customerId,
-                            "CUSTOMER",
-                            message.trim());
 
-            boolean success =
-                    chatDAO.saveMessage(chatMessage);
+            ChatMessage chatMessage = new ChatMessage(customerId, sender, message.trim());
 
+            boolean success = chatDAO.saveMessage(chatMessage);
             out.print("{\"success\":" + success + "}");
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
-            out.print(
-                    "{\"success\":false,\"message\":\"Server Error\"}"
-            );
+            out.print("{\"success\":false,\"message\":\"Server Error\"}");
         }
 
         out.flush();
     }
 
     private String convertToJson(List<ChatMessage> list) {
-
         StringBuilder json = new StringBuilder("[");
 
         for (int i = 0; i < list.size(); i++) {
-
             ChatMessage m = list.get(i);
+
 
             json.append("{")
                     .append("\"id\":").append(m.getId()).append(",")
-                    .append("\"customerId\":\"")
-                    .append(escapeJson(m.getCustomerId()))
-                    .append("\",")
-                    .append("\"sender\":\"")
-                    .append(escapeJson(m.getSender()))
-                    .append("\",")
-                    .append("\"text\":\"")
-                    .append(escapeJson(m.getMessage()))
-                    .append("\"")
+                    .append("\"customerId\":\"").append(escapeJson(m.getCustomerId())).append("\",")
+                    .append("\"sender\":\"").append(escapeJson(m.getSender())).append("\",")
+                    .append("\"text\":\"").append(escapeJson(m.getMessage())).append("\",")
+                    .append("\"message\":\"").append(escapeJson(m.getMessage())).append("\"")
                     .append("}");
 
             if (i < list.size() - 1) {
@@ -127,16 +110,13 @@ public class ChatClientController extends HttpServlet {
         }
 
         json.append("]");
-
         return json.toString();
     }
 
     private String escapeJson(String text) {
-
         if (text == null) {
             return "";
         }
-
         return text
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"")

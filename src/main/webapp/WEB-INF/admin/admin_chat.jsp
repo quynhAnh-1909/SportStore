@@ -4,18 +4,15 @@
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
 <style>
-    /* Custom CSS để khớp hoàn hảo với hệ thống Dashboard hiện tại của bạn */
     .chat-wrapper {
         display: flex;
-        height: calc(100vh - 160px); /* Khớp độ cao còn lại của mainContent */
+        height: calc(100vh - 200px);
         background: var(--white);
         border-radius: 20px;
         box-shadow: 0 4px 18px rgba(0,0,0,0.06);
         border: 1px solid var(--border);
         overflow: hidden;
     }
-
-    /* Vùng danh sách khách hàng bên trái */
     .chat-sidebar {
         width: 300px;
         border-right: 1px solid var(--border);
@@ -23,7 +20,6 @@
         flex-direction: column;
         background: #fafafa;
     }
-
     .chat-sidebar-header {
         padding: 20px;
         background: var(--black);
@@ -31,12 +27,10 @@
         font-weight: 700;
         font-size: 16px;
     }
-
     .customer-list-group {
         flex: 1;
         overflow-y: auto;
     }
-
     .customer-chat-item {
         padding: 15px 20px;
         border-bottom: 1px solid #f0f0f0;
@@ -46,17 +40,14 @@
         gap: 12px;
         transition: all 0.2s ease;
     }
-
     .customer-chat-item:hover {
         background: #f1f3f5;
     }
-
     .customer-chat-item.active-chat {
         background: rgba(216, 31, 25, 0.08);
         border-left: 4px solid var(--main-red);
         font-weight: 600;
     }
-
     .avatar-icon {
         width: 40px;
         height: 40px;
@@ -68,15 +59,12 @@
         justify-content: center;
         font-size: 16px;
     }
-
-    /* Vùng nội dung chat bên phải */
     .chat-main {
         flex: 1;
         display: flex;
         flex-direction: column;
         background: var(--light-bg);
     }
-
     .chat-main-header {
         padding: 18px 25px;
         background: var(--white);
@@ -85,7 +73,6 @@
         color: var(--black);
         font-size: 18px;
     }
-
     .chat-messages-container {
         flex: 1;
         padding: 25px;
@@ -94,8 +81,6 @@
         flex-direction: column;
         gap: 12px;
     }
-
-    /* Bubble bong bóng tin nhắn */
     .chat-bubble {
         max-width: 65%;
         padding: 12px 16px;
@@ -104,7 +89,6 @@
         line-height: 1.4;
         word-wrap: break-word;
     }
-
     .chat-bubble.customer-type {
         background: var(--white);
         color: var(--black);
@@ -112,7 +96,6 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         border-bottom-left-radius: 4px;
     }
-
     .chat-bubble.admin-type {
         background: var(--main-red);
         color: var(--white);
@@ -120,8 +103,6 @@
         border-bottom-right-radius: 4px;
         box-shadow: 0 2px 6px rgba(216,31,25,0.2);
     }
-
-    /* Thanh nhập liệu phía dưới */
     .chat-input-footer {
         padding: 20px 25px;
         background: var(--white);
@@ -132,7 +113,7 @@
 </style>
 
 <div class="container-fluid p-0">
-    <h1 class="dashboard-title">
+    <h1 class="dashboard-title" style="font-size: 28px; font-weight: 800; color: var(--main-red); margin-bottom: 25px;">
         <i class="fas fa-comments me-2"></i>Tư vấn trực tuyến Realtime
     </h1>
 
@@ -169,57 +150,60 @@
 </div>
 
 <script>
-    // Khởi tạo đường dẫn API trỏ trực tiếp đến ChatAdminController của bạn
     const ADMIN_API = "${root}/api/chat-admin";
     let activeCustomerId = null;
+    let isFirstLoadDetail = false;
 
-    // 1. Tải danh sách khách hàng nhắn tin (action=getChatList)
+
     function fetchChatCustomers() {
         fetch(ADMIN_API + "?action=getChatList")
                 .then(res => res.json())
                 .then(customers => {
                     const container = document.getElementById("customerContainer");
-                    if (customers.length === 0) {
+                    if (!customers || customers.length === 0) {
                         container.innerHTML = '<div class="text-center text-muted py-4 small">Chưa có cuộc hội thoại nào.</div>';
                         return;
                     }
 
                     let html = "";
                     customers.forEach(id => {
+
                         let activeClass = (id === activeCustomerId) ? "active-chat" : "";
-                        // Hiển thị gọn email hoặc chuỗi Guest
                         let shortId = id.length > 22 ? id.substring(0, 20) + "..." : id;
 
-                        html += `
-                        <div class="customer-chat-item ${activeClass}" onclick="selectActiveCustomer('${id}')">
-                            <div class="avatar-icon"><i class="fas fa-user"></i></div>
-                            <div class="text-truncate">
-                                <div class="small text-dark fw-bold" title="${id}">${shortId}</div>
-                                <div class="text-muted" style="font-size: 12px;">Đang trực tuyến</div>
-                            </div>
-                        </div>
-                    `;
+                        html += '<div class="customer-chat-item ' + activeClass + '" onclick="selectActiveCustomer(\'' + id + '\')">' +
+                                '<div class="avatar-icon"><i class="fas fa-user"></i></div>' +
+                                '<div class="text-truncate" style="flex: 1;">' +
+                                '<div class="small text-dark fw-bold" title="' + id + '">' + shortId + '</div>' +
+                                '<div class="text-muted" style="font-size: 12px;">Đang trực tuyến</div>' +
+                                '</div>' +
+                                '</div>';
                     });
                     container.innerHTML = html;
                 })
                 .catch(err => console.error("Lỗi lấy danh sách chat:", err));
     }
 
-    // 2. Click chọn 1 khách hàng cụ thể
-    function selectActiveCustomer(id) {
-        activeCustomerId = id;
-        document.getElementById("currentChatUser").innerHTML = `<i class="fas fa-user-tag text-danger me-2"></i> Hỗ trợ: <strong class="text-dark">${id}</strong>`;
 
-        // Kích hoạt ô nhập liệu
+    function selectActiveCustomer(id) {
+
+        if (activeCustomerId === id) return;
+
+        activeCustomerId = id;
+        isFirstLoadDetail = true;
+
+        document.getElementById("currentChatUser").innerHTML = '<i class="fas fa-user-tag text-danger me-2"></i> Hỗ trợ: <strong class="text-dark">' + id + '</strong>';
+
         document.getElementById("messageInput").disabled = false;
         document.getElementById("sendBtn").disabled = false;
         document.getElementById("messageInput").focus();
 
-        // Cập nhật ngay class active trên giao diện trực quan
+
+        fetchChatCustomers();
         fetchConversationDetail();
     }
 
-    // 3. Lấy lịch sử chat chi tiết (action=getDetail)
+
     function fetchConversationDetail() {
         if (!activeCustomerId) return;
 
@@ -229,38 +213,49 @@
                     const msgContainer = document.getElementById("messagesContainer");
                     let html = "";
 
-                    messages.forEach(msg => {
-                        let bubbleClass = (msg.sender === "ADMIN") ? "admin-type" : "customer-type";
-                        html += `<div class="chat-bubble ${bubbleClass}">${msg.text}</div>`;
-                    });
+                    if (messages && messages.length > 0) {
+                        messages.forEach(msg => {
+
+                            let bubbleClass = (msg.sender && msg.sender.toUpperCase() === "ADMIN") ? "admin-type" : "customer-type";
+                            html += '<div class="chat-bubble ' + bubbleClass + '">' + msg.text + '</div>';
+                        });
+                    } else {
+                        html = '<div class="text-center text-muted my-auto">Chưa có tin nhắn nào.</div>';
+                    }
+
+
+                    const mangCuonXuong = msgContainer.scrollHeight - msgContainer.scrollTop <= msgContainer.clientHeight + 100;
 
                     msgContainer.innerHTML = html;
-                    // Tự động cuộn khung chat xuống đáy khi có tin nhắn mới đổ về
-                    msgContainer.scrollTop = msgContainer.scrollHeight;
+
+
+                    if (isFirstLoadDetail || mangCuonXuong) {
+                        msgContainer.scrollTop = msgContainer.scrollHeight;
+                        isFirstLoadDetail = false;
+                    }
                 })
                 .catch(err => console.error("Lỗi lấy chi tiết chat:", err));
     }
 
-    // 4. Gửi tin nhắn phản hồi (POST)
+
     function sendAdminMessage() {
         const input = document.getElementById("messageInput");
         const text = input.value.trim();
 
         if (text === "" || !activeCustomerId) return;
-
-        // Khóa tạm nút gửi để tránh bấm double click spam dữ liệu trùng lặp
         document.getElementById("sendBtn").disabled = true;
 
         fetch(ADMIN_API, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-            body: `customerId=${encodeURIComponent(activeCustomerId)}&message=${encodeURIComponent(text)}`
+            body: 'customerId=' + encodeURIComponent(activeCustomerId) + '&message=' + encodeURIComponent(text)
         })
                 .then(res => res.json())
                 .then(result => {
                     if (result.success) {
-                        input.value = ""; // Xóa trắng ô nhập sau khi gửi thành công
-                        fetchConversationDetail(); // Re-render tin nhắn mới lên màn hình luôn
+                        input.value = "";
+                        isFirstLoadDetail = true; // Gửi xong ép cuộn màn hình xuống đáy để xem tin nhắn mới
+                        fetchConversationDetail();
                     }
                 })
                 .catch(err => console.error("Lỗi gửi tin nhắn:", err))
@@ -275,12 +270,14 @@
         }
     }
 
-    // 5. POLLING LOOP: Chạy ngầm quét dữ liệu định kỳ mỗi 2 giây để tạo hiệu ứng realtime đồng bộ
+
     setInterval(() => {
         fetchChatCustomers();
-        fetchConversationDetail();
-    }, 2000);
+        if (activeCustomerId) {
+            fetchConversationDetail();
+        }
+    }, 2500);
 
-    // Chạy kích hoạt nạp danh sách ngay khi vừa load trang
+
     fetchChatCustomers();
 </script>

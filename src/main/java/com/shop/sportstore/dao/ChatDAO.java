@@ -1,42 +1,43 @@
 package com.shop.sportstore.dao;
-
-
 import com.shop.sportstore.model.ChatMessage;
-
+import com.shop.sportstore.untils.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChatDAO {
 
-    private Connection getConnection() throws Exception {
-        String url = "jdbc:mysql://localhost:3306/sportstore?useUnicode=true&characterEncoding=utf-8";
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        return DriverManager.getConnection(url, "root", "");
-    }
+
 
     public boolean saveMessage(ChatMessage msg) {
-        String sql = "INSERT INTO chats (customer_id, sender, message, created_at) VALUES (?, ?, ?, NOW())";
-        try (Connection conn = getConnection();
+        String sql = "INSERT INTO chats (customer_id, sender, message) VALUES (?, ?, ?)";
+
+
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, msg.getCustomerId());
-            ps.setString(2, msg.getSender());
-            ps.setString(3, msg.getMessage());
+            String customerId = (msg.getCustomerId() != null) ? msg.getCustomerId().trim() : "UNKNOWN";
+            String sender = (msg.getSender() != null) ? msg.getSender().trim() : "customer";
+            String message = (msg.getMessage() != null) ? msg.getMessage().trim() : "";
+
+            ps.setString(1, customerId);
+            ps.setString(2, sender);
+            ps.setString(3, message);
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
+            System.out.println(" LỖI LƯU TIN NHẮN TẠI CHAT_DAO:");
             e.printStackTrace();
         }
         return false;
     }
 
     public List<ChatMessage> getMessagesByCustomer(String customerId) {
-        List<List<ChatMessage>> list = new ArrayList<>(); // Tránh lỗi logic bọc dữ liệu
         List<ChatMessage> messages = new ArrayList<>();
         String sql = "SELECT * FROM chats WHERE customer_id = ? ORDER BY created_at ASC";
 
-        try (Connection conn = getConnection();
+
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, customerId);
@@ -52,25 +53,28 @@ public class ChatDAO {
                 }
             }
         } catch (Exception e) {
+            System.out.println(" LỖI LẤY CHI TIẾT TIN NHẮN TẠI CHAT_DAO:");
             e.printStackTrace();
         }
         return messages;
     }
 
     public List<String> getActiveCustomers() {
-        List<String> customers = new ArrayList<>();
-        String sql = "SELECT customer_id, MAX(created_at) as last_chat FROM chats GROUP BY customer_id ORDER BY last_chat DESC";
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT customer_id FROM chats GROUP BY customer_id ORDER BY MAX(created_at) DESC";
 
-        try (Connection conn = getConnection();
+
+        try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                customers.add(rs.getString("customer_id"));
+                list.add(rs.getString("customer_id"));
             }
         } catch (Exception e) {
+            System.out.println(" LỖI LẤY DANH SÁCH KHÁCH HÀNG TẠI CHAT_DAO:");
             e.printStackTrace();
         }
-        return customers;
+        return list;
     }
 }
