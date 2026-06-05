@@ -2,6 +2,11 @@ package com.shop.sportstore.dao;
 
 import com.shop.sportstore.model.User;
 import com.shop.sportstore.untils.DBConnection;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
 import java.sql.*;
 
 public class UserDAO extends DBConnection {
@@ -237,4 +242,55 @@ public class UserDAO extends DBConnection {
         }
         return false;
     }
+
+    public boolean updatePassword(String email, String newPassword) {
+
+        String sql =
+                "UPDATE users SET password = ? WHERE email = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPassword);
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private void verifyOTP(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpSession session)
+            throws IOException {
+
+        String userOTP =
+                request.getParameter("otp");
+
+        String sessionOTP =
+                (String)session.getAttribute("OTP");
+
+        response.setContentType("application/json");
+
+        if(sessionOTP != null &&
+                sessionOTP.equals(userOTP)){
+
+            response.getWriter().write(
+                    "{\"success\":true}"
+            );
+
+        }else{
+
+            response.getWriter().write(
+                    "{\"success\":false}"
+            );
+        }
+    }
+
+
 }

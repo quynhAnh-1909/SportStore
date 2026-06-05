@@ -7,6 +7,7 @@ import com.shop.sportstore.model.User;
 import com.shop.sportstore.untils.FacebookUtils;
 import com.shop.sportstore.untils.GoogleUtils;
 
+import com.shop.sportstore.untils.MailUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -17,7 +18,10 @@ import java.io.IOException;
         "/register",
         "/logout",
         "/login-google",
-        "/login-facebook"
+        "/login-facebook",
+        "/forgot-password",
+        "/verify-otp",
+        "/reset-password"
 })
 public class AuthServlet extends HttpServlet {
 
@@ -62,6 +66,18 @@ public class AuthServlet extends HttpServlet {
                 break;
             case "/register":
                 handleRegister(request, response, session);
+                break;
+
+            case "/forgot-password":
+                forgotPassword(request,response,session);
+                break;
+
+            case "/verify-otp":
+                verifyOTP(request,response,session);
+                break;
+
+            case "/reset-password":
+                resetPassword(request,response,session);
                 break;
             default:
                 response.sendRedirect(request.getContextPath() + "/products");
@@ -158,6 +174,109 @@ public class AuthServlet extends HttpServlet {
             }
             response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
         }
+    }
+
+    private void forgotPassword(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpSession session)
+            throws IOException {
+
+        String email =
+                request.getParameter("email");
+
+        User user =
+                dao.findByEmail(email);
+
+        response.setContentType("application/json");
+
+        if(user == null){
+
+            response.getWriter().write(
+                    "{\"success\":false,\"message\":\"Email không tồn tại\"}"
+            );
+
+            return;
+        }
+
+        String otp =
+                String.valueOf(
+                        (int)(100000 + Math.random()*900000)
+                );
+
+        session.setAttribute("OTP", otp);
+        session.setAttribute("OTP_EMAIL", email);
+
+        try{
+
+            MailUtils.sendOTP(email, otp);
+
+            response.getWriter().write(
+                    "{\"success\":true}"
+            );
+
+        }catch(Exception e){
+
+            e.printStackTrace();
+
+            response.getWriter().write(
+                    "{\"success\":false,\"message\":\"Không gửi được OTP\"}"
+            );
+        }
+    }
+
+    private void verifyOTP(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpSession session)
+            throws IOException {
+
+        String userOTP =
+                request.getParameter("otp");
+
+        String sessionOTP =
+                (String)session.getAttribute("OTP");
+
+        response.setContentType("application/json");
+
+        if(sessionOTP != null &&
+                sessionOTP.equals(userOTP)){
+
+            response.getWriter().write(
+                    "{\"success\":true}"
+            );
+
+        }else{
+
+            response.getWriter().write(
+                    "{\"success\":false}"
+            );
+        }
+    }
+
+    private void resetPassword(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpSession session)
+            throws IOException {
+
+        String newPassword =
+                request.getParameter("password");
+
+        String email =
+                (String)session.getAttribute("OTP_EMAIL");
+
+        boolean ok =
+                dao.updatePassword(
+                        email,
+                        newPassword
+                );
+
+        response.setContentType("application/json");
+
+        response.getWriter().write(
+                "{\"success\":"+ok+"}"
+        );
     }
 
     private void handleRegister(HttpServletRequest request, HttpServletResponse response, HttpSession session)
