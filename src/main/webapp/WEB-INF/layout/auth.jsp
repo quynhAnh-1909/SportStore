@@ -91,7 +91,6 @@
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-
     .input-success {
         border-color: #2ed573 !important;
         box-shadow: 0 0 5px rgba(46, 213, 115, 0.3);
@@ -203,7 +202,6 @@
         margin: 0;
     }
 
-
     .password-requirements {
         background-color: #f9f9f9;
         padding: 10px 12px;
@@ -221,7 +219,6 @@
         gap: 5px;
         transition: color 0.2s ease;
     }
-
 
     .req-invalid { color: #ea3838; }
     .req-valid { color: #2ed573; font-weight: 500; }
@@ -288,7 +285,7 @@
                     <div class="requirement-item req-invalid" id="reqUppercase"> Ít nhất 1 chữ hoa (A-Z)</div>
                     <div class="requirement-item req-invalid" id="reqLowercase"> Ít nhất 1 chữ thường (a-z)</div>
                     <div class="requirement-item req-invalid" id="reqNumber">Ít nhất 1 chữ số (0-9)</div>
-                    <div class="requirement-item req-invalid" id="reqSpecial">Ít nhất 1 ký tự đặc biệt (@, $, !, ...)</div>
+                    <div class="requirement-item req-invalid" id="reqSpecial">Ít nhất 1 ký tự đặc biệt (@, $, !, ...)}</div>
                 </div>
 
                 <div class="error" id="regPassError"></div>
@@ -320,8 +317,8 @@
 
             <div class="form-group">
                 <label>Số điện thoại</label>
-                <input type="text" name="soDienThoai" id="regPhone" value="${activeTab == 'register' && oldUser != null ? oldUser.phoneNumber : ''}">
-                <div class="error" id="regPhoneError"></div>
+                <input type="text" name="soDienThoai" id="regPhone" oninput="checkPhoneLocation(this)" value="${activeTab == 'register' && oldUser != null ? oldUser.phoneNumber : ''}">
+                <div id="regPhoneError"></div>
             </div>
 
             <c:if test="${not empty errorMessage && activeTab == 'register'}">
@@ -386,7 +383,6 @@
         }
     }
 
-
     function validatePasswordFormat(password) {
         let inputField = document.getElementById("regPass");
         let block = document.getElementById("passRequirementsBlock");
@@ -399,20 +395,17 @@
 
         block.style.display = "block";
 
-
         let hasLength = password.length >= 6;
         let hasUpper = /[A-Z]/.test(password);
         let hasLower = /[a-z]/.test(password);
         let hasNumber = /[0-9]/.test(password);
         let hasSpecial = /[^A-Za-z0-9]/.test(password);
 
-
         updateRequirementStatus("reqLength", hasLength, "✓ Tối thiểu 6 ký tự", "Tối thiểu 6 ký tự");
-        updateRequirementStatus("reqUppercase", hasUpper, "✓ Có chữ hoa (A-Z)", "Thiếu chữ hoa (A-Z)");
-        updateRequirementStatus("reqLowercase", hasLower, "✓ Có chữ thường (a-z)", "Thiếu chữ thường (a-z)");
-        updateRequirementStatus("reqNumber", hasNumber, "✓ Có chữ số (0-9)", " Thiếu chữ số (0-9)");
-        updateRequirementStatus("reqSpecial", hasSpecial, "✓ Có ký tự đặc biệt", " Thiếu ký tự đặc biệt (@, $, !, ...)");
-
+        updateRequirementStatus("reqUppercase", hasUpper, " Có chữ hoa (A-Z)", "Thiếu chữ hoa (A-Z)");
+        updateRequirementStatus("reqLowercase", hasLower, " Có chữ thường (a-z)", "Thiếu chữ thường (a-z)");
+        updateRequirementStatus("reqNumber", hasNumber, "Có chữ số (0-9)", " Thiếu chữ số (0-9)");
+        updateRequirementStatus("reqSpecial", hasSpecial, "Có ký tự đặc biệt", " Thiếu ký tự đặc biệt (@, $, !, ...)");
 
         if (hasLength && hasUpper && hasLower && hasNumber && hasSpecial) {
             inputField.classList.add("input-success");
@@ -455,6 +448,83 @@
         }
     }
 
+
+    function checkPhoneLocation(inputElement) {
+        let displayArea = document.getElementById("regPhoneError");
+        let rawPhone = inputElement.value.replace(/\D/g, '');
+
+        if (rawPhone.length > 10) {
+            rawPhone = rawPhone.substr(0, 10);
+        }
+
+        let formattedPhone = "";
+        if (rawPhone.length > 0) {
+            if (rawPhone.length <= 4) {
+                formattedPhone = rawPhone;
+            } else if (rawPhone.length <= 7) {
+                formattedPhone = rawPhone.substr(0, 4) + " " + rawPhone.substr(4);
+            } else {
+                formattedPhone = rawPhone.substr(0, 4) + " " + rawPhone.substr(4, 3) + " " + rawPhone.substr(7);
+            }
+        }
+        inputElement.value = formattedPhone;
+
+        if (rawPhone === "") {
+            displayArea.innerHTML = "";
+            inputElement.classList.remove("input-success");
+            return;
+        }
+
+        if (rawPhone.length < 10) {
+            displayArea.className = "error";
+            displayArea.innerText = " Đang nhập... (Cần đủ 10 chữ số)";
+            inputElement.classList.remove("input-success");
+            return;
+        }
+
+        if (rawPhone.length === 10) {
+            let uniqueChars = new Set(rawPhone);
+            if (uniqueChars.size === 1) {
+                displayArea.className = "error";
+                displayArea.innerText = "SĐT ảo không hợp lệ (Chuỗi số lặp)!";
+                inputElement.classList.remove("input-success");
+                return;
+            }
+
+            if (rawPhone === "0123456789" || rawPhone === "9876543210") {
+                displayArea.className = "error";
+                displayArea.innerText = " SĐT ảo không hợp lệ (Chuỗi số liên tiếp)!";
+                inputElement.classList.remove("input-success");
+                return;
+            }
+
+            let carrier = "";
+            let prefix3 = rawPhone.substr(0, 3);
+
+            const viettel = ["032", "033", "034", "035", "036", "037", "038", "039", "086", "096", "097", "098"];
+            const mobifone = ["070", "076", "077", "078", "079", "089", "090", "093"];
+            const vinaphone = ["081", "082", "083", "084", "085", "088", "091", "094"];
+            const vietnamobile = ["056", "058", "092"];
+            const itel_wintel = ["055", "059", "087"];
+
+            if (viettel.includes(prefix3)) carrier = "Viettel";
+            else if (mobifone.includes(prefix3)) carrier = "MobiFone";
+            else if (vinaphone.includes(prefix3)) carrier = "VinaPhone";
+            else if (vietnamobile.includes(prefix3)) carrier = "Vietnamobile";
+            else if (itel_wintel.includes(prefix3)) carrier = "Mạng ảo (Wintel/iTel...)";
+
+            if (carrier !== "") {
+                displayArea.className = "success-text";
+                displayArea.innerText = "✓ SĐT hợp lệ - Nhà mạng: " + carrier;
+                inputElement.classList.add("input-success");
+            } else {
+                displayArea.className = "error";
+                displayArea.innerText = " Đầu số không tồn tại tại VN!";
+                inputElement.classList.remove("input-success");
+            }
+        }
+    }
+
     function validateLogin() {
         let valid = true;
         document.getElementById("loginEmailError").innerText = "";
@@ -485,18 +555,19 @@
         document.getElementById("regPassError").innerText = "";
         document.getElementById("regConfirmPassError").innerHTML = "";
         document.getElementById("regGenderError").innerText = "";
-        document.getElementById("regPhoneError").innerText = "";
+
+        let phoneField = document.getElementById("regPhone");
+        let phoneError = document.getElementById("regPhoneError");
 
         let name = document.getElementById("regName").value.trim();
         let email = document.getElementById("regEmail").value.trim();
         let pass = document.getElementById("regPass").value.trim();
         let confirmPass = document.getElementById("regConfirmPass").value.trim();
-        let phone = document.getElementById("regPhone").value.trim();
+        let rawPhone = phoneField.value.replace(/\D/g, '');
         let isMaleChecked = document.getElementById("genderMale").checked;
         let isFemaleChecked = document.getElementById("genderFemale").checked;
 
         let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        let phoneRegex = /^[0-9]{9,12}$/;
 
         if (name === "") {
             document.getElementById("regNameError").innerText = "Vui lòng nhập họ tên";
@@ -509,7 +580,6 @@
             document.getElementById("regEmailError").innerText = "Email không hợp lệ";
             valid = false;
         }
-
 
         let hasLength = pass.length >= 6;
         let hasUpper = /[A-Z]/.test(pass);
@@ -534,12 +604,16 @@
             document.getElementById("regGenderError").innerText = "Vui lòng chọn giới tính";
             valid = false;
         }
-        if (phone !== "" && !phoneRegex.test(phone)) {
-            document.getElementById("regPhoneError").innerText = "Số điện thoại không hợp lệ";
+
+        if (rawPhone !== "" && !phoneField.classList.contains("input-success")) {
+            phoneError.className = "error";
+            phoneError.innerText = "Số điện thoại không hợp lệ hoặc không thuộc hệ thống VN!";
             valid = false;
         }
+
         return valid;
     }
+
 
     function togglePassword(inputId, iconElement) {
         let input = document.getElementById(inputId);
