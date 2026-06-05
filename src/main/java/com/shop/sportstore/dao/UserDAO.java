@@ -49,15 +49,15 @@ public class UserDAO extends DBConnection {
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPassword());
-
-            // CẬP NHẬT: Đảm bảo loại bỏ khoảng trắng định dạng trước khi lưu database
             String phone = user.getPhoneNumber();
             if (phone != null) {
                 phone = phone.replaceAll("\\s+", "");
             }
             ps.setString(4, phone);
 
-            ps.setString(5, user.getGioiTinh()); // gender nằm đúng vị trí theo cấu trúc ALTER TABLE
+            ps.setString(5, user.getGioiTinh()); 
+            ps.setString(4, user.getPhoneNumber());
+            ps.setString(5, user.getGioiTinh()); /
 
 
             String role = (user.getRole() == null || user.getRole().trim().isEmpty()) ? "USER" : user.getRole();

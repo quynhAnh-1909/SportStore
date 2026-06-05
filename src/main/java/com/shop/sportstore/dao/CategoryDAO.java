@@ -147,4 +147,60 @@ public class CategoryDAO {
 
         return list;
     }
+    public Category getCategoryById(int id) {
+
+        String sql = "SELECT * FROM category WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                Category c = new Category();
+
+                c.setId(rs.getInt("id"));
+                c.setName(rs.getString("name"));
+                c.setParentId((Integer) rs.getObject("parent_id"));
+
+                return c;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    public void updateCategory(int id,
+                               String name,
+                               String parentId) {
+
+        String sql =
+                "UPDATE category " +
+                        "SET name = ?, parent_id = ? " +
+                        "WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+
+            if (parentId == null || parentId.isEmpty()) {
+                ps.setNull(2, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(2, Integer.parseInt(parentId));
+            }
+
+            ps.setInt(3, id);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
