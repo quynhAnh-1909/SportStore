@@ -209,6 +209,10 @@ public class AuthServlet extends HttpServlet {
             String accessToken = GoogleUtils.getToken(code);
             GoogleUser googleUser = GoogleUtils.getUserInfo(accessToken);
 
+            System.out.println("EMAIL = " + googleUser.getEmail());
+            System.out.println("NAME = " + googleUser.getName());
+            System.out.println("AVATAR = " + googleUser.getPicture());
+
             User user =
                     dao.findOrCreateSocialUser(
                             googleUser.getEmail(),
@@ -240,25 +244,43 @@ public class AuthServlet extends HttpServlet {
 
         try {
             if (code == null) {
-                String appId = "YOUR_FB_APP_ID";
-                String redirectUri = "http://localhost:8080/SportStore/login-facebook";
+
+                String appId = "3605093742977294";
+
+                String redirectUri =
+                        "https://norbert-wintrier-nicol.ngrok-free.dev/login-facebook";
+
                 String fbURL = "https://www.facebook.com/v18.0/dialog/oauth?"
                         + "client_id=" + appId
                         + "&redirect_uri=" + redirectUri
                         + "&response_type=code"
-                        + "&scope=email,public_profile";
+                        + "&scope=public_profile";
+
                 response.sendRedirect(fbURL);
                 return;
             }
 
             String accessToken = FacebookUtils.getToken(code);
             FacebookUser fbUser = FacebookUtils.getUserInfo(accessToken);
+            System.out.println("FB ID = " + fbUser.getId());
+            System.out.println("FB NAME = " + fbUser.getName());
+            System.out.println("FB EMAIL = " + fbUser.getEmail());
 
             if (fbUser.getEmail() == null) {
                 fbUser.setEmail(fbUser.getId() + "@facebook.com");
             }
 
-            User user = dao.findOrCreateSocialUser(fbUser.getEmail(), fbUser.getName(), "FACEBOOK");
+            String avatar =
+                    "https://graph.facebook.com/"
+                            + fbUser.getId()
+                            + "/picture?type=large";
+
+            User user = dao.findOrCreateSocialUser(
+                    fbUser.getEmail(),
+                    fbUser.getName(),
+                    "FACEBOOK",
+                    avatar
+            );
 
             if (!user.isStatus()) {
                 session.setAttribute("errorMessage", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");

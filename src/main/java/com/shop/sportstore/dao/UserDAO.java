@@ -135,8 +135,27 @@ public class UserDAO extends DBConnection {
 
         } else {
 
-            // cập nhật avatar mới nếu Google đổi avatar
-            user.setAvatar(avatar);
+            String sql =
+                    "UPDATE users " +
+                            "SET avatar = ?, provider = ? " +
+                            "WHERE email = ?";
+
+            try (Connection conn = getConnection();
+                 PreparedStatement ps =
+                         conn.prepareStatement(sql)) {
+
+                ps.setString(1, avatar);
+                ps.setString(2, provider);
+                ps.setString(3, email);
+
+                ps.executeUpdate();
+
+                user.setAvatar(avatar);
+                user.setProvider(provider);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return user;
