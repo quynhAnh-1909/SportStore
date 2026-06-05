@@ -48,7 +48,7 @@ public class UserDAO extends DBConnection {
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPassword());
             ps.setString(4, user.getPhoneNumber());
-            ps.setString(5, user.getGioiTinh()); /
+            ps.setString(5, user.getGioiTinh());
 
 
             String role = (user.getRole() == null || user.getRole().trim().isEmpty()) ? "USER" : user.getRole();
@@ -85,30 +85,60 @@ public class UserDAO extends DBConnection {
         return null;
     }
 
-    public User findOrCreateSocialUser(String email, String name, String provider) {
+    public User findOrCreateSocialUser(
+            String email,
+            String name,
+            String provider,
+            String avatar) {
+
         User user = findByEmail(email);
+
         if (user == null) {
-            String sql = "INSERT INTO users (full_name, email, password, role, provider) VALUES (?, ?, '', 'USER', ?)";
+
+            String sql =
+                    "INSERT INTO users " +
+                            "(full_name, email, password, role, provider, avatar) " +
+                            "VALUES (?, ?, '', 'USER', ?, ?)";
+
             try (Connection conn = getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                 PreparedStatement ps =
+                         conn.prepareStatement(
+                                 sql,
+                                 Statement.RETURN_GENERATED_KEYS)) {
+
                 ps.setString(1, name);
                 ps.setString(2, email);
                 ps.setString(3, provider);
+                ps.setString(4, avatar);
+
                 ps.executeUpdate();
+
                 try (ResultSet rs = ps.getGeneratedKeys()) {
+
                     if (rs.next()) {
+
                         user = new User();
+
                         user.setUserId(rs.getInt(1));
                         user.setFullName(name);
                         user.setEmail(email);
                         user.setRole("USER");
+                        user.setProvider(provider);
+                        user.setAvatar(avatar);
                         user.setStatus(true);
                     }
                 }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+        } else {
+
+            // cập nhật avatar mới nếu Google đổi avatar
+            user.setAvatar(avatar);
         }
+
         return user;
     }
 
@@ -120,7 +150,8 @@ public class UserDAO extends DBConnection {
         user.setPassword(rs.getString("password"));
         user.setPhoneNumber(rs.getString("phone_number"));
         user.setRole(rs.getString("role"));
-
+        user.setAvatar(rs.getString("avatar"));
+        user.setProvider(rs.getString("provider"));
 
         user.setStatus(rs.getInt("status") == 1 || rs.getBoolean("status"));
 
@@ -130,10 +161,6 @@ public class UserDAO extends DBConnection {
             System.out.println("Cột giới tính chưa tồn tại trong ResultSet");
         }
         return user;
-    }
-
-    public User findOrCreateSocialUser(String email, String name) {
-        return findOrCreateSocialUser(email, name, "SOCIAL");
     }
 
     public User getUserById(int id) throws SQLException {

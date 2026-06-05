@@ -15,7 +15,7 @@ public class FacebookUtils {
 
         String appId = "YOUR_FB_APP_ID";
         String appSecret = "YOUR_FB_SECRET";
-        String redirectUri = "http://localhost:8080/your-app/login-facebook";
+        String redirectUri = "http://localhost:8080/SportStore/login-facebook";
 
         String link = "https://graph.facebook.com/v18.0/oauth/access_token?"
                 + "client_id=" + appId

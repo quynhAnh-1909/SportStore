@@ -195,8 +195,8 @@ public class AuthServlet extends HttpServlet {
 
         try {
             if (code == null) {
-                String clientId = "YOUR_CLIENT_ID";
-                String redirectUri = "http://localhost:8080/SportStore/login-google";
+                String clientId = "1021470481637-vv36ulkhn7f0mv47vumauputq70rqnt7.apps.googleusercontent.com";
+                String redirectUri = "https://norbert-wintrier-nicol.ngrok-free.dev/login-google";
                 String googleURL = "https://accounts.google.com/o/oauth2/v2/auth?"
                         + "scope=email profile"
                         + "&redirect_uri=" + redirectUri
@@ -209,7 +209,13 @@ public class AuthServlet extends HttpServlet {
             String accessToken = GoogleUtils.getToken(code);
             GoogleUser googleUser = GoogleUtils.getUserInfo(accessToken);
 
-            User user = dao.findOrCreateSocialUser(googleUser.getEmail(), googleUser.getName(), "GOOGLE");
+            User user =
+                    dao.findOrCreateSocialUser(
+                            googleUser.getEmail(),
+                            googleUser.getName(),
+                            "GOOGLE",
+                            googleUser.getPicture()
+                    );
 
             if (!user.isStatus()) {
                 session.setAttribute("errorMessage", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
