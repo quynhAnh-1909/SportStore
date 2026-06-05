@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
 <div class="container-fluid pt-4 px-4">
     <div class="bg-white rounded p-4 shadow-sm border">
 
@@ -23,7 +25,7 @@
 
         <c:if test="${not empty orders}">
             <div class="table-responsive">
-                <table class="table compact-table table-bordered table-hover align-middle text-center mb-0">
+                <table id="orderTable" class="table compact-table table-bordered table-hover align-middle text-center mb-0">
                     <thead class="table-dark">
                     <tr>
                         <th style="width: 50px;">#</th>
@@ -38,11 +40,9 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <c:set var="stt" value="1"/>
                     <c:forEach var="order" items="${orders}">
                         <tr>
-                            <td>${stt}</td>
-                            <c:set var="stt" value="${stt + 1}"/>
+                            <td class="stt-column"></td>
 
                             <td class="fw-bold">${order.orderCode}</td>
                             <td class="fw-semibold text-success">${order.userFullName}</td>
@@ -65,8 +65,17 @@
                                     <c:when test="${order.status eq 'COMPLETED'}">
                                         <span class="badge bg-success text-white">Hoàn tất</span>
                                     </c:when>
-                                    <c:when test='${order.status eq "CANCELLED"}'>
+                                    <c:when test="${order.status eq 'CANCELLED'}">
                                         <span class="badge bg-danger text-white">Đã hủy</span>
+                                    </c:when>
+                                    <c:when test="${order.status eq 'PENDING_REFUND' || order.status eq 'REFUND_PENDING'}">
+                                        <span class="badge bg-warning text-dark">Chờ hoàn tiền</span>
+                                    </c:when>
+                                    <c:when test="${order.status eq 'REFUNDED'}">
+                                        <span class="badge bg-success text-white">Đã hoàn tiền</span>
+                                    </c:when>
+                                    <c:when test="${order.status eq 'REFUND_REJECTED'}">
+                                        <span class="badge bg-danger text-white">Từ chối hoàn</span>
                                     </c:when>
                                     <c:otherwise>
                                         <span class="badge bg-secondary text-white">${order.status}</span>
@@ -80,7 +89,6 @@
                                 <div class="d-flex flex-column gap-1">
                                     <div class="d-flex justify-content-center gap-2 flex-wrap">
 
-                                            <%-- 1. TRẠNG THÁI CHỜ XỬ LÝ --%>
                                         <c:if test="${order.status eq 'PENDING'}">
                                             <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
                                                   data-success-msg="Xác nhận đơn hàng! Đã chuyển sang danh mục Chờ lấy hàng." data-success-color="#198754">
@@ -97,7 +105,6 @@
                                             </form>
                                         </c:if>
 
-                                            <%-- 2. TRẠNG THÁI CHỜ LẤY HÀNG  --%>
                                         <c:if test="${order.status eq 'CONFIRMED'}">
                                             <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
                                                   data-success-msg="Đã đẩy thông tin sang GHN! Đơn hàng chuyển sang danh mục Đang giao." data-success-color="#0d6efd">
@@ -109,7 +116,6 @@
                                             </form>
                                         </c:if>
 
-                                            <%-- 3. TRẠNG THÁI ĐANG GIAO HÀNG --%>
                                         <c:if test="${order.status eq 'SHIPPING'}">
                                             <button type="button" class="btn btn-sm btn-warning text-dark fw-bold btn-tracking" data-ghncode="${order.ghnCode}">
                                                 <i class="fas fa-route me-1"></i> Lịch trình
@@ -123,11 +129,26 @@
                                             </form>
                                         </c:if>
 
+                                        <c:if test="${order.status eq 'PENDING_REFUND' || order.status eq 'REFUND_PENDING'}">
+                                            <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
+                                                  data-success-msg="Đã phê duyệt và thực hiện hoàn tiền!" data-success-color="#198754">
+                                                <input type="hidden" name="action" value="approveRefund">
+                                                <input type="hidden" name="id" value="${order.id}">
+                                                <button type="submit" class="btn btn-sm btn-success">Hoàn tiền</button>
+                                            </form>
+
+                                            <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
+                                                  data-success-msg="Đã từ chối yêu cầu hoàn tiền!" data-success-color="#dc3545">
+                                                <input type="hidden" name="action" value="rejectRefund">
+                                                <input type="hidden" name="id" value="${order.id}">
+                                                <button type="submit" class="btn btn-sm btn-danger">Từ chối</button>
+                                            </form>
+                                        </c:if>
+
                                     </div>
 
                                     <div>
-                                        <a href="${pageContext.request.contextPath}/admin/orders/details?orderCode=${order.orderCode}"
-                                           class="btn btn-sm btn-outline-info w-100">
+                                        <a href="${pageContext.request.contextPath}/admin/orders/details?orderCode=${order.orderCode}" class="btn btn-sm btn-outline-info w-100">
                                             <i class="fas fa-eye"></i> Chi tiết đơn
                                         </a>
                                     </div>
@@ -164,74 +185,26 @@
 </div>
 
 <style>
-    .compact-table{
-        table-layout: fixed;
-        font-size: 13px;
-    }
-    .compact-table th,
-    .compact-table td{
-        padding: 12px 8px !important;
-        vertical-align: middle;
-        word-wrap: break-word;
-    }
-    .compact-table .btn{
-        font-size: 12px;
-        padding: 5px 10px;
-    }
-    .compact-table .badge{
-        font-size: 11px;
-        padding: 6px 10px;
-    }
-
-    .timeline-list {
-        list-style-type: none;
-        position: relative;
-        padding-left: 30px;
-        margin: 0;
-    }
-    .timeline-list:before {
-        content: ' ';
-        background: #ced4da;
-        display: inline-block;
-        position: absolute;
-        left: 11px;
-        width: 2px;
-        height: 100%;
-        z-index: 400;
-    }
-    .timeline-item {
-        margin: 20px 0;
-        position: relative;
-    }
-
-    .timeline-marker {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: #6c757d;
-        position: absolute;
-        left: -24px;
-        top: 5px;
-        z-index: 400;
-        border: 2px solid #fff;
-    }
-    .timeline-item:first-child .timeline-marker {
-        background: #198754;
-        box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.3);
-    }
-    .timeline-date {
-        font-size: 11px;
-        color: #6c757d;
-        font-weight: bold;
-    }
-    .timeline-content {
-        font-size: 13px;
-        color: #212529;
-        margin-top: 2px;
-    }
+    .compact-table{ table-layout: fixed; font-size: 13px; }
+    .compact-table th, .compact-table td{ padding: 12px 8px !important; vertical-align: middle; word-wrap: break-word; }
+    .compact-table .btn{ font-size: 12px; padding: 5px 10px; }
+    .compact-table .badge{ font-size: 11px; padding: 6px 10px; }
+    .timeline-list { list-style-type: none; position: relative; padding-left: 30px; margin: 0; }
+    .timeline-list:before { content: ' '; background: #ced4da; display: inline-block; position: absolute; left: 11px; width: 2px; height: 100%; z-index: 400; }
+    .timeline-item { margin: 20px 0; position: relative; }
+    .timeline-marker { width: 12px; height: 12px; border-radius: 50%; background: #6c757d; position: absolute; left: -24px; top: 5px; z-index: 400; border: 2px solid #fff; }
+    .timeline-item:first-child .timeline-marker { background: #198754; box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.3); }
+    .timeline-date { font-size: 11px; color: #6c757d; font-weight: bold; }
+    .timeline-content { font-size: 13px; color: #212529; margin-top: 2px; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 0px !important; margin: 2px !important; }
+    .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter { margin-bottom: 15px; font-size: 13px; }
 </style>
 
 <div id="toast" style="position: fixed; top: 20px; right: 20px; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-weight: bold;"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
     function showToast(message, color) {
@@ -241,6 +214,7 @@
         toast.style.display = "block";
         setTimeout(() => { toast.style.display = "none"; }, 3500);
     }
+
     function translateGhnStatus(status) {
         const mapping = {
             'ready_to_pick': 'Mới tạo đơn - Chờ lấy hàng',
@@ -264,6 +238,30 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
+        const table = $('#orderTable').DataTable({
+            "pageLength": 10,
+            "lengthChange": false,
+            "ordering": false,
+            "info": true,
+            "dom": '<"d-flex justify-content-between align-items-center mb-3"f>t<"d-flex justify-content-between align-items-center mt-3"ip>',
+            "language": {
+                "search": "Tìm kiếm nhanh:",
+                "info": "Hiển thị dòng _START_ đến _END_ trên tổng số _TOTAL_ đơn hàng",
+                "paginate": {
+                    "next": '<i class="fas fa-chevron-right"></i>',
+                    "previous": '<i class="fas fa-chevron-left"></i>'
+                },
+                "zeroRecords": "Không tìm thấy dữ liệu khớp"
+            }
+        });
+
+        table.on('order.dt search.dt', function () {
+            let i = 1;
+            table.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
+                this.data(i++);
+            });
+        }).draw();
+
         const ajaxForms = document.querySelectorAll('.ajax-form');
         ajaxForms.forEach(form => {
             form.addEventListener('submit', function(event) {
@@ -292,11 +290,8 @@
                                     rowElement.style.transition = "opacity 0.4s ease";
                                     rowElement.style.opacity = "0";
                                     setTimeout(() => {
-                                        rowElement.remove();
-                                        const tbody = document.querySelector('table tbody');
-                                        if (tbody && tbody.children.length === 0) {
-                                            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Đã xử lý hết đơn hàng trong mục này.</td></tr>';
-                                        }
+                                        var tableInstance = $('#orderTable').DataTable();
+                                        tableInstance.row($(rowElement)).remove().draw(false);
                                     }, 400);
                                 }
                             } else {
@@ -311,6 +306,7 @@
                         });
             });
         });
+
         const trackingModalElement = document.getElementById('trackingModal');
         if (trackingModalElement) {
             const trackingModal = new bootstrap.Modal(trackingModalElement);
@@ -351,9 +347,7 @@
                                             const d = new Date(item.updated_date);
                                             formattedTime = d.toLocaleDateString('vi-VN') + " " + d.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
                                         }
-
                                         const statusVietnamese = translateGhnStatus(item.status);
-
                                         htmlContent += `
                                     <li class="timeline-item">
                                         <div class="timeline-marker"></div>
@@ -362,7 +356,6 @@
                                     </li>
                                 `;
                                     });
-
                                     timelineContainer.innerHTML = htmlContent;
                                 } else {
                                     timelineContainer.innerHTML = `

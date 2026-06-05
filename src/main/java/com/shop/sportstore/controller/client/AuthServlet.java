@@ -28,7 +28,6 @@ public class AuthServlet extends HttpServlet {
         dao = new UserDAO();
     }
 
-
     private void loginUser(HttpSession session, HttpServletRequest request,
                            HttpServletResponse response, User user) throws IOException {
 
@@ -37,8 +36,13 @@ public class AuthServlet extends HttpServlet {
         session.setAttribute("userFullName", user.getFullName());
         session.setAttribute("userRole", user.getRole());
 
+
+        session.removeAttribute("errorMessage");
+        session.removeAttribute("activeTab");
+        session.removeAttribute("oldUser");
+
         if ("ADMIN".equals(user.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            response.sendRedirect(request.getContextPath() + "/admin/");
         } else {
             response.sendRedirect(request.getContextPath() + "/products");
         }
@@ -64,7 +68,6 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -73,7 +76,6 @@ public class AuthServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         switch (path) {
-
             case "/logout":
                 session.invalidate();
                 response.sendRedirect(request.getContextPath() + "/products");
@@ -97,30 +99,34 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-    // ================= LOGIN (XỬ LÝ ĐẾM SAI PASS VÀ KHÓA TÀI KHOẢN) =================
-    private void handleLogin(HttpServletRequest request,
-                             HttpServletResponse response,
-                             HttpSession session)
+    private void handleLogin(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws ServletException, IOException {
 
         String email = request.getParameter("email");
         String pass = request.getParameter("password");
 
-        // 1. Kiểm tra xem tài khoản có đang bị khóa 15 phút không
+        User oldUser = new User();
+        oldUser.setEmail(email);
+        session.setAttribute("oldUser", oldUser);
+
+
+        session.setAttribute("activeTab", "login");
+
+
         Long lockTime = (Long) session.getAttribute("lockTime");
         if (lockTime != null) {
             long currentTime = System.currentTimeMillis();
-            long unlockTime = lockTime + (15 * 60 * 1000); // 15 phút
+            long unlockTime = lockTime + (15 * 60 * 1000);
 
             if (currentTime < unlockTime) {
                 long remainingMinutes = (unlockTime - currentTime) / (60 * 1000);
-                if (remainingMinutes == 0) remainingMinutes = 1; // Hiển thị tối thiểu 1 phút
+                if (remainingMinutes == 0) remainingMinutes = 1;
 
-                session.setAttribute("errorLogin", "Tài khoản tạm khóa. Vui lòng thử lại sau " + remainingMinutes + " phút.");
+                session.setAttribute("errorMessage", "Tài khoản tạm khóa. Vui lòng thử lại sau " + remainingMinutes + " phút.");
                 response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
-                return; // Chặn luôn
+                return;
             } else {
-                // Đã hết 15 phút -> Xóa trạng thái khóa
+
                 session.removeAttribute("lockTime");
                 session.removeAttribute("loginAttempts");
             }
@@ -129,19 +135,16 @@ public class AuthServlet extends HttpServlet {
         User user = dao.checkLogin(email, pass);
 
         if (user != null) {
-            // 2. Kiểm tra xem tài khoản có bị khóa vĩnh viễn (do hủy đơn) trong Database không
             if (!user.isStatus()) {
-                session.setAttribute("errorLogin", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
+                session.setAttribute("errorMessage", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
                 response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
                 return;
             }
-
-            // Đăng nhập thành công -> Xóa đếm lỗi và Login
             session.removeAttribute("loginAttempts");
             loginUser(session, request, response, user);
 
         } else {
-            // 3. Đăng nhập thất bại  Đếm số lần sai
+
             Integer attempts = (Integer) session.getAttribute("loginAttempts");
             if (attempts == null) attempts = 0;
             attempts++;
@@ -149,49 +152,46 @@ public class AuthServlet extends HttpServlet {
 
             if (attempts >= 5) {
                 session.setAttribute("lockTime", System.currentTimeMillis());
-                session.setAttribute("errorLogin", "Sai mật khẩu 5 lần. Tài khoản bị khóa 15 phút!");
+                session.setAttribute("errorMessage", "Sai mật khẩu 5 lần. Tài khoản bị khóa 15 phút!");
             } else {
-                session.setAttribute("errorLogin", "Email hoặc mật khẩu không chính xác! (Lần " + attempts + "/5)");
+                session.setAttribute("errorMessage", "Email hoặc mật khẩu không chính xác! (Lần " + attempts + "/5)");
             }
             response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
         }
     }
 
-    // ================= REGISTER =================
-    private void handleRegister(HttpServletRequest request,
-                                HttpServletResponse response,
-                                HttpSession session)
+    private void handleRegister(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws ServletException, IOException {
 
         User newUser = new User();
         newUser.setFullName(request.getParameter("hoTen"));
         newUser.setEmail(request.getParameter("email"));
         newUser.setPassword(request.getParameter("matKhau"));
-
-
         newUser.setGioiTinh(request.getParameter("gioiTinh"));
-
         newUser.setPhoneNumber(request.getParameter("soDienThoai"));
+
         newUser.setRole("USER");
+        newUser.setStatus(true);
+
+        session.setAttribute("oldUser", newUser);
+
+
+        session.setAttribute("activeTab", "register");
 
         if (dao.registerUser(newUser)) {
             User user = dao.findByEmail(newUser.getEmail());
             loginUser(session, request, response, user);
         } else {
-            request.setAttribute("errorRegister", "Email đã tồn tại!");
-            request.setAttribute("oldUser", newUser);
-            request.getRequestDispatcher("/products.jsp")
-                    .forward(request, response);
+            session.setAttribute("errorMessage", "Đăng ký thất bại! Email này đã được đăng ký sử dụng trong hệ thống.");
+            response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
         }
     }
 
-    /* ================= GOOGLE LOGIN ================= */
-    private void handleGoogleLogin(HttpServletRequest request,
-                                   HttpServletResponse response,
-                                   HttpSession session)
+    private void handleGoogleLogin(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws IOException {
 
         String code = request.getParameter("code");
+        session.setAttribute("activeTab", "login");
 
         try {
             if (code == null) {
@@ -209,15 +209,10 @@ public class AuthServlet extends HttpServlet {
             String accessToken = GoogleUtils.getToken(code);
             GoogleUser googleUser = GoogleUtils.getUserInfo(accessToken);
 
-            User user = dao.findOrCreateSocialUser(
-                    googleUser.getEmail(),
-                    googleUser.getName(),
-                    "GOOGLE"
-            );
+            User user = dao.findOrCreateSocialUser(googleUser.getEmail(), googleUser.getName(), "GOOGLE");
 
-            // Chặn đăng nhập nếu account Google này đã bị khóa do hủy đơn
             if (!user.isStatus()) {
-                session.setAttribute("errorLogin", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
+                session.setAttribute("errorMessage", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
                 response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
                 return;
             }
@@ -226,17 +221,16 @@ public class AuthServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/login");
+            session.setAttribute("errorMessage", "Lỗi xác thực mạng xã hội Google, vui lòng thử lại!");
+            response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
         }
     }
 
-    /* ================= FACEBOOK LOGIN ================= */
-    private void handleFacebookLogin(HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     HttpSession session)
+    private void handleFacebookLogin(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws IOException {
 
         String code = request.getParameter("code");
+        session.setAttribute("activeTab", "login");
 
         try {
             if (code == null) {
@@ -258,15 +252,10 @@ public class AuthServlet extends HttpServlet {
                 fbUser.setEmail(fbUser.getId() + "@facebook.com");
             }
 
-            User user = dao.findOrCreateSocialUser(
-                    fbUser.getEmail(),
-                    fbUser.getName(),
-                    "FACEBOOK"
-            );
-
+            User user = dao.findOrCreateSocialUser(fbUser.getEmail(), fbUser.getName(), "FACEBOOK");
 
             if (!user.isStatus()) {
-                session.setAttribute("errorLogin", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
+                session.setAttribute("errorMessage", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
                 response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
                 return;
             }
@@ -275,7 +264,8 @@ public class AuthServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/login");
+            session.setAttribute("errorMessage", "Lỗi xác thực mạng xã hội Facebook, vui lòng thử lại!");
+            response.sendRedirect(request.getContextPath() + "/products?showLogin=true");
         }
     }
 }

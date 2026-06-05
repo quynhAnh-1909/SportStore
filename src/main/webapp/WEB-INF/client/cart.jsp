@@ -35,11 +35,11 @@
 
         .cart-count {
             position: absolute;
-            top: -5px;          /* Đẩy lên phía trên */
-            right: -8px;        /* Đẩy sang phải */
+            top: -5px;
+            right: -8px;
             background-color: #ff0000;
             color: white;
-            border-radius: 50%; /* Làm cho badge hình tròn */
+            border-radius: 50%;
             padding: 2px 6px;
             font-size: 12px;
             font-weight: bold;
@@ -158,8 +158,8 @@
         }
 
         .checkout-btn:hover {
-            background-color: #b71c1c!important; /* đỏ đậm khi hover */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* bóng nhẹ khi hover */
+            background-color: #b71c1c!important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .btn-back {
@@ -424,7 +424,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between mt-2">
-                        <span>Phí ship</span>
+                        <span>Phí ship Tạm Tính</span>
                         <span>30,000 VNĐ</span>
                     </div>
 
@@ -441,6 +441,11 @@
                             Thanh toán
                         </button>
                     </form>
+                    <c:if test="${sessionScope.userRole == 'ADMIN'}">
+                        <div class="alert alert-warning mt-3 text-center">
+                            Tài khoản Admin không được phép mua hàng.
+                        </div>
+                    </c:if>
 
                 </div>
 

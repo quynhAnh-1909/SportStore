@@ -34,6 +34,13 @@ public class Order {
     private double discountAmount;
     private String ghnCode;
     private String shippingStatus;
+    private String refundStatus;
+    private String refundReason;
+
+    private Timestamp refundRequestedAt;
+    private Timestamp refundedAt;
+    private Timestamp refundRejectedAt;
+
 
     public int getId() {
 
@@ -288,5 +295,45 @@ public class Order {
     public void setShippingStatus(String shippingStatus) {
 
         this.shippingStatus = shippingStatus;
+    }
+
+    public String getRefundStatus() {
+        return refundStatus;
+    }
+
+    public void setRefundStatus(String refundStatus) {
+        this.refundStatus = refundStatus;
+    }
+
+    public String getRefundReason() {
+        return refundReason;
+    }
+
+    public void setRefundReason(String refundReason) {
+        this.refundReason = refundReason;
+    }
+
+    public Timestamp getRefundRequestedAt() {
+        return refundRequestedAt;
+    }
+
+    public void setRefundRequestedAt(Timestamp refundRequestedAt) {
+        this.refundRequestedAt = refundRequestedAt;
+    }
+
+    public Timestamp getRefundedAt() {
+        return refundedAt;
+    }
+
+    public void setRefundedAt(Timestamp refundedAt) {
+        this.refundedAt = refundedAt;
+    }
+
+    public Timestamp getRefundRejectedAt() {
+        return refundRejectedAt;
+    }
+
+    public void setRefundRejectedAt(Timestamp refundRejectedAt) {
+        this.refundRejectedAt = refundRejectedAt;
     }
 }

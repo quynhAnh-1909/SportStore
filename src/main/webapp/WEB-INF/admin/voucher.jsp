@@ -4,11 +4,12 @@
 
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
 <div class="container-fluid pt-4 px-4">
 
     <div class="voucher-wrapper">
 
-        <!-- HEADER -->
         <div class="voucher-header">
             <div>
                 <h3 class="title">🎫 Quản lý Voucher</h3>
@@ -21,18 +22,9 @@
             </a>
         </div>
 
-        <!-- SEARCH -->
-        <div class="search-box">
-            <input type="text"
-                   id="searchInput"
-                   class="form-control search-input"
-                   placeholder="🔍 Tìm mã voucher...">
-        </div>
-
-        <!-- TABLE -->
         <div class="table-responsive">
 
-            <table class="table voucher-table align-middle">
+            <table id="voucherTable" class="table voucher-table align-middle">
 
                 <thead>
                 <tr>
@@ -55,14 +47,12 @@
                         ${!v.status ? 'voucher-disabled' : ''}
                     ">
 
-                        <!-- CODE -->
                         <td>
                             <div class="voucher-code">
                                     ${v.code}
                             </div>
                         </td>
 
-                        <!-- DISCOUNT -->
                         <td>
 
                             <c:if test="${v.discountType == 'PERCENT'}">
@@ -84,7 +74,6 @@
 
                         </td>
 
-                        <!-- CONDITION -->
                         <td class="condition-cell">
 
                             <div>
@@ -121,7 +110,6 @@
 
                         </td>
 
-                        <!-- USAGE -->
                         <td>
 
                             <div class="usage-box">
@@ -138,7 +126,6 @@
 
                         </td>
 
-                        <!-- DATE -->
                         <td>
 
                             <div class="date-box">
@@ -171,7 +158,6 @@
 
                         </td>
 
-                        <!-- STATUS -->
                         <td>
 
                             <c:if test="${v.status}">
@@ -188,7 +174,6 @@
 
                         </td>
 
-                        <!-- ACTION -->
                         <td>
 
                             <div class="action-buttons">
@@ -218,7 +203,6 @@
 
         </div>
 
-        <!-- EMPTY -->
         <c:if test="${empty vouchers}">
             <div class="empty-box">
                 <h5>📭 Chưa có voucher</h5>
@@ -229,16 +213,11 @@
 
 </div>
 
-<!-- STYLE -->
 <style>
 
     body{
         background:#f4f6f9;
     }
-
-    /* =========================
-        WRAPPER
-    ========================= */
 
     .voucher-wrapper{
         background:#fff;
@@ -247,10 +226,6 @@
         border:1px solid #e5e7eb;
         box-shadow:0 3px 15px rgba(0,0,0,0.05);
     }
-
-    /* =========================
-        HEADER
-    ========================= */
 
     .voucher-header{
         display:flex;
@@ -274,10 +249,6 @@
         color:#6b7280;
     }
 
-    /* =========================
-        BUTTON
-    ========================= */
-
     .btn-add{
         background:#dc3545;
         color:white;
@@ -295,40 +266,11 @@
         transform:translateY(-2px);
     }
 
-    /* =========================
-        SEARCH
-    ========================= */
-
-    .search-box{
-        margin-bottom:18px;
-    }
-
-    .search-input{
-        height:45px;
-        border-radius:12px;
-        border:1px solid #d1d5db;
-        padding:0 16px;
-        font-size:14px;
-        box-shadow:none !important;
-    }
-
-    .search-input:focus{
-        border-color:#dc3545;
-    }
-
-    /* =========================
-        TABLE RESPONSIVE
-    ========================= */
-
     .table-responsive{
         width:100%;
         overflow-x:auto;
         border-radius:16px;
     }
-
-    /* =========================
-        TABLE
-    ========================= */
 
     .voucher-table{
         width:100%;
@@ -342,10 +284,6 @@
         background:white;
     }
 
-    /* =========================
-        HEADER
-    ========================= */
-
     .voucher-table thead th{
         background:#111827;
         color:white;
@@ -356,10 +294,6 @@
         white-space:nowrap;
         border:none;
     }
-
-    /* =========================
-        BODY
-    ========================= */
 
     .voucher-table tbody td{
         padding:14px 10px;
@@ -373,10 +307,6 @@
     .voucher-table tbody tr:hover td{
         background:#f9fafb;
     }
-
-    /* =========================
-        COLUMN WIDTH
-    ========================= */
 
     .voucher-table th:nth-child(1),
     .voucher-table td:nth-child(1){
@@ -418,10 +348,6 @@
         text-align:center;
     }
 
-    /* =========================
-        CODE
-    ========================= */
-
     .voucher-code{
         font-size:14px;
         font-weight:700;
@@ -429,20 +355,12 @@
         word-break:break-word;
     }
 
-    /* =========================
-        BADGE
-    ========================= */
-
     .badge-custom{
         padding:6px 10px;
         border-radius:8px;
         font-size:12px;
         font-weight:600;
     }
-
-    /* =========================
-        CONDITION
-    ========================= */
 
     .condition-cell{
         line-height:1.6;
@@ -452,10 +370,6 @@
     .condition-cell div{
         margin-bottom:4px;
     }
-
-    /* =========================
-        USAGE
-    ========================= */
 
     .usage-box{
         display:flex;
@@ -478,10 +392,6 @@
         padding:5px 8px;
         border-radius:8px;
     }
-
-    /* =========================
-        DATE
-    ========================= */
 
     .date-box{
         display:flex;
@@ -506,10 +416,6 @@
         font-size:12px;
     }
 
-    /* =========================
-        STATUS
-    ========================= */
-
     .status{
         display:inline-block;
         padding:6px 12px;
@@ -527,10 +433,6 @@
         background:#e5e7eb;
         color:#374151;
     }
-
-    /* =========================
-        ACTION
-    ========================= */
 
     .action-buttons{
         display:flex;
@@ -564,10 +466,6 @@
         color:white;
     }
 
-    /* =========================
-        ROW STATE
-    ========================= */
-
     .voucher-full td{
         border-left:3px solid #dc3545 !important;
     }
@@ -577,19 +475,11 @@
         opacity:0.85;
     }
 
-    /* =========================
-        EMPTY
-    ========================= */
-
     .empty-box{
         text-align:center;
         padding:40px;
         color:#6b7280;
     }
-
-    /* =========================
-        SCROLLBAR
-    ========================= */
 
     .table-responsive::-webkit-scrollbar{
         height:8px;
@@ -600,38 +490,56 @@
         border-radius:20px;
     }
 
+    /* Style DataTables tinh chỉnh đồng bộ */
+    .dataTables_wrapper .dataTables_filter input {
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        padding: 0 14px;
+        font-size: 14px;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: #dc3545;
+        outline: none;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0px !important;
+        margin: 2px !important;
+    }
+    .dataTables_wrapper .dataTables_info {
+        font-size: 13px;
+        color: #6b7280;
+    }
 </style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- SEARCH -->
+
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Tích hợp DataTables phân trang 10 mục, ép thanh tìm kiếm sang bên trái
+        $('#voucherTable').DataTable({
+            "pageLength": 10,
+            "lengthChange": false,
+            "ordering": false,
+            "info": true,
+            "dom": '<"d-flex justify-content-between align-items-center mb-3"f>t<"d-flex justify-content-between align-items-center mt-3"ip>',
+            "language": {
+                "search": "🔍 Tìm kiếm nhanh:",
+                "searchPlaceholder": "Nhập mã voucher...",
+                "info": "Hiển thị dòng _START_ đến _END_ trên tổng số _TOTAL_ voucher",
+                "paginate": {
+                    "next": '<i class="fas fa-chevron-right"></i>',
+                    "previous": '<i class="fas fa-chevron-left"></i>'
+                },
+                "zeroRecords": "Không tìm thấy dữ liệu khớp"
+            }
+        });
+    });
 
-    // SEARCH
-    document.getElementById("searchInput")
-            .addEventListener("keyup", function () {
-
-                let keyword = this.value.toLowerCase();
-
-                let rows = document.querySelectorAll("tbody tr");
-
-                rows.forEach(row => {
-
-                    let code = row.children[0]
-                            .innerText
-                            .toLowerCase();
-
-                    row.style.display =
-                            code.includes(keyword)
-                                    ? ""
-                                    : "none";
-
-                });
-
-            });
-
-
-    // DELETE CONFIRM
     function confirmDelete(event, url, code) {
-
         event.preventDefault();
 
         Swal.fire({
@@ -639,13 +547,10 @@
             html: `
                 Bạn muốn xóa voucher:
                 <br><br>
-
                 <b style="color:#dc3545;font-size:18px">
                     ${code}
                 </b>
-
                 <br><br>
-
                 Hành động này không thể hoàn tác!
             `,
             icon: 'warning',
@@ -655,9 +560,7 @@
             confirmButtonText: '🗑 Xóa',
             cancelButtonText: 'Hủy'
         }).then((result) => {
-
             if (result.isConfirmed) {
-
                 Swal.fire({
                     title: 'Đã xóa!',
                     text: 'Voucher đã được xóa thành công.',
@@ -669,12 +572,9 @@
                 setTimeout(() => {
                     window.location.href = url;
                 }, 1200);
-
             }
-
         });
 
         return false;
     }
-
 </script>
