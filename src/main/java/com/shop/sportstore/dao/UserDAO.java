@@ -14,7 +14,7 @@ public class UserDAO extends DBConnection {
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            // Xóa bỏ khoảng trắng vô tình gõ ở hai đầu email
+
             ps.setString(1, email.trim());
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -49,7 +49,14 @@ public class UserDAO extends DBConnection {
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPassword());
-            ps.setString(4, user.getPhoneNumber());
+
+            // CẬP NHẬT: Đảm bảo loại bỏ khoảng trắng định dạng trước khi lưu database
+            String phone = user.getPhoneNumber();
+            if (phone != null) {
+                phone = phone.replaceAll("\\s+", "");
+            }
+            ps.setString(4, phone);
+
             ps.setString(5, user.getGioiTinh()); // gender nằm đúng vị trí theo cấu trúc ALTER TABLE
 
 
@@ -171,7 +178,13 @@ public class UserDAO extends DBConnection {
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fullName);
+
+
+            if (phone != null) {
+                phone = phone.replaceAll("\\s+", "");
+            }
             ps.setString(2, phone);
+
             ps.setString(3, address);
             ps.setInt(4, userId);
             return ps.executeUpdate() > 0;
@@ -185,7 +198,13 @@ public class UserDAO extends DBConnection {
         String sql = "UPDATE users SET phone_number = ? WHERE user_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
+
+            if (newPhone != null) {
+                newPhone = newPhone.replaceAll("\\s+", "");
+            }
             ps.setString(1, newPhone);
+
             ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {

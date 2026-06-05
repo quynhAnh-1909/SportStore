@@ -168,7 +168,13 @@ public class AuthServlet extends HttpServlet {
         newUser.setEmail(request.getParameter("email"));
         newUser.setPassword(request.getParameter("matKhau"));
         newUser.setGioiTinh(request.getParameter("gioiTinh"));
-        newUser.setPhoneNumber(request.getParameter("soDienThoai"));
+
+
+        String rawPhone = request.getParameter("soDienThoai");
+        if (rawPhone != null) {
+            rawPhone = rawPhone.replaceAll("\\s+", "");
+        }
+        newUser.setPhoneNumber(rawPhone);
 
         newUser.setRole("USER");
         newUser.setStatus(true);
