@@ -109,6 +109,48 @@
             border-top: 1px solid #eee;
             margin: 35px 0;
         }
+
+        .btn-password{
+            background:#e60000;
+            color:white;
+            border:none;
+            border-radius:12px;
+            padding:12px 28px;
+            font-weight:600;
+            transition:0.3s;
+        }
+
+        .btn-password:hover{
+            background:#c40000;
+            transform:translateY(-2px);
+        }
+
+        .password-wrapper{
+            position:relative;
+        }
+
+        .password-wrapper input{
+            padding-right:50px;
+        }
+
+        .password-wrapper i{
+            position:absolute;
+            right:15px;
+            top:50%;
+            transform:translateY(-50%);
+            cursor:pointer;
+            color:#777;
+            font-size:18px;
+        }
+
+        .section-title{
+            color:#e60000;
+            font-size:24px;
+            font-weight:700;
+            padding-bottom:10px;
+            border-bottom:2px solid #f1f1f1;
+            margin-bottom:25px;
+        }
     </style>
 </head>
 <body>
@@ -183,9 +225,9 @@
 
                     <div class="profile-info-box">
 
-                        <h4 class="section-title mb-4">
+                        <h2 class="section-title">
                             Thông tin cá nhân
-                        </h4>
+                        </h2>
 
                         <form action="${pageContext.request.contextPath}/account"
                               method="post"
@@ -265,6 +307,116 @@
 
                             </button>
                         </form>
+
+                        <div class="security-box mt-5">
+
+                            <h2 class="section-title">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Bảo mật tài khoản
+                            </h2>
+
+                            <form action="${pageContext.request.contextPath}/change-password"
+                                  method="post">
+
+                                <div class="mb-3">
+
+                                    <label class="info-label">
+                                        Mật khẩu hiện tại
+                                    </label>
+
+                                    <div class="password-wrapper">
+
+                                        <input type="password"
+                                               id="currentPassword"
+                                               name="currentPassword"
+                                               class="form-control"
+                                               required>
+
+                                        <i class="fas fa-eye"
+                                           onclick="togglePassword('currentPassword',this)">
+                                        </i>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label class="info-label">
+                                        Mật khẩu mới
+                                    </label>
+
+                                    <div class="password-wrapper">
+
+                                        <input type="password"
+                                               id="newPassword"
+                                               name="newPassword"
+                                               class="form-control"
+                                               required>
+
+                                        <i class="fas fa-eye"
+                                           onclick="togglePassword('newPassword',this)">
+                                        </i>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="mb-4">
+
+                                    <label class="info-label">
+                                        Xác nhận mật khẩu mới
+                                    </label>
+
+                                    <div class="password-wrapper">
+
+                                        <input type="password"
+                                               id="confirmPassword"
+                                               name="confirmPassword"
+                                               class="form-control"
+                                               required>
+
+                                        <i class="fas fa-eye"
+                                           onclick="togglePassword('confirmPassword', this)">
+                                        </i>
+
+                                    </div>
+
+                                </div>
+
+                                <button type="submit" class="btn-password">
+                                    <i class="fas fa-key me-2"></i>
+                                    Đổi mật khẩu
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                        <c:if test="${not empty passwordSuccess}">
+                            <script>
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Thành công',
+                                    text: '${passwordSuccess}',
+                                    confirmButtonColor: '#dc3545'
+                                });
+                            </script>
+                            <c:remove var="passwordSuccess" scope="session"/>
+                        </c:if>
+
+                        <c:if test="${not empty passwordError}">
+                            <script>
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: '${passwordError}',
+                                    confirmButtonColor: '#dc3545'
+                                });
+                            </script>
+                            <c:remove var="passwordError" scope="session"/>
+                        </c:if>
+
                     </div>
                 </div>
             </div>
@@ -304,7 +456,52 @@
 
         return true;
     }
-</script>
 
+    function togglePassword(id, icon){
+
+        const input =
+                document.getElementById(id);
+
+        if(input.type === "password"){
+
+            input.type = "text";
+
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+
+        }else{
+
+            input.type = "password";
+
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<c:if test="${not empty sessionScope.passwordSuccess}">
+    <script>
+        Swal.fire({
+            icon:'success',
+            title:'Thành công',
+            text:'${sessionScope.passwordSuccess}',
+            confirmButtonColor:'#d81f19'
+        });
+    </script>
+    <c:remove var="passwordSuccess" scope="session"/>
+</c:if>
+
+<c:if test="${not empty sessionScope.passwordError}">
+    <script>
+        Swal.fire({
+            icon:'error',
+            title:'Lỗi',
+            text:'${sessionScope.passwordError}',
+            confirmButtonColor:'#d81f19'
+        });
+    </script>
+    <c:remove var="passwordError" scope="session"/>
+</c:if>
 </body>
 </html>

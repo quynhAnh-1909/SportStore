@@ -188,18 +188,33 @@ public class UserDAO extends DBConnection {
     }
 
     public User getUserById(int id) throws SQLException {
-        String sql = "SELECT user_id, full_name, phone_number, email, password, role, status, gender FROM users WHERE user_id = ?";
+
+        System.out.println("SEARCH USER ID = " + id);
+
+        String sql =
+                "SELECT * FROM users WHERE user_id = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, id);
+
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
+
+                    System.out.println("FOUND USER IN DB");
+
                     return mapResultSetToUser(rs);
                 }
+
+                System.out.println("NOT FOUND USER IN DB");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -292,5 +307,28 @@ public class UserDAO extends DBConnection {
         }
     }
 
+    public boolean changePassword(int userId, String newPassword) {
+
+        String sql =
+                "UPDATE users SET password = ? WHERE user_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPassword);
+            ps.setInt(2, userId);
+
+            int result = ps.executeUpdate();
+
+            System.out.println("UPDATE RESULT = " + result);
+
+            return result > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
 }
