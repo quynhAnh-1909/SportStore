@@ -12,9 +12,11 @@ import java.net.URL;
 
 public class GoogleUtils {
 
-    private static final String CLIENT_ID = "YOUR_CLIENT_ID";
-    private static final String CLIENT_SECRET = "YOUR_CLIENT_SECRET";
-    private static final String REDIRECT_URI = "http://localhost:8080/your-app/login-google";
+    public static final String CLIENT_ID = "";
+
+    public static final String CLIENT_SECRET = "";
+
+    public static final String REDIRECT_URI = "";
 
     public static String getToken(String code) throws Exception {
 

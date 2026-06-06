@@ -29,8 +29,20 @@ public class CheckoutServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
 
-        List<CartItem> cart =
-                (List<CartItem>) session.getAttribute("cart");
+        String type = request.getParameter("type");
+
+        List<CartItem> cart;
+
+        if ("buyNow".equals(type)) {
+
+            cart = (List<CartItem>)
+                    session.getAttribute("buyNowItems");
+
+        } else {
+
+            cart = (List<CartItem>)
+                    session.getAttribute("cart");
+        }
 
         if (cart == null || cart.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
@@ -90,8 +102,20 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
-        List<CartItem> cart =
-                (List<CartItem>) session.getAttribute("cart");
+        String type = request.getParameter("type");
+
+        List<CartItem> cart;
+
+        if ("buyNow".equals(type)) {
+
+            cart = (List<CartItem>)
+                    session.getAttribute("buyNowItems");
+
+        } else {
+
+            cart = (List<CartItem>)
+                    session.getAttribute("cart");
+        }
 
         String selectedIds =
                 request.getParameter("selectedIds");
@@ -356,9 +380,12 @@ public class CheckoutServlet extends HttpServlet {
             // REMOVE CART
             // =========================
 
-            cart.removeAll(selectedCart);
+            if (!"buyNow".equals(type)) {
 
-            session.setAttribute("cart", cart);
+                cart.removeAll(selectedCart);
+
+                session.setAttribute("cart", cart);
+            }
 
             response.sendRedirect(
                     request.getContextPath()
