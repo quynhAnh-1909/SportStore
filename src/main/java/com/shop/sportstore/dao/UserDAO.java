@@ -57,7 +57,7 @@ public class UserDAO extends DBConnection {
 
             ps.setString(5, user.getGioiTinh()); 
             ps.setString(4, user.getPhoneNumber());
-            ps.setString(5, user.getGioiTinh()); /
+            ps.setString(5, user.getGioiTinh());
 
 
             String role = (user.getRole() == null || user.getRole().trim().isEmpty()) ? "USER" : user.getRole();
