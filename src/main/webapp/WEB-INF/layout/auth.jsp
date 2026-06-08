@@ -406,8 +406,8 @@
         } else {
             passwordInput.type = "password";
             eyeIcon.style.opacity = "1";
+        }
     }
-
     function checkDetailedEmail(inputElement, errorElementId) {
         let value = inputElement.value.trim();
         let errorBlock = document.getElementById(errorElementId);
