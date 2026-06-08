@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<fmt:setLocale value="vi_VN"/>
 
 <h2 class="dashboard-title">Dashboard Tổng Quan</h2>
 
@@ -17,19 +19,17 @@
         </div>
     </div>
     <div class="col-md-4">
-        <div class="dashboard-card">
+        <div class="dashboard-card" data-bs-toggle="collapse" data-bs-target="#collapseChart" aria-expanded="false" aria-controls="collapseChart" style="cursor: pointer;">
             <h5><i class="fas fa-money-bill-wave text-danger me-2"></i>Doanh thu tháng này</h5>
-            <h2>${revenue} ₫</h2>
-        </div>
-    </div>
-</div>
+            <h2>
+                <fmt:formatNumber value="${revenue.longValue()}" type="number" groupingUsed="true"/> đ
+                <small style="font-size: 12px; color: #6c757d; font-weight: normal;">(Bấm để xem biểu đồ)</small>
+            </h2>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="dashboard-box">
-            <h4 class="text-danger mb-4"><i class="fas fa-chart-line me-2"></i>Biểu đồ doanh thu năm nay</h4>
-            <div style="position: relative; height:320px; width:100%">
-                <canvas id="revenueChart"></canvas>
+            <div class="collapse mt-3" id="collapseChart">
+                <div style="position: relative; height:200px; width:100%">
+                    <canvas id="revenueChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         const ctx = document.getElementById('revenueChart').getContext('2d');
 
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
         gradient.addColorStop(0, 'rgba(216, 31, 25, 0.4)');
         gradient.addColorStop(1, 'rgba(216, 31, 25, 0.0)');
 
@@ -122,7 +122,7 @@
                         },
                         ticks: {
                             callback: function(value) {
-                                return value.toLocaleString('vi-VN') + ' ₫';
+                                return value.toLocaleString('vi-VN') + ' đ';
                             }
                         }
                     },
