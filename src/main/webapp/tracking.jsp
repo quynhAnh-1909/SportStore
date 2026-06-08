@@ -205,8 +205,6 @@
         const errorDiv = document.getElementById("errorMessage");
         const resultArea = document.getElementById("resultArea");
         const btnSearch = document.getElementById("btnSearch");
-
-        // Reset trạng thái ban đầu
         errorDiv.innerText = "";
 
         if (!keyword) {
@@ -216,8 +214,6 @@
         }
 
         if (keyword.startsWith("#")) keyword = keyword.substring(1);
-
-        // Hiệu ứng xoay vòng lúc bấm nút
         btnSearch.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...`;
         btnSearch.disabled = true;
 
@@ -227,18 +223,13 @@
                     return response.json();
                 })
                 .then(res => {
-                    // Trả lại trạng thái nút ban đầu
                     btnSearch.innerHTML = "Tìm kiếm";
                     btnSearch.disabled = false;
-
-                    // Nếu Backend trả về trạng thái lỗi (không tìm thấy đơn, lỗi API GHN...)
                     if (res.status === "error") {
                         resultArea.style.display = "none";
                         errorDiv.innerHTML = `<div class="alert alert-danger shadow-sm py-2 px-3"><i class="fa-solid fa-circle-exclamation me-2"></i>${res.message}</div>`;
                         return;
                     }
-
-                    // Nếu thành công -> Hiện thị vùng dữ liệu và đổ thông tin vào các thẻ
                     resultArea.style.display = "block";
                     document.getElementById("resOrderId").innerText = res.orderId;
                     document.getElementById("resOrderDate").innerText = res.orderDate;
@@ -250,8 +241,6 @@
                     resetTimelineStyles();
 
                     const code = res.statusCode;
-
-                    // Đắp class màu sắc dựa theo các đầu mã trạng thái (statusCode)
                     if (code === 4) {
                         setNodeStatus("node-pending", "done");
                         setNodeStatus("node-processing", "done");

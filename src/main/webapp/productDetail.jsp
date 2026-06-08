@@ -361,8 +361,6 @@
 
             box-shadow:0 6px 18px rgba(238,77,45,0.35);
         }
-
-        /* FIX INPUT QUANTITY OVERLAY MODAL */
         .quantity-box,
         .quantity-box input,
         .qty-btn {
@@ -370,20 +368,6 @@
             z-index: 1;
         }
 
-        /* LOGIN MODAL */
-        .modal,
-        .modal-dialog,
-        .modal-content,
-        .auth-modal,
-        .login-modal {
-            z-index: 99999 !important;
-        }
-
-        /* OVERLAY */
-        .modal-backdrop,
-        .overlay {
-            z-index: 99998 !important;
-        }
 
         .quantity-box input[type=number]::-webkit-outer-spin-button,
         .quantity-box input[type=number]::-webkit-inner-spin-button {
@@ -417,7 +401,7 @@
             font-size:14px;
         }
 
-        /* EDIT */
+
         .edit-btn{
             color:#0d6efd;
         }
@@ -427,7 +411,6 @@
             transform:scale(1.08);
         }
 
-        /* DELETE */
         .delete-btn{
             color:#dc3545;
         }
@@ -453,20 +436,17 @@
 <div class="container mt-5">
 
     <div class="detail-card">
-
-        <!-- BACK -->
         <a href="${root}/products" class="back-link">
             ← Quay lại
         </a>
 
         <div class="row align-items-center">
 
-            <!-- IMAGE -->
             <div class="col-md-5 text-center">
                 <div class="zoom-container">
                     <img src="${root}/resources/${product.imageUrl}" class="zoom-img">
                 </div>
-                <!-- SHARE -->
+
                 <div class="share-box mt-3">
 
                     <span>Chia sẻ:</span>
@@ -492,13 +472,12 @@
                 </div>
             </div>
 
-            <!-- INFO -->
             <div class="col-md-7">
 
                 <div class="product-title">${product.name}</div>
 
                 <div class="product-price">
-                    <fmt:formatNumber value="${product.price}"/> VNĐ
+                    <fmt:formatNumber value="${product.price}"/> ₫
                 </div>
 
                 <!-- VOUCHER -->
@@ -520,7 +499,6 @@
                     </div>
                 </div>
 
-                <!-- SHIPPING -->
                 <div class="shipping-box mt-2">
                     <div class="label">Vận chuyển</div>
                     <div>
@@ -535,7 +513,6 @@
 
                         <c:if test="${empty sessionScope.user || sessionScope.user.role != 'ADMIN'}">
 
-                            <!-- SỐ LƯỢNG -->
                             <div class="d-flex align-items-center mt-3" style="gap:20px;">
                                 <div class="label">Số lượng</div>
 
@@ -599,10 +576,8 @@
 
     </div>
 
-    <!-- CARD CHI TIẾT + MÔ TẢ -->
     <div class="detail-card mt-4">
 
-        <!-- CHI TIẾT -->
         <div class="section-title">CHI TIẾT SẢN PHẨM</div>
 
         <div class="row mt-3">
@@ -621,8 +596,6 @@
         </div>
 
         <hr>
-
-        <!-- MÔ TẢ -->
         <div class="section-title">MÔ TẢ SẢN PHẨM</div>
 
         <div class="mt-3">
@@ -631,14 +604,11 @@
 
     </div>
 
-    <!-- REVIEW -->
     <div class="detail-card mt-4">
 
         <div class="section-title">
             ĐÁNH GIÁ SẢN PHẨM
         </div>
-
-        <!-- FORM -->
         <form id="reviewForm" class="mt-3">
 
             <input type="hidden"
@@ -692,8 +662,6 @@
             </button>
 
         </form>
-
-        <!-- REVIEW LIST -->
         <div class="mt-4" id="reviewList">
 
             <c:forEach var="r"
@@ -715,8 +683,6 @@
                             </div>
 
                         </div>
-
-                        <!-- OWNER ACTION -->
                         <c:if test="${sessionScope.user != null
                             && sessionScope.user.userId == r.userId}">
 
@@ -747,8 +713,6 @@
                         </c:if>
 
                     </div>
-
-                    <!-- CONTENT -->
                     <div class="mt-2 review-comment">
                         <c:out value="${r.comment}"/>
                     </div>
@@ -776,8 +740,6 @@
                         ←
                     </button>
                 </c:if>
-
-                <!-- PAGE -->
                 <c:forEach begin="1"
                            end="${totalPages}"
                            var="i">
@@ -792,8 +754,6 @@
                     </button>
 
                 </c:forEach>
-
-                <!-- NEXT -->
                 <c:if test="${currentPage < totalPages}">
                     <button type="button"
                             class="btn btn-light"
@@ -808,14 +768,12 @@
 
     </div>
 
-    <!-- GỢI Ý SẢN PHẨM -->
     <div class="mt-4">
 
         <div class="suggest-title mb-3">
             GỢI Ý CHO BẠN
         </div>
 
-        <!-- 4 sản phẩm đầu -->
         <div id="preview-products" class="row">
 
             <c:forEach var="p"
@@ -837,7 +795,7 @@
                             </div>
 
                             <div class="suggest-price">
-                                <fmt:formatNumber value="${p.price}"/> VNĐ
+                                <fmt:formatNumber value="${p.price}"/> ₫
                             </div>
 
                         </a>
@@ -849,8 +807,6 @@
             </c:forEach>
 
         </div>
-
-        <!-- TẤT CẢ SẢN PHẨM -->
         <div id="all-products"
              class="row d-none">
 
@@ -870,7 +826,7 @@
                         </div>
 
                         <div class="suggest-price">
-                            <fmt:formatNumber value="${p.price}"/> VNĐ
+                            <fmt:formatNumber value="${p.price}"/> ₫
                         </div>
 
                     </a>
@@ -1140,8 +1096,6 @@
                     } else {
                     badge.style.display = "none";
                 }
-
-                // animation nhẹ
                 badge.classList.remove("animate");
                 void badge.offsetWidth;
                 badge.classList.add("animate");
@@ -1189,19 +1143,18 @@
                                         window.location.href
                                 );
 
-                                // lưu scroll
                                 sessionStorage.setItem(
                                         "redirectScroll",
                                         window.scrollY
                                 );
 
-                                // lưu rating
+
                                 sessionStorage.setItem(
                                         "reviewRating",
                                         document.getElementById("rating").value
                                 );
 
-                                // lưu comment
+
                                 sessionStorage.setItem(
                                         "reviewComment",
                                         document.getElementById("comment").value
@@ -1286,10 +1239,9 @@
                         "restoreReview"
                 );
 
-        // CHỈ restore khi login xong quay lại
         if(shouldRestore === "true"){
 
-            // restore rating
+
             const savedRating =
                     sessionStorage.getItem(
                             "reviewRating"
@@ -1302,7 +1254,6 @@
                 ).value = savedRating;
             }
 
-            // restore comment
             const savedComment =
                     sessionStorage.getItem(
                             "reviewComment"
@@ -1315,7 +1266,7 @@
                 ).value = savedComment;
             }
 
-            // restore scroll
+
             const scrollPos =
                     sessionStorage.getItem(
                             "redirectScroll"
@@ -1332,8 +1283,6 @@
 
                 }, 200);
             }
-
-            // restore xong thì xóa
             sessionStorage.removeItem(
                     "restoreReview"
             );

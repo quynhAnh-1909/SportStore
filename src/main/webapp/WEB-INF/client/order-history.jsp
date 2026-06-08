@@ -183,14 +183,12 @@
                             <c:set var="isUnder30Mins" value="${timeDiff < (30 * 60 * 1000)}" />
 
                             <c:choose>
-                                <%-- KIỂM TRA 1: Nếu đơn dưới 30 phút và ở trạng thái chờ xác nhận -> Cho phép hủy đơn bình thường --%>
                                 <c:when test="${isUnder30Mins && (statusLower eq 'pending' or statusLower eq 'confirmed' or statusLower eq '0' or statusLower eq 'chờ xác nhận')}">
                                     <button type="button" class="btn btn-sm btn-danger" onclick="openCancelModal('${item.orderCode}')">
                                         <i class="fas fa-times"></i> Hủy đơn
                                     </button>
                                 </c:when>
 
-                                <%-- KIỂM TRA 2: LOGIC MỚI - Nếu đơn hàng ở trạng thái ĐÃ HỦY nhưng phương thức thanh toán là VNPAY và ĐÃ THANH TOÁN THÀNH CÔNG --%>
                                 <c:when test="${(statusLower eq 'cancelled' or statusLower eq '3' or statusLower eq 'đã hủy') && item.paymentMethod eq 'VNPAY' && item.paid}">
                                     <c:choose>
                                         <%-- Nếu chưa làm đơn gửi yêu cầu hoàn tiền --%>
@@ -199,7 +197,6 @@
                                                 <i class="fas fa-rotate-left"></i> Hoàn tiền
                                             </button>
                                         </c:when>
-                                        <%-- Các trạng thái xử lý sau khi nộp đơn hoàn tiền --%>
                                         <c:when test="${item.refundStatus eq 'PENDING_REFUND'}">
                                             <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Chờ duyệt</span>
                                         </c:when>
@@ -211,8 +208,6 @@
                                         </c:when>
                                     </c:choose>
                                 </c:when>
-
-                                <%-- KIỂM TRA 3: Mọi trường hợp COD hủy hoặc đơn hàng thanh toán VNPAY chưa thanh toán sẽ bị Khóa hành động --%>
                                 <c:otherwise>
                                     <button type="button" class="btn btn-sm btn-light border text-muted" disabled>
                                         <i class="fas fa-ban"></i> Khóa

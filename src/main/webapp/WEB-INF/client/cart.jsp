@@ -23,7 +23,7 @@
 
         /* HEADER */
         .cart-header {
-            background: rgba(255, 0, 0, 0.85); /* đỏ hơi trong suốt */
+            background: rgba(255, 0, 0, 0.85);
             color: white;
             font-weight: bold;
             padding: 10px 0;
@@ -44,7 +44,7 @@
             font-size: 12px;
             font-weight: bold;
             line-height: 1;
-            border: 2px solid white; /* Tạo viền trắng để nổi bật trên nền đỏ */
+            border: 2px solid white;
             min-width: 18px;
             text-align: center;
         }
@@ -374,7 +374,7 @@
                             </div>
 
                             <div class="cart-price cart-col text-danger fw-bold">
-                                <fmt:formatNumber value="${item.product.price}" /> VNĐ
+                                <fmt:formatNumber value="${item.product.price}" /> ₫
                             </div>
 
                             <div class="cart-qty cart-col">
@@ -420,12 +420,12 @@
 
                     <div class="d-flex justify-content-between">
                         <span>Tạm tính</span>
-                        <span id="totalPrice">0 VNĐ</span>
+                        <span id="totalPrice">0 ₫</span>
                     </div>
 
                     <div class="d-flex justify-content-between mt-2">
                         <span>Phí ship Tạm Tính</span>
-                        <span>30,000 VNĐ</span>
+                        <span>30,000 ₫</span>
                     </div>
 
                     <hr>
@@ -496,10 +496,10 @@
         let shipping = checkedCount > 0 ? 30000 : 0;
 
         document.getElementById("totalPrice").innerText =
-                total.toLocaleString('vi-VN') + " VNĐ";
+                total.toLocaleString('vi-VN') + " ₫";
 
         document.getElementById("finalTotal").innerText =
-                (total + shipping).toLocaleString('vi-VN') + " VNĐ";
+                (total + shipping).toLocaleString('vi-VN') + " ₫";
     }
 
     // ===== UPDATE QTY =====
@@ -538,7 +538,7 @@
             let itemTotal = qty * price;
 
             item.querySelector('.item-total').innerText =
-                    itemTotal.toLocaleString('vi-VN') + " VNĐ";
+                    itemTotal.toLocaleString('vi-VN') + " ₫";
 
             updateTotal();
         }
@@ -554,7 +554,7 @@
             let itemTotal = qty * price;
 
             item.querySelector('.item-total').innerText =
-                    itemTotal.toLocaleString('vi-VN') + " VNĐ";
+                    itemTotal.toLocaleString('vi-VN') + " ₫";
 
             updateTotal();
         }
