@@ -32,47 +32,78 @@ public class OrdersServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         try {
+    
             if ("tracking".equals(action)) {
                 String trackingCode = request.getParameter("ghnCode");
+
                 if (trackingCode == null || trackingCode.isEmpty() || "null".equals(trackingCode)) {
                     throw new RuntimeException("Đơn hàng chưa có mã vận đơn GHN!");
                 }
+
                 GhnOrderService trackingService = new GhnOrderService(GHN_TOKEN, GHN_SHOP_ID);
                 String jsonGHN = trackingService.getOrderTracking(trackingCode);
+
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().write(jsonGHN);
                 return;
             }
 
+       
+            if ("confirmAll".equals(action)) {
+                int updatedRows = orderDAO.confirmAllPendingOrders();
+
+                if (updatedRows > 0) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write(
+                            "{\"success\":true,\"message\":\"Đã xác nhận thành công " + updatedRows + " đơn hàng!\"}"
+                    );
+                } else {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write(
+                            "{\"success\":false,\"message\":\"Không tìm thấy đơn hàng nào đang ở trạng thái chờ xử lý!\"}"
+                    );
+                }
+                return;
+            }
+
+    
             String idParam = request.getParameter("id");
             if (idParam == null || idParam.isEmpty()) {
                 throw new RuntimeException("Thiếu ID đơn hàng!");
             }
+
             int id = Integer.parseInt(idParam);
 
             switch (action) {
                 case "confirm":
                     orderDAO.confirmOrder(id);
                     break;
+
                 case "cancel":
                     orderDAO.cancelOrderByAdmin(id);
                     break;
+
                 case "shipping":
                     Order order = orderDAO.getOrderById(id);
                     if (order == null) {
-                        throw new RuntimeException("Không tìm thấy đơn hàng!");
+                        throw new RuntimeException("Không tìm thấy thông tin đơn hàng này!");
                     }
+
                     GhnOrderService ghnService = new GhnOrderService(GHN_TOKEN, GHN_SHOP_ID);
                     String ghnCode = ghnService.createOrder(order);
+
                     if (ghnCode == null || ghnCode.isEmpty()) {
-                        throw new RuntimeException("GHN đang bận hoặc địa chỉ không hợp lệ!");
+                        throw new RuntimeException("GHN đang bận hoặc thông tin địa chỉ đơn hàng không hợp lệ!");
                     }
+
                     orderDAO.updateGhnCode(id, ghnCode);
                     orderDAO.shippingOrder(id);
                     break;
+
                 case "complete":
                     orderDAO.completeOrder(id);
                     break;
+
                 case "approveRefund":
                 case "approve_refund":
                     Order refundOrder = orderDAO.getOrderById(id);
@@ -82,6 +113,7 @@ public class OrdersServlet extends HttpServlet {
                     orderDAO.approveRefund(id);
                     orderDAO.updateOrderStatus(refundOrder.getOrderCode(), "REFUNDED");
                     break;
+
                 case "rejectRefund":
                 case "reject_refund":
                     Order rejectOrder = orderDAO.getOrderById(id);
@@ -91,12 +123,13 @@ public class OrdersServlet extends HttpServlet {
                     orderDAO.rejectRefund(id);
                     orderDAO.updateOrderStatus(rejectOrder.getOrderCode(), "REFUND_REJECTED");
                     break;
+
                 default:
-                    throw new RuntimeException("Action không hợp lệ!");
+                    throw new RuntimeException("Hành động xử lý (Action) không hợp lệ!");
             }
 
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"success\":true,\"message\":\"Thao tác thành công!\"}");
+            response.getWriter().write("{\"success\":true,\"message\":\"Thao tác xử lý thành công!\"}");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,6 +143,7 @@ public class OrdersServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
+
 
         if ("sync".equals(action)) {
             try {
@@ -140,13 +174,14 @@ public class OrdersServlet extends HttpServlet {
                         }
                     }
                 }
-                response.setContentType("text/plain;charset=UTF-8");
-                response.getWriter().write("sync_success");
+               
+                response.sendRedirect(request.getContextPath() + "/admin/orders");
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.getWriter().write("Lỗi đồng bộ GHN: " + e.getMessage());
+                response.setContentType("text/plain;charset=UTF-8");
+                response.getWriter().write("Lỗi hệ thống đồng bộ GHN: " + e.getMessage());
                 return;
             }
         }
@@ -158,38 +193,29 @@ public class OrdersServlet extends HttpServlet {
             orders = orderDAO.getAllOrders();
         } else {
             switch (status.toLowerCase()) {
-                case "pending":
-                    status = "PENDING";
-                    break;
-                case "pickup":
-                    status = "CONFIRMED";
-                    break;
-                case "shipping":
-                    status = "SHIPPING";
-                    break;
-                case "completed":
-                    status = "COMPLETED";
-                    break;
-                case "cancelled":
-                    status = "CANCELLED";
-                    break;
+                case "pending": status = "PENDING"; break;
+                case "pickup": status = "CONFIRMED"; break;
+                case "shipping": status = "SHIPPING"; break;
+                case "completed": status = "COMPLETED"; break;
+                case "cancelled": status = "CANCELLED"; break;
                 case "refund_pending":
                 case "refund":
-                case "pending_refund":
-                    status = "PENDING_REFUND";
-                    break;
-                case "refunded":
-                    status = "REFUNDED";
-                    break;
-                case "refund_rejected":
-                    status = "REFUND_REJECTED";
-                    break;
-                default:
-                    status = "PENDING";
+                case "pending_refund": status = "PENDING_REFUND"; break;
+                case "refunded": status = "REFUNDED"; break;
+                case "refund_rejected": status = "REFUND_REJECTED"; break;
+                default: status = "PENDING";
             }
             orders = orderDAO.getOrdersByStatus(status);
         }
 
+    
+        int pendingCount = 0;
+        List<Order> pendingList = orderDAO.getOrdersByStatus("PENDING");
+        if (pendingList != null) {
+            pendingCount = pendingList.size();
+        }
+
+        request.setAttribute("pendingCount", pendingCount);
         request.setAttribute("orders", orders);
         request.setAttribute("contentPage", "/WEB-INF/admin/order.jsp");
         request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);

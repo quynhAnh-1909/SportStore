@@ -11,9 +11,25 @@
             <h4 class="mb-0 text-success fw-bold">
                 <i class="fas fa-box me-2"></i> Quản lý đơn hàng
             </h4>
-            <a href="${pageContext.request.contextPath}/admin/orders?action=sync" class="btn btn-info text-white fw-bold shadow-sm">
-                <i class="fas fa-sync me-2"></i> Đồng bộ GHN
-            </a>
+            <div class="d-flex gap-2">
+                <!-- Hiển thị nút Xác nhận tất cả nếu có đơn hàng đang chờ xử lý -->
+                <c:if test="${pendingCount > 0}">
+                    <form action="${pageContext.request.contextPath}/admin/orders"
+                          method="post"
+                          id="confirmAllForm"
+                          class="d-inline">
+                        <input type="hidden" name="action" value="confirmAll">
+                        <button type="submit" id="btnConfirmAll" class="btn btn-success fw-bold shadow-sm">
+                            <i class="fas fa-check-double me-2"></i>
+                            Xác nhận tất cả (${pendingCount})
+                        </button>
+                    </form>
+                </c:if>
+
+                <a href="${pageContext.request.contextPath}/admin/orders?action=sync" class="btn btn-info text-white fw-bold shadow-sm">
+                    <i class="fas fa-sync me-2"></i> Đồng bộ GHN
+                </a>
+            </div>
         </div>
 
         <c:if test="${empty orders}">
@@ -43,7 +59,6 @@
                     <c:forEach var="order" items="${orders}">
                         <tr>
                             <td class="stt-column"></td>
-
                             <td class="fw-bold">${order.orderCode}</td>
                             <td class="fw-semibold text-success">${order.userFullName}</td>
                             <td><fmt:formatDate value="${order.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
@@ -238,6 +253,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
+        // 1. Khởi tạo Datatable chính xác
         const table = $('#orderTable').DataTable({
             "pageLength": 10,
             "lengthChange": false,
@@ -255,6 +271,7 @@
             }
         });
 
+        // 2. Đánh số thứ tự (STT) tự động tăng
         table.on('order.dt search.dt', function () {
             let i = 1;
             table.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
@@ -262,6 +279,59 @@
             });
         }).draw();
 
+        // 3. Xử lý Ajax gửi yêu cầu và thông báo Toast cho nút "Xác nhận tất cả"
+        const confirmAllForm = document.getElementById('confirmAllForm');
+        if (confirmAllForm) {
+            confirmAllForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const submitBtn = document.getElementById('btnConfirmAll');
+                const originalBtnText = submitBtn.innerHTML;
+
+                // Tạo hiệu ứng loading chờ xử lý
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+
+                const actionUrl = this.getAttribute('action');
+                const formData = new FormData(this);
+
+                fetch(actionUrl, {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                })
+                        .then(response => {
+                            if (response.ok) {
+                                // Trường hợp Backend trả về JSON thành công hoặc text trống
+                                return response.json().catch(() => {
+                                    return { success: true, message: "Đã phê duyệt hàng loạt đơn hàng chờ xử lý thành công!" };
+                                });
+                            } else {
+                                throw new Error('Yêu cầu xử lý từ server thất bại.');
+                            }
+                        })
+                        .then(data => {
+                            if (data.success || data.status === "success") {
+                                showToast(data.message || "Xác nhận tất cả thành công!", "#198754");
+                                // Tự động tải lại trang sau 1.5 giây để cập nhật toàn bộ trạng thái mới
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1500);
+                            } else {
+                                showToast(data.message || "Xử lý hàng loạt thất bại!", "#dc3545");
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalBtnText;
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error ConfirmAll:", error);
+                            showToast("Có lỗi phát sinh trong quá trình xác nhận hàng loạt!", "#dc3545");
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                        });
+            });
+        }
+
+        // 4. Xử lý Ajax các form hành động đơn lẻ trong bảng (Xác nhận, Hủy, Hoàn tiền,...)
         const ajaxForms = document.querySelectorAll('.ajax-form');
         ajaxForms.forEach(form => {
             form.addEventListener('submit', function(event) {
@@ -307,6 +377,7 @@
             });
         });
 
+        // 5. Xử lý Modal theo dõi hành trình Giao Hàng Nhanh (GHN)
         const trackingModalElement = document.getElementById('trackingModal');
         if (trackingModalElement) {
             const trackingModal = new bootstrap.Modal(trackingModalElement);

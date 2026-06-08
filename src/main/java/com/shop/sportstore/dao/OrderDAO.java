@@ -614,4 +614,26 @@ public class OrderDAO extends DBConnection {
         }
         return orders;
     }
+
+    public int confirmAllPendingOrders() {
+
+        String sql = """
+        UPDATE Orders
+        SET status = 'CONFIRMED'
+        WHERE status = 'PENDING'
+    """;
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            return ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
 }
