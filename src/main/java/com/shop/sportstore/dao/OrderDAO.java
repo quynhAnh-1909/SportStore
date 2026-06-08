@@ -32,45 +32,53 @@ public class OrderDAO extends DBConnection {
         }
         return count;
     }
-    public long calculateMonthlyRevenue(int month, int year) {
-        long total = 0;
-        String sql = "SELECT SUM(TotalPrice) FROM orders WHERE Status = 'COMPLETED' AND MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, month);
-            ps.setInt(2, year);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    total = (long) rs.getDouble(1);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public long calculateDailyStats(String type, int day, int month, int year) {
+        long result = 0;
+        String column = "COUNT(Id)";
+        if ("revenue".equalsIgnoreCase(type)) {
+            column = "SUM(TotalPrice)";
+        } else if ("products".equalsIgnoreCase(type)) {
+            column = "IFNULL(SUM((SELECT SUM(Quantity) FROM orderdetails WHERE OrderId = orders.Id)), 0)";
         }
-        return total;
-    }
-    public long calculateDailyRevenue(int day, int month, int year) {
-        long total = 0;
-        String sql = "SELECT SUM(TotalPrice) FROM orders WHERE Status = 'COMPLETED' " +
-                "AND DAY(CreatedAt) = ? AND MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
+        String sql = "SELECT " + column + " FROM orders WHERE Status = 'COMPLETED' AND DAY(CreatedAt) = ? AND MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, day);
             ps.setInt(2, month);
             ps.setInt(3, year);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    total = (long) rs.getDouble(1);
+                    result = (long) rs.getDouble(1);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return total;
+        return result;
+    }
+
+    public long calculateMonthlyStats(String type, int month, int year) {
+        long result = 0;
+        String column = "COUNT(Id)";
+        if ("revenue".equalsIgnoreCase(type)) {
+            column = "SUM(TotalPrice)";
+        } else if ("products".equalsIgnoreCase(type)) {
+            column = "IFNULL(SUM((SELECT SUM(Quantity) FROM orderdetails WHERE OrderId = orders.Id)), 0)";
+        }
+        String sql = "SELECT " + column + " FROM orders WHERE Status = 'COMPLETED' AND MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, month);
+            ps.setInt(2, year);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    result = (long) rs.getDouble(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
     private Order mapOrder(ResultSet rs) throws SQLException {
         Order o = new Order();

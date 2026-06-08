@@ -55,7 +55,7 @@
     }
 </style>
 
-<h2 class="dashboard-title">Dashboard Tổng Quan</h2>
+<h2 class="dashboard-title">Dashboard Tổng Overview</h2>
 
 <div class="row g-4">
     <div class="col-md-4">
@@ -166,14 +166,24 @@
 
 <div class="collapse mt-4" id="collapseChart" data-bs-parent=".dashboard-title">
     <div class="dashboard-box bg-white p-4 rounded shadow-sm border">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="text-danger mb-0"><i class="fas fa-chart-line me-2"></i>Biểu Đồ Phân Tích Doanh Thu</h4>
-            <div class="d-flex align-items-center">
-                <label for="viewFilter" class="me-2 fw-bold text-muted mb-0" style="font-size: 15px;">Xem theo:</label>
-                <select id="viewFilter" class="form-select" style="width: 160px; height: 40px; cursor: pointer; font-size: 15px;">
-                    <option value="year" selected>Doanh thu Năm</option>
-                    <option value="month">Doanh thu Tháng</option>
-                </select>
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <h4 class="text-danger mb-0"><i class="fas fa-chart-line me-2"></i>Biểu Đồ Phân Tích Hệ Thống</h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center">
+                    <label for="dataFilter" class="me-2 fw-bold text-muted mb-0" style="font-size: 15px; white-space: nowrap;">Tiêu chí:</label>
+                    <select id="dataFilter" class="form-select" style="width: 180px; height: 40px; cursor: pointer; font-size: 15px;">
+                        <option value="revenue" selected>Doanh thu (đ)</option>
+                        <option value="orders">Số đơn hàng</option>
+                        <option value="products">Sản phẩm bán ra</option>
+                    </select>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label for="viewFilter" class="me-2 fw-bold text-muted mb-0" style="font-size: 15px; white-space: nowrap;">Xem theo:</label>
+                    <select id="viewFilter" class="form-select" style="width: 160px; height: 40px; cursor: pointer; font-size: 15px;">
+                        <option value="year" selected>Theo Năm</option>
+                        <option value="month">Theo Tháng</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div style="position: relative; height:380px; width:100%">
@@ -191,8 +201,18 @@
         gradient.addColorStop(0, 'rgba(216, 31, 25, 0.4)');
         gradient.addColorStop(1, 'rgba(216, 31, 25, 0.0)');
 
-        const dataYear = ${yearlyRevenueJson != null ? yearlyRevenueJson : '[0,0,0,0,0,0,0,0,0,0,0,0]'};
-        const dataMonth = ${monthlyDailyRevenueJson != null ? monthlyDailyRevenueJson : '[]'};
+        const dataStore = {
+            year: {
+                revenue: ${revYearJson != null ? revYearJson : '[]'},
+                orders: ${ordYearJson != null ? ordYearJson : '[]'},
+                products: ${prodYearJson != null ? prodYearJson : '[]'}
+            },
+            month: {
+                revenue: ${revMonthJson != null ? revMonthJson : '[]'},
+                orders: ${ordMonthJson != null ? ordMonthJson : '[]'},
+                products: ${prodMonthJson != null ? prodMonthJson : '[]'}
+            }
+        };
 
         const labelsYear = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
         const labelsMonth = ${daysLabelJson != null ? daysLabelJson : '[]'};
@@ -202,8 +222,8 @@
             data: {
                 labels: labelsYear,
                 datasets: [{
-                    label: 'Doanh thu',
-                    data: dataYear,
+                    label: 'Chỉ số',
+                    data: dataStore.year.revenue,
                     backgroundColor: gradient,
                     borderColor: '#d81f19',
                     borderWidth: 3.5,
@@ -226,7 +246,11 @@
                         ticks: {
                             font: { size: 13 },
                             callback: function(value) {
-                                return value.toLocaleString('vi-VN') + ' đ';
+                                const currentDataFilter = document.getElementById('dataFilter').value;
+                                if (currentDataFilter === 'revenue') {
+                                    return value.toLocaleString('vi-VN') + ' đ';
+                                }
+                                return value.toLocaleString('vi-VN');
                             }
                         }
                     },
@@ -238,15 +262,16 @@
             }
         });
 
-        document.getElementById('viewFilter').addEventListener('change', function () {
-            if (this.value === 'month') {
-                revenueChart.data.labels = labelsMonth;
-                revenueChart.data.datasets[0].data = dataMonth;
-            } else {
-                revenueChart.data.labels = labelsYear;
-                revenueChart.data.datasets[0].data = dataYear;
-            }
+        function updateChart() {
+            const timeValue = document.getElementById('viewFilter').value;
+            const dataValue = document.getElementById('dataFilter').value;
+
+            revenueChart.data.labels = (timeValue === 'month') ? labelsMonth : labelsYear;
+            revenueChart.data.datasets[0].data = dataStore[timeValue][dataValue];
             revenueChart.update();
-        });
+        }
+
+        document.getElementById('viewFilter').addEventListener('change', updateChart);
+        document.getElementById('dataFilter').addEventListener('change', updateChart);
     });
 </script>

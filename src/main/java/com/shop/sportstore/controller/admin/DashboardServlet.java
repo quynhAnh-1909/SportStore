@@ -46,27 +46,32 @@ public class DashboardServlet extends HttpServlet {
         int currentYear = cal.get(Calendar.YEAR);
         int maxDaysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        double monthlyRevenue = orderDAO.calculateMonthlyRevenue(currentMonth, currentYear);
+        double monthlyRevenue = orderDAO.calculateMonthlyStats("revenue", currentMonth, currentYear);
 
-        StringJoiner sjYear = new StringJoiner(",", "[", "]");
+        StringJoiner revYear = new StringJoiner(",", "[", "]");
+        StringJoiner ordYear = new StringJoiner(",", "[", "]");
+        StringJoiner prodYear = new StringJoiner(",", "[", "]");
+
         for (int m = 1; m <= 12; m++) {
-            double rev = orderDAO.calculateMonthlyRevenue(m, currentYear);
-            sjYear.add(String.valueOf((long) rev));
+            revYear.add(String.valueOf(orderDAO.calculateMonthlyStats("revenue", m, currentYear)));
+            ordYear.add(String.valueOf(orderDAO.calculateMonthlyStats("orders", m, currentYear)));
+            prodYear.add(String.valueOf(orderDAO.calculateMonthlyStats("products", m, currentYear)));
         }
-        String yearlyRevenueJson = sjYear.toString();
 
-        StringJoiner sjMonthData = new StringJoiner(",", "[", "]");
+        StringJoiner revMonth = new StringJoiner(",", "[", "]");
+        StringJoiner ordMonth = new StringJoiner(",", "[", "]");
+        StringJoiner prodMonth = new StringJoiner(",", "[", "]");
+
         for (int d = 1; d <= maxDaysInMonth; d++) {
-            double revDay = orderDAO.calculateDailyRevenue(d, currentMonth, currentYear);
-            sjMonthData.add(String.valueOf((long) revDay));
+            revMonth.add(String.valueOf(orderDAO.calculateDailyStats("revenue", d, currentMonth, currentYear)));
+            ordMonth.add(String.valueOf(orderDAO.calculateDailyStats("orders", d, currentMonth, currentYear)));
+            prodMonth.add(String.valueOf(orderDAO.calculateDailyStats("products", d, currentMonth, currentYear)));
         }
-        String monthlyDailyRevenueJson = sjMonthData.toString();
 
         StringJoiner sjMonthLabels = new StringJoiner("\",\"", "[\"", "\"]");
         for (int d = 1; d <= maxDaysInMonth; d++) {
             sjMonthLabels.add("Ngày " + d);
         }
-        String daysLabelJson = sjMonthLabels.toString();
 
         request.setAttribute("inventoryList", productDAO.getInventoryProducts());
         request.setAttribute("slowMovingList", productDAO.getSlowMovingProducts());
@@ -76,9 +81,15 @@ public class DashboardServlet extends HttpServlet {
         request.setAttribute("productCount", productCount);
         request.setAttribute("orderCount", orderCount);
 
-        request.setAttribute("yearlyRevenueJson", yearlyRevenueJson);
-        request.setAttribute("monthlyDailyRevenueJson", monthlyDailyRevenueJson);
-        request.setAttribute("daysLabelJson", daysLabelJson);
+        request.setAttribute("revYearJson", revYear.toString());
+        request.setAttribute("ordYearJson", ordYear.toString());
+        request.setAttribute("prodYearJson", prodYear.toString());
+
+        request.setAttribute("revMonthJson", revMonth.toString());
+        request.setAttribute("ordMonthJson", ordMonth.toString());
+        request.setAttribute("prodMonthJson", prodMonth.toString());
+
+        request.setAttribute("daysLabelJson", sjMonthLabels.toString());
 
         request.setAttribute("contentPage", "/WEB-INF/admin/dashboard.jsp");
         request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
