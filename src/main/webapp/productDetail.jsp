@@ -424,6 +424,16 @@
 
             transition:0.3s ease;
         }
+        .stock-box {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .stock-box .badge {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
 
     </style>
 
@@ -594,7 +604,23 @@
             <div class="col-md-3 text-muted">Xuất xứ</div>
             <div class="col-md-9">Việt Nam</div>
         </div>
-
+        <div class="row mt-2">
+            <div class="col-md-3 text-muted">Trạng thái kho</div>
+            <div class="col-md-9">
+                <c:choose>
+                    <c:when test="${product.stockQuantity > 0}">
+                        <span class="badge bg-success">Còn hàng (${product.stockQuantity})</span>
+                    </c:when>
+                    <c:otherwise>
+                        <span class="badge bg-danger">Hết hàng</span>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-3 text-muted">Số lượng đã bán</div>
+            <div class="col-md-9 fw-bold text-success">${product.soldQuantity} sản phẩm</div>
+        </div>
         <hr>
         <div class="section-title">MÔ TẢ SẢN PHẨM</div>
 
