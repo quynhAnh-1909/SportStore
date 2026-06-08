@@ -17,9 +17,29 @@
     </div>
 
     <div class="col-md-4">
-        <div class="dashboard-card">
-            <h5><i class="fas fa-shopping-cart text-danger me-2"></i>Tổng đơn hàng</h5>
-            <h2>${orderCount}</h2>
+        <div class="dashboard-card h-100 d-flex flex-column justify-content-between">
+            <div>
+                <h5><i class="fas fa-shopping-cart text-danger me-2"></i>Tổng đơn hàng</h5>
+                <h2>${orderCount}</h2>
+            </div>
+
+            <div class="border-top pt-2 mt-2" style="border-top: 1px dashed #dee2e6 !important;">
+                <h6 class="text-muted mb-1" style="font-size: 13px;"><i class="fas fa-ticket-alt text-success me-2"></i>Tỷ lệ sử dụng Voucher</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-dark" style="font-size: 14px;">
+                        ${usedVouchers} <small class="text-muted" style="font-weight: normal;">đã dùng</small>
+                    </span>
+                    <span class="text-muted">/</span>
+                    <span class="fw-bold text-primary" style="font-size: 14px;">
+                        ${totalVouchers} <small class="text-muted" style="font-weight: normal;">tổng số</small>
+                    </span>
+                </div>
+                <div class="progress mt-2" style="height: 6px;">
+                    <div class="progress-bar bg-success" role="progressbar"
+                         style="width: ${totalVouchers > 0 ? (usedVouchers * 100 / totalVouchers) : 0}%"
+                         aria-valuenow="${usedVouchers}" aria-valuemin="0" aria-valuemax="${totalVouchers}"></div>
+                </div>
+            </div>
         </div>
     </div>
 

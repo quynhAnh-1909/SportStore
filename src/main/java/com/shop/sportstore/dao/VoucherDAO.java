@@ -13,8 +13,6 @@ public class VoucherDAO {
     public VoucherDAO(Connection conn) {
         this.conn = conn;
     }
-
-    // ================== THÊM ==================
     public void insert(Voucher v) {
         try {
             String sql = "INSERT INTO vouchers(code, discount_type, discount_value, min_order_value, max_discount, quantity, payment_method, min_product_price, category_id, start_date, expiry_date, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -293,7 +291,7 @@ public class VoucherDAO {
 
         return list;
     }
-    // ================== LẤY VOUCHER HOẠT ĐỘNG ==================
+
     public List<Voucher> findAllActive() {
 
         List<Voucher> list = new ArrayList<>();
@@ -342,5 +340,33 @@ public class VoucherDAO {
         }
 
         return list;
+    }
+
+    public int getTotalVoucherQuantity() {
+        int total = 0;
+        String sql = "SELECT SUM(quantity) FROM vouchers";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return total;
+    }
+
+    public int getTotalVoucherUsedCount() {
+        int total = 0;
+        String sql = "SELECT SUM(used_count) FROM vouchers";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return total;
     }
 }

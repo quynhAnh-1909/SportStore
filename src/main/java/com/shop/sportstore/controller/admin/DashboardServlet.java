@@ -2,6 +2,7 @@ package com.shop.sportstore.controller.admin;
 
 import com.shop.sportstore.dao.OrderDAO;
 import com.shop.sportstore.dao.ProductDAO;
+import com.shop.sportstore.dao.VoucherDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,6 +31,16 @@ public class DashboardServlet extends HttpServlet {
         int productCount = productDAO.countProducts(null, null);
         int orderCount = orderDAO.countOrdersByStatus("COMPLETED");
 
+        int totalVouchers = 0;
+        int usedVouchers = 0;
+        try (java.sql.Connection conn = com.shop.sportstore.untils.DBConnection.getConnection()) {
+            VoucherDAO voucherDAO = new VoucherDAO(conn);
+            totalVouchers = voucherDAO.getTotalVoucherQuantity();
+            usedVouchers = voucherDAO.getTotalVoucherUsedCount();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Calendar cal = Calendar.getInstance();
         int currentMonth = cal.get(Calendar.MONTH) + 1;
         int currentYear = cal.get(Calendar.YEAR);
@@ -43,11 +54,10 @@ public class DashboardServlet extends HttpServlet {
         }
         String yearlyRevenueJson = sj.toString();
 
-        // --- ĐOẠN ĐẨY DỮ LIỆU TỒN KHO SANG JSP ---
         request.setAttribute("inventoryList", productDAO.getInventoryProducts());
         request.setAttribute("slowMovingList", productDAO.getSlowMovingProducts());
-        // ----------------------------------------
-
+        request.setAttribute("totalVouchers", totalVouchers);
+        request.setAttribute("usedVouchers", usedVouchers);
         request.setAttribute("revenue", monthlyRevenue);
         request.setAttribute("productCount", productCount);
         request.setAttribute("orderCount", orderCount);
