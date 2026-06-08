@@ -7,6 +7,7 @@ import com.shop.sportstore.model.User;
 import com.shop.sportstore.untils.FacebookUtils;
 import com.shop.sportstore.untils.GoogleUtils;
 
+import com.shop.sportstore.untils.MailUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -17,7 +18,10 @@ import java.io.IOException;
         "/register",
         "/logout",
         "/login-google",
-        "/login-facebook"
+        "/login-facebook",
+        "/forgot-password",
+        "/verify-otp",
+        "/reset-password"
 })
 public class AuthServlet extends HttpServlet {
 
@@ -62,6 +66,18 @@ public class AuthServlet extends HttpServlet {
                 break;
             case "/register":
                 handleRegister(request, response, session);
+                break;
+
+            case "/forgot-password":
+                forgotPassword(request,response,session);
+                break;
+
+            case "/verify-otp":
+                verifyOTP(request,response,session);
+                break;
+
+            case "/reset-password":
+                resetPassword(request,response,session);
                 break;
             default:
                 response.sendRedirect(request.getContextPath() + "/products");
@@ -160,6 +176,109 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
+    private void forgotPassword(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpSession session)
+            throws IOException {
+
+        String email =
+                request.getParameter("email");
+
+        User user =
+                dao.findByEmail(email);
+
+        response.setContentType("application/json");
+
+        if(user == null){
+
+            response.getWriter().write(
+                    "{\"success\":false,\"message\":\"Email không tồn tại\"}"
+            );
+
+            return;
+        }
+
+        String otp =
+                String.valueOf(
+                        (int)(100000 + Math.random()*900000)
+                );
+
+        session.setAttribute("OTP", otp);
+        session.setAttribute("OTP_EMAIL", email);
+
+        try{
+
+            MailUtils.sendOTP(email, otp);
+
+            response.getWriter().write(
+                    "{\"success\":true}"
+            );
+
+        }catch(Exception e){
+
+            e.printStackTrace();
+
+            response.getWriter().write(
+                    "{\"success\":false,\"message\":\"Không gửi được OTP\"}"
+            );
+        }
+    }
+
+    private void verifyOTP(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpSession session)
+            throws IOException {
+
+        String userOTP =
+                request.getParameter("otp");
+
+        String sessionOTP =
+                (String)session.getAttribute("OTP");
+
+        response.setContentType("application/json");
+
+        if(sessionOTP != null &&
+                sessionOTP.equals(userOTP)){
+
+            response.getWriter().write(
+                    "{\"success\":true}"
+            );
+
+        }else{
+
+            response.getWriter().write(
+                    "{\"success\":false}"
+            );
+        }
+    }
+
+    private void resetPassword(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpSession session)
+            throws IOException {
+
+        String newPassword =
+                request.getParameter("password");
+
+        String email =
+                (String)session.getAttribute("OTP_EMAIL");
+
+        boolean ok =
+                dao.updatePassword(
+                        email,
+                        newPassword
+                );
+
+        response.setContentType("application/json");
+
+        response.getWriter().write(
+                "{\"success\":"+ok+"}"
+        );
+    }
+
     private void handleRegister(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws ServletException, IOException {
 
@@ -201,8 +320,8 @@ public class AuthServlet extends HttpServlet {
 
         try {
             if (code == null) {
-                String clientId = "YOUR_CLIENT_ID";
-                String redirectUri = "http://localhost:8080/SportStore/login-google";
+                String clientId = "1021470481637-vv36ulkhn7f0mv47vumauputq70rqnt7.apps.googleusercontent.com";
+                String redirectUri = "https://norbert-wintrier-nicol.ngrok-free.dev/login-google";
                 String googleURL = "https://accounts.google.com/o/oauth2/v2/auth?"
                         + "scope=email profile"
                         + "&redirect_uri=" + redirectUri
@@ -215,7 +334,17 @@ public class AuthServlet extends HttpServlet {
             String accessToken = GoogleUtils.getToken(code);
             GoogleUser googleUser = GoogleUtils.getUserInfo(accessToken);
 
-            User user = dao.findOrCreateSocialUser(googleUser.getEmail(), googleUser.getName(), "GOOGLE");
+            System.out.println("EMAIL = " + googleUser.getEmail());
+            System.out.println("NAME = " + googleUser.getName());
+            System.out.println("AVATAR = " + googleUser.getPicture());
+
+            User user =
+                    dao.findOrCreateSocialUser(
+                            googleUser.getEmail(),
+                            googleUser.getName(),
+                            "GOOGLE",
+                            googleUser.getPicture()
+                    );
 
             if (!user.isStatus()) {
                 session.setAttribute("errorMessage", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");
@@ -240,25 +369,43 @@ public class AuthServlet extends HttpServlet {
 
         try {
             if (code == null) {
-                String appId = "YOUR_FB_APP_ID";
-                String redirectUri = "http://localhost:8080/SportStore/login-facebook";
+
+                String appId = "3605093742977294";
+
+                String redirectUri =
+                        "https://norbert-wintrier-nicol.ngrok-free.dev/login-facebook";
+
                 String fbURL = "https://www.facebook.com/v18.0/dialog/oauth?"
                         + "client_id=" + appId
                         + "&redirect_uri=" + redirectUri
                         + "&response_type=code"
-                        + "&scope=email,public_profile";
+                        + "&scope=public_profile";
+
                 response.sendRedirect(fbURL);
                 return;
             }
 
             String accessToken = FacebookUtils.getToken(code);
             FacebookUser fbUser = FacebookUtils.getUserInfo(accessToken);
+            System.out.println("FB ID = " + fbUser.getId());
+            System.out.println("FB NAME = " + fbUser.getName());
+            System.out.println("FB EMAIL = " + fbUser.getEmail());
 
             if (fbUser.getEmail() == null) {
                 fbUser.setEmail(fbUser.getId() + "@facebook.com");
             }
 
-            User user = dao.findOrCreateSocialUser(fbUser.getEmail(), fbUser.getName(), "FACEBOOK");
+            String avatar =
+                    "https://graph.facebook.com/"
+                            + fbUser.getId()
+                            + "/picture?type=large";
+
+            User user = dao.findOrCreateSocialUser(
+                    fbUser.getEmail(),
+                    fbUser.getName(),
+                    "FACEBOOK",
+                    avatar
+            );
 
             if (!user.isStatus()) {
                 session.setAttribute("errorMessage", "Tài khoản của bạn đã bị khóa do vi phạm chính sách hủy đơn!");

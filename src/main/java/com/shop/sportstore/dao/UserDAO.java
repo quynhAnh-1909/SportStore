@@ -2,6 +2,11 @@ package com.shop.sportstore.dao;
 
 import com.shop.sportstore.model.User;
 import com.shop.sportstore.untils.DBConnection;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
 import java.sql.*;
 
 public class UserDAO extends DBConnection {
@@ -94,30 +99,79 @@ public class UserDAO extends DBConnection {
         return null;
     }
 
-    public User findOrCreateSocialUser(String email, String name, String provider) {
+    public User findOrCreateSocialUser(
+            String email,
+            String name,
+            String provider,
+            String avatar) {
+
         User user = findByEmail(email);
+
         if (user == null) {
-            String sql = "INSERT INTO users (full_name, email, password, role, provider) VALUES (?, ?, '', 'USER', ?)";
+
+            String sql =
+                    "INSERT INTO users " +
+                            "(full_name, email, password, role, provider, avatar) " +
+                            "VALUES (?, ?, '', 'USER', ?, ?)";
+
             try (Connection conn = getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                 PreparedStatement ps =
+                         conn.prepareStatement(
+                                 sql,
+                                 Statement.RETURN_GENERATED_KEYS)) {
+
                 ps.setString(1, name);
                 ps.setString(2, email);
                 ps.setString(3, provider);
+                ps.setString(4, avatar);
+
                 ps.executeUpdate();
+
                 try (ResultSet rs = ps.getGeneratedKeys()) {
+
                     if (rs.next()) {
+
                         user = new User();
+
                         user.setUserId(rs.getInt(1));
                         user.setFullName(name);
                         user.setEmail(email);
                         user.setRole("USER");
+                        user.setProvider(provider);
+                        user.setAvatar(avatar);
                         user.setStatus(true);
                     }
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } else {
+
+            String sql =
+                    "UPDATE users " +
+                            "SET avatar = ?, provider = ? " +
+                            "WHERE email = ?";
+
+            try (Connection conn = getConnection();
+                 PreparedStatement ps =
+                         conn.prepareStatement(sql)) {
+
+                ps.setString(1, avatar);
+                ps.setString(2, provider);
+                ps.setString(3, email);
+
+                ps.executeUpdate();
+
+                user.setAvatar(avatar);
+                user.setProvider(provider);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
         return user;
     }
 
@@ -129,7 +183,8 @@ public class UserDAO extends DBConnection {
         user.setPassword(rs.getString("password"));
         user.setPhoneNumber(rs.getString("phone_number"));
         user.setRole(rs.getString("role"));
-
+        user.setAvatar(rs.getString("avatar"));
+        user.setProvider(rs.getString("provider"));
 
         user.setStatus(rs.getInt("status") == 1 || rs.getBoolean("status"));
 
@@ -141,23 +196,34 @@ public class UserDAO extends DBConnection {
         return user;
     }
 
-    public User findOrCreateSocialUser(String email, String name) {
-        return findOrCreateSocialUser(email, name, "SOCIAL");
-    }
-
     public User getUserById(int id) throws SQLException {
-        String sql = "SELECT user_id, full_name, phone_number, email, password, role, status, gender FROM users WHERE user_id = ?";
+
+        System.out.println("SEARCH USER ID = " + id);
+
+        String sql =
+                "SELECT * FROM users WHERE user_id = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, id);
+
             try (ResultSet rs = ps.executeQuery()) {
+
                 if (rs.next()) {
+
+                    System.out.println("FOUND USER IN DB");
+
                     return mapResultSetToUser(rs);
                 }
+
+                System.out.println("NOT FOUND USER IN DB");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -212,4 +278,78 @@ public class UserDAO extends DBConnection {
         }
         return false;
     }
+
+    public boolean updatePassword(String email, String newPassword) {
+
+        String sql =
+                "UPDATE users SET password = ? WHERE email = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPassword);
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private void verifyOTP(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            HttpSession session)
+            throws IOException {
+
+        String userOTP =
+                request.getParameter("otp");
+
+        String sessionOTP =
+                (String)session.getAttribute("OTP");
+
+        response.setContentType("application/json");
+
+        if(sessionOTP != null &&
+                sessionOTP.equals(userOTP)){
+
+            response.getWriter().write(
+                    "{\"success\":true}"
+            );
+
+        }else{
+
+            response.getWriter().write(
+                    "{\"success\":false}"
+            );
+        }
+    }
+
+    public boolean changePassword(int userId, String newPassword) {
+
+        String sql =
+                "UPDATE users SET password = ? WHERE user_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPassword);
+            ps.setInt(2, userId);
+
+            int result = ps.executeUpdate();
+
+            System.out.println("UPDATE RESULT = " + result);
+
+            return result > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
 }
