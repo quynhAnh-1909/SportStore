@@ -32,7 +32,6 @@ public class OrdersServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         try {
-    
             if ("tracking".equals(action)) {
                 String trackingCode = request.getParameter("ghnCode");
 
@@ -48,14 +47,13 @@ public class OrdersServlet extends HttpServlet {
                 return;
             }
 
-       
             if ("confirmAll".equals(action)) {
                 int updatedRows = orderDAO.confirmAllPendingOrders();
 
                 if (updatedRows > 0) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.getWriter().write(
-                            "{\"success\":true,\"message\":\"Đã xác nhận thành công " + updatedRows + " đơn hàng!\"}"
+                            "{\"success\":true,\"message\":\"Đã xác nhận thành công và cập nhật kho " + updatedRows + " đơn hàng!\"}"
                     );
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -66,7 +64,6 @@ public class OrdersServlet extends HttpServlet {
                 return;
             }
 
-    
             String idParam = request.getParameter("id");
             if (idParam == null || idParam.isEmpty()) {
                 throw new RuntimeException("Thiếu ID đơn hàng!");
@@ -144,7 +141,6 @@ public class OrdersServlet extends HttpServlet {
 
         String action = request.getParameter("action");
 
-
         if ("sync".equals(action)) {
             try {
                 List<Order> shippingOrders = orderDAO.getOrdersByStatus("SHIPPING");
@@ -164,7 +160,19 @@ public class OrdersServlet extends HttpServlet {
                                 if ("delivered".equals(ghnStatus)) {
                                     orderDAO.updateStatusByGhnCode(ghnCode, "COMPLETED");
                                 } else if ("cancel".equals(ghnStatus)) {
-                                    orderDAO.updateStatusByGhnCode(ghnCode, "CANCELLED");
+                                    java.sql.Connection conn = null;
+                                    try {
+                                        conn = com.shop.sportstore.untils.DBConnection.getConnection();
+                                        conn.setAutoCommit(false);
+                                        orderDAO.updateStatusByGhnCode(ghnCode, "CANCELLED");
+                                        orderDAO.increaseProductStock(order.getId(), conn);
+                                        conn.commit();
+                                    } catch (Exception ex) {
+                                        if (conn != null) conn.rollback();
+                                        throw ex;
+                                    } finally {
+                                        if (conn != null) conn.close();
+                                    }
                                 } else if (ghnStatus.contains("return") || ghnStatus.contains("refund")
                                         || "damage".equals(ghnStatus) || "lost".equals(ghnStatus)) {
                                     orderDAO.requestRefund(order.getId(), "Đơn hàng bị trả về hoặc gặp sự cố từ đối tác giao hàng GHN.");
@@ -174,7 +182,7 @@ public class OrdersServlet extends HttpServlet {
                         }
                     }
                 }
-               
+
                 response.sendRedirect(request.getContextPath() + "/admin/orders");
                 return;
             } catch (Exception e) {
@@ -208,7 +216,6 @@ public class OrdersServlet extends HttpServlet {
             orders = orderDAO.getOrdersByStatus(status);
         }
 
-    
         int pendingCount = 0;
         List<Order> pendingList = orderDAO.getOrdersByStatus("PENDING");
         if (pendingList != null) {

@@ -608,30 +608,26 @@ public class ProductDAO extends DBConnection {
         }
         return list;
     }
-
-    public List<Product> getWeeklyHotProducts() {
-        List<Product> list = new ArrayList<>();
-        String sql = """
-            SELECT p.*, SUM(od.Quantity) AS WeeklySold 
-            FROM orderdetails od 
-            JOIN orders o ON od.OrderId = o.Id 
-            JOIN products p ON od.ProductId = p.id 
-            WHERE o.Status = 'COMPLETED' AND o.CreatedAt >= NOW() - INTERVAL 7 DAY 
-            GROUP BY p.id, p.name, p.brand, p.price, p.stock_quantity, p.size, p.color, p.description, p.image_url, p.category_id
-            ORDER BY WeeklySold DESC LIMIT 5
-        """;
-
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Product p = mapResultSetToProduct(rs);
-                p.setPrice(rs.getDouble("WeeklySold"));
-                list.add(p);
+    public void decreaseStock(int productId, int quantity, Connection conn) throws SQLException {
+        String sql = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            ps.setInt(3, quantity);
+            int rows = ps.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Sản phẩm ID " + productId + " không đủ số lượng trong kho!");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return list;
     }
+
+    public void increaseStock(int productId, int quantity, Connection conn) throws SQLException {
+        String sql = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            ps.executeUpdate();
+        }
+    }
+
 }

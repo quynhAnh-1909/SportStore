@@ -14,6 +14,54 @@ import java.util.Map;
 import static com.shop.sportstore.untils.DBConnection.getConnection;
 
 public class OrderDAO extends DBConnection {
+
+
+    public void decreaseProductStock(int orderId, Connection conn) throws SQLException {
+        String selectSql = "SELECT ProductId, Quantity FROM orderdetails WHERE OrderId = ?";
+        String updateSql = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?";
+
+        try (PreparedStatement psSelect = conn.prepareStatement(selectSql)) {
+            psSelect.setInt(1, orderId);
+            try (ResultSet rs = psSelect.executeQuery()) {
+                try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+                    while (rs.next()) {
+                        int qty = rs.getInt("Quantity");
+                        int pId = rs.getInt("ProductId");
+
+                        psUpdate.setInt(1, qty);
+                        psUpdate.setInt(2, pId);
+                        psUpdate.setInt(3, qty);
+                        psUpdate.addBatch();
+                    }
+                    int[] results = psUpdate.executeBatch();
+                    for (int r : results) {
+                        if (r == 0) {
+                            throw new SQLException("Thao tác thất bại: Có sản phẩm trong đơn hàng không đủ số lượng tồn kho!");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void increaseProductStock(int orderId, Connection conn) throws SQLException {
+        String selectSql = "SELECT ProductId, Quantity FROM orderdetails WHERE OrderId = ?";
+        String updateSql = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?";
+
+        try (PreparedStatement psSelect = conn.prepareStatement(selectSql)) {
+            psSelect.setInt(1, orderId);
+            try (ResultSet rs = psSelect.executeQuery()) {
+                try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+                    while (rs.next()) {
+                        psUpdate.setInt(1, rs.getInt("Quantity"));
+                        psUpdate.setInt(2, rs.getInt("ProductId"));
+                        psUpdate.addBatch();
+                    }
+                    psUpdate.executeBatch();
+                }
+            }
+        }
+    }
     public int countOrdersByStatus(String status) {
         int count = 0;
         String sql = "SELECT COUNT(*) FROM orders WHERE Status = ?";
@@ -184,19 +232,17 @@ public class OrderDAO extends DBConnection {
         return status;
     }
 
-    public void createOrder(Integer userId, String orderCode, double total, String paymentMethod, String status,
-                            String receiverName, String receiverPhone, String address, int districtId, String wardCode,
-                            String note, Integer voucherId, double discountAmount, double shippingFee, List<CartItem> cart) throws SQLException {
+    public boolean createOrder(Integer userId, String orderCode, double total, String paymentMethod, String status,
+                               String receiverName, String receiverPhone, String address, int districtId, String wardCode,
+                               String note, Integer voucherId, double discountAmount, double shippingFee, List<CartItem> cart) throws SQLException {
         String insertOrderSQL = "INSERT INTO orders (UserId, OrderCode, TotalPrice, PaymentMethod, Status, " +
                 "ReceiverName, ReceiverPhone, Address, district_id, ward_code, Note, VoucherId, DiscountAmount, " +
                 "shipping_fee, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
         String insertDetailSQL = "INSERT INTO orderdetails (OrderId, ProductId, Quantity, Price) VALUES (?, ?, ?, ?)";
         Connection conn = null;
         try {
             conn = getConnection();
             conn.setAutoCommit(false);
-
             int orderId;
             try (PreparedStatement psOrder = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
                 psOrder.setInt(1, userId);
@@ -210,28 +256,22 @@ public class OrderDAO extends DBConnection {
                 psOrder.setInt(9, districtId);
                 psOrder.setString(10, wardCode);
                 psOrder.setString(11, note);
-
                 if (voucherId != null) {
                     psOrder.setInt(12, voucherId);
                 } else {
                     psOrder.setNull(12, Types.INTEGER);
                 }
-
                 psOrder.setDouble(13, discountAmount);
                 psOrder.setDouble(14, shippingFee);
-
                 Timestamp currentLocalTime = new Timestamp(System.currentTimeMillis());
                 psOrder.setTimestamp(15, currentLocalTime);
                 psOrder.setTimestamp(16, currentLocalTime);
-
                 psOrder.executeUpdate();
-
                 try (ResultSet rs = psOrder.getGeneratedKeys()) {
                     if (rs.next()) orderId = rs.getInt(1);
                     else throw new SQLException("Không lấy được Order ID");
                 }
             }
-
             try (PreparedStatement psDetail = conn.prepareStatement(insertDetailSQL)) {
                 for (CartItem item : cart) {
                     psDetail.setInt(1, orderId);
@@ -242,7 +282,11 @@ public class OrderDAO extends DBConnection {
                 }
                 psDetail.executeBatch();
             }
+            if ("PENDING".equalsIgnoreCase(status) || "CONFIRMED".equalsIgnoreCase(status)) {
+                decreaseProductStock(orderId, conn);
+            }
             conn.commit();
+            return true;
         } catch (Exception e) {
             if (conn != null) conn.rollback();
             throw new SQLException("Lỗi tạo đơn hàng: " + e.getMessage());
@@ -250,7 +294,6 @@ public class OrderDAO extends DBConnection {
             if (conn != null) conn.close();
         }
     }
-
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
