@@ -30,6 +30,12 @@
         .bg-warning-subtle { background-color: #fff3cd !important; }
         .bg-primary-subtle { background-color: #cfe2ff !important; }
         .bg-info-subtle { background-color: #cff4fc !important; }
+        .nav-tabs .nav-link { color: #495057; font-weight: 500; }
+        .nav-tabs .nav-link.active {
+            color: #d81f19 !important;
+            border-bottom: 3px solid #d81f19 !important;
+            background: none;
+        }
     </style>
 </head>
 <body>
@@ -61,158 +67,68 @@
         <c:remove var="errorMsg" scope="session" />
     </c:if>
 
-    <c:if test="${empty orders}">
-        <div class="alert alert-info shadow-sm border-0">
-            <i class="fas fa-info-circle me-2"></i> Bạn chưa có đơn hàng nào.
-            <a href="${pageContext.request.contextPath}/" class="fw-bold text-info text-decoration-none">Mua sắm ngay tại đây!</a>
-        </div>
-    </c:if>
+    <ul class="nav nav-tabs mb-4 bg-white rounded shadow-sm p-2" id="orderTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-all" type="button">Tất cả</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pending" type="button">Chờ xử lý</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-shipping" type="button">Đang giao</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-completed" type="button">Hoàn tất</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cancelled" type="button">Đã hủy</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-refund" type="button">Trả hàng/Hoàn tiền</button>
+        </li>
+    </ul>
 
-    <c:if test="${not empty orders}">
-        <div id="orderArea" class="table-responsive shadow-sm rounded">
-            <table class="table table-hover align-middle bg-white mb-0">
-                <thead class="table-danger-custom">
-                <tr>
-                    <th>Mã đơn</th>
-                    <th>Ngày đặt</th>
-                    <th>Phương thức</th>
-                    <th>Tổng tiền</th>
-                    <th class="text-center">Thanh toán</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                    <th>Hành động</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach var="item" items="${orders}">
-                    <c:set var="statusLower" value="${not empty item.status ? fn:toLowerCase(item.status) : 'pending'}" />
-                    <tr>
-                        <td class="fw-bold">#<c:out value="${item.orderCode}" default="0000" /></td>
-                        <td class="small text-muted">
-                            <c:catch var="errDate">
-                                <fmt:formatDate value="${item.createdAt}" pattern="dd/MM/yyyy HH:mm" />
-                            </c:catch>
-                            <c:if test="${not empty errDate}">--/--/----</c:if>
-                        </td>
-                        <td>
-                            <span class="badge border text-dark bg-light px-2 py-1">
-                                <i class="fas ${item.paymentMethod eq 'VNPAY' ? 'fa-credit-card text-primary' : 'fa-money-bill-wave text-danger-custom'} me-1"></i>
-                                <c:out value="${item.paymentMethod}" default="COD" />
-                            </span>
-                        </td>
-                        <td class="fw-bold text-danger-custom">
-                            <fmt:formatNumber value="${item.totalPrice}" type="number" /> đ
-                        </td>
-                        <td class="text-center">
-                            <c:choose>
-                                <c:when test="${item.paid}">
-                                    <span class="badge rounded-pill bg-danger-subtle-custom text-danger-custom border border-danger-custom px-2">
-                                        <i class="fas fa-check-circle me-1"></i>Đã thanh toán
-                                    </span>
-                                </c:when>
-                                <c:when test="${item.paymentMethod eq 'VNPAY'}">
-                                    <span class="badge rounded-pill bg-warning-subtle text-dark border border-warning px-2">
-                                        <i class="fas fa-clock me-1"></i>Chờ tiền
-                                    </span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="badge rounded-pill bg-light text-muted border px-2">Chưa thanh toán</span>
-                                </c:otherwise>
-                            </c:choose>
-                        </td>
-                        <td>
-                            <c:choose>
-                                <c:when test="${statusLower eq 'pending' or statusLower eq 'chờ xác nhận'}">
-                                    <span class="badge bg-primary-subtle text-primary px-2 py-1">
-                                        <i class="fas fa-sync-alt fa-spin me-1"></i>Chờ xác nhận
-                                    </span>
-                                </c:when>
-                                <c:when test="${statusLower eq 'shipping' or statusLower eq 'đang giao'}">
-                                    <span class="badge bg-info-subtle text-info px-2 py-1">
-                                        <i class="fas fa-truck me-1"></i>Đang giao
-                                    </span>
-                                </c:when>
-                                <c:when test="${statusLower eq 'delivered' or statusLower eq 'completed' or statusLower eq 'hoàn tất' or statusLower eq 'đã giao'}">
-                                    <span class="badge bg-success text-white px-2 py-1">
-                                        <i class="fas fa-check me-1"></i>Hoàn tất
-                                    </span>
-                                </c:when>
-                                <c:when test="${statusLower eq 'cancelled' or statusLower eq 'đã hủy'}">
-                                    <span class="badge bg-light text-secondary border px-2 py-1 text-decoration-line-through">
-                                        <i class="fas fa-ban me-1"></i>Đã hủy
-                                    </span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="badge bg-secondary px-2 py-1"><c:out value="${item.status}" /></span>
-                                </c:otherwise>
-                            </c:choose>
-                        </td>
-                        <td>
-                            <a href="${pageContext.request.contextPath}/order-detail?id=${item.id}" class="btn btn-sm btn-info text-white shadow-sm" title="Xem chi tiết">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <c:if test="${not empty item.ghnCode}">
-                                <a href="https://tracking.ghn.dev/?order_code=${item.ghnCode}"
-                                   target="_blank"
-                                   class="btn btn-sm btn-warning text-dark shadow-sm ms-1" title="Tra cứu hành trình đơn hàng trên GHN">
-                                    <i class="fas fa-truck"></i>
-                                </a>
-                            </c:if>
-                        </td>
-                        <td>
-                            <jsp:useBean id="now" class="java.util.Date"/>
-                            <c:set var="timeDiff" value="${now.time - item.createdAt.time}" />
-                            <c:set var="isUnder30Mins" value="${timeDiff < (30 * 60 * 1000)}" />
-                            <c:choose>
-                                <c:when test="${(statusLower eq 'pending' or statusLower eq 'chờ xác nhận') && isUnder30Mins}">
-                                    <button type="button" class="btn btn-sm btn-danger w-100" onclick="openCancelModal('${item.orderCode}')">
-                                        <i class="fas fa-times me-1"></i>Hủy đơn
-                                    </button>
-                                </c:when>
-                                <c:when test="${statusLower eq 'shipping' or statusLower eq 'đang giao'}">
-                                    <form action="${pageContext.request.contextPath}/confirm-received" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận bạn đã nhận được gói hàng này?')">
-                                        <input type="hidden" name="orderId" value="${item.id}">
-                                        <button type="submit" class="btn btn-sm btn-success w-100">
-                                            <i class="fas fa-box-open me-1"></i>Đã nhận hàng
-                                        </button>
-                                    </form>
-                                </c:when>
-                                <c:when test="${statusLower eq 'delivered' or statusLower eq 'completed' or statusLower eq 'hoàn tất' or statusLower eq 'đã giao'}">
-                                    <a href="${pageContext.request.contextPath}/productDetail?id=${item.id}#reviewForm" class="btn btn-sm btn-outline-danger w-100">
-                                        <i class="fas fa-star me-1"></i>Đánh giá
-                                    </a>
-                                </c:when>
-                                <c:when test="${(statusLower eq 'cancelled' or statusLower eq 'đã hủy') && item.paymentMethod eq 'VNPAY' && item.paid}">
-                                    <c:choose>
-                                        <c:when test="${empty item.refundStatus}">
-                                            <button type="button" class="btn btn-sm btn-warning w-100" onclick="openRefundModal('${item.id}')">
-                                                <i class="fas fa-rotate-left me-1"></i>Hoàn tiền
-                                            </button>
-                                        </c:when>
-                                        <c:when test="${item.refundStatus eq 'PENDING_REFUND'}">
-                                            <span class="badge bg-warning text-dark d-block py-2"><i class="fas fa-clock me-1"></i>Chờ duyệt</span>
-                                        </c:when>
-                                        <c:when test="${item.refundStatus eq 'REFUNDED'}">
-                                            <span class="badge bg-success d-block py-2"><i class="fas fa-check me-1"></i>Đã hoàn tiền</span>
-                                        </c:when>
-                                        <c:when test="${item.refundStatus eq 'REJECTED'}">
-                                            <span class="badge bg-danger d-block py-2"><i class="fas fa-times me-1"></i>Từ chối</span>
-                                        </c:when>
-                                    </c:choose>
-                                </c:when>
-                                <c:otherwise>
-                                    <button type="button" class="btn btn-sm btn-light border text-muted w-100" disabled>
-                                        <i class="fas fa-lock me-1"></i>Khóa
-                                    </button>
-                                </c:otherwise>
-                            </c:choose>
-                        </td>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-        </div>
-    </c:if>
+    <c:choose>
+        <c:when test="${empty orders}">
+            <div class="alert alert-info shadow-sm border-0">
+                <i class="fas fa-info-circle me-2"></i> Bạn chưa có đơn hàng nào.
+                <a href="${pageContext.request.contextPath}/" class="fw-bold text-info text-decoration-none">Mua sắm ngay tại đây!</a>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <div class="tab-content" id="orderTabsContent">
+                <div class="tab-pane fade show active" id="tab-all" role="tabpanel">
+                    <c:set var="filterStatus" value="ALL" scope="request"/>
+                    <jsp:include page="_orderTableTemplate.jsp"/>
+                </div>
+
+                <div class="tab-pane fade" id="tab-pending" role="tabpanel">
+                    <c:set var="filterStatus" value="PENDING" scope="request"/>
+                    <jsp:include page="_orderTableTemplate.jsp"/>
+                </div>
+
+                <div class="tab-pane fade" id="tab-shipping" role="tabpanel">
+                    <c:set var="filterStatus" value="SHIPPING" scope="request"/>
+                    <jsp:include page="_orderTableTemplate.jsp"/>
+                </div>
+
+                <div class="tab-pane fade" id="tab-completed" role="tabpanel">
+                    <c:set var="filterStatus" value="COMPLETED" scope="request"/>
+                    <jsp:include page="_orderTableTemplate.jsp"/>
+                </div>
+
+                <div class="tab-pane fade" id="tab-cancelled" role="tabpanel">
+                    <c:set var="filterStatus" value="CANCELLED" scope="request"/>
+                    <jsp:include page="_orderTableTemplate.jsp"/>
+                </div>
+
+                <div class="tab-pane fade" id="tab-refund" role="tabpanel">
+                    <c:set var="filterStatus" value="REFUND" scope="request"/>
+                    <jsp:include page="_orderTableTemplate.jsp"/>
+                </div>
+            </div>
+        </c:otherwise>
+    </c:choose>
 </div>
 
 <div class="modal fade" id="refundModal" tabindex="-1" aria-hidden="true">
