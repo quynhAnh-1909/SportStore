@@ -44,15 +44,29 @@ public class DashboardServlet extends HttpServlet {
         Calendar cal = Calendar.getInstance();
         int currentMonth = cal.get(Calendar.MONTH) + 1;
         int currentYear = cal.get(Calendar.YEAR);
+        int maxDaysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
         double monthlyRevenue = orderDAO.calculateMonthlyRevenue(currentMonth, currentYear);
 
-        StringJoiner sj = new StringJoiner(",", "[", "]");
+        StringJoiner sjYear = new StringJoiner(",", "[", "]");
         for (int m = 1; m <= 12; m++) {
             double rev = orderDAO.calculateMonthlyRevenue(m, currentYear);
-            sj.add(String.valueOf((long) rev));
+            sjYear.add(String.valueOf((long) rev));
         }
-        String yearlyRevenueJson = sj.toString();
+        String yearlyRevenueJson = sjYear.toString();
+
+        StringJoiner sjMonthData = new StringJoiner(",", "[", "]");
+        for (int d = 1; d <= maxDaysInMonth; d++) {
+            double revDay = orderDAO.calculateDailyRevenue(d, currentMonth, currentYear);
+            sjMonthData.add(String.valueOf((long) revDay));
+        }
+        String monthlyDailyRevenueJson = sjMonthData.toString();
+
+        StringJoiner sjMonthLabels = new StringJoiner("\",\"", "[\"", "\"]");
+        for (int d = 1; d <= maxDaysInMonth; d++) {
+            sjMonthLabels.add("Ngày " + d);
+        }
+        String daysLabelJson = sjMonthLabels.toString();
 
         request.setAttribute("inventoryList", productDAO.getInventoryProducts());
         request.setAttribute("slowMovingList", productDAO.getSlowMovingProducts());
@@ -61,11 +75,15 @@ public class DashboardServlet extends HttpServlet {
         request.setAttribute("revenue", monthlyRevenue);
         request.setAttribute("productCount", productCount);
         request.setAttribute("orderCount", orderCount);
+
         request.setAttribute("yearlyRevenueJson", yearlyRevenueJson);
+        request.setAttribute("monthlyDailyRevenueJson", monthlyDailyRevenueJson);
+        request.setAttribute("daysLabelJson", daysLabelJson);
 
         request.setAttribute("contentPage", "/WEB-INF/admin/dashboard.jsp");
         request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
