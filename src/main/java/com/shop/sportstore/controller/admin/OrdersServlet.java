@@ -32,7 +32,7 @@ public class OrdersServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         try {
-            // 1. Tác vụ Theo dõi hành trình GHN
+    
             if ("tracking".equals(action)) {
                 String trackingCode = request.getParameter("ghnCode");
 
@@ -48,7 +48,7 @@ public class OrdersServlet extends HttpServlet {
                 return;
             }
 
-            // 2. Tác vụ Xác nhận hàng loạt đơn hàng Chờ xử lý
+       
             if ("confirmAll".equals(action)) {
                 int updatedRows = orderDAO.confirmAllPendingOrders();
 
@@ -66,7 +66,7 @@ public class OrdersServlet extends HttpServlet {
                 return;
             }
 
-            // 3. Các tác vụ xử lý đơn lẻ theo ID đơn hàng
+    
             String idParam = request.getParameter("id");
             if (idParam == null || idParam.isEmpty()) {
                 throw new RuntimeException("Thiếu ID đơn hàng!");
@@ -144,7 +144,7 @@ public class OrdersServlet extends HttpServlet {
 
         String action = request.getParameter("action");
 
-        // Tác vụ đồng bộ trạng thái tự động từ API Giao Hàng Nhanh
+
         if ("sync".equals(action)) {
             try {
                 List<Order> shippingOrders = orderDAO.getOrdersByStatus("SHIPPING");
@@ -174,7 +174,7 @@ public class OrdersServlet extends HttpServlet {
                         }
                     }
                 }
-                // Đồng bộ xong quay lại thẳng danh mục quản lý chung
+               
                 response.sendRedirect(request.getContextPath() + "/admin/orders");
                 return;
             } catch (Exception e) {
@@ -186,7 +186,6 @@ public class OrdersServlet extends HttpServlet {
             }
         }
 
-        // Lọc danh sách đơn hàng theo trạng thái danh mục
         String status = request.getParameter("status");
         List<Order> orders;
 
@@ -209,7 +208,7 @@ public class OrdersServlet extends HttpServlet {
             orders = orderDAO.getOrdersByStatus(status);
         }
 
-        // LẤY ĐẾM SỐ LƯỢNG ĐƠN CHỜ DUYỆT ĐỂ RENDERING NÚT XÁC NHẬN TẤT CẢ Ở VIEW
+    
         int pendingCount = 0;
         List<Order> pendingList = orderDAO.getOrdersByStatus("PENDING");
         if (pendingList != null) {
