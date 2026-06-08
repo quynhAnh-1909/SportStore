@@ -86,7 +86,6 @@ public class ProductDetailServlet extends HttpServlet {
 
             int pageSize = 3;
 
-            /* LẤY REVIEW THEO TRANG */
             List<Review> reviews =
                     reviewDAO.getReviewsByProductPaging(
                             id,
@@ -115,7 +114,7 @@ public class ProductDetailServlet extends HttpServlet {
             );
 
 
-//            request.setAttribute("showAll", showAll);
+
             request.getRequestDispatcher("/productDetail.jsp")
                     .forward(request, response);
 
