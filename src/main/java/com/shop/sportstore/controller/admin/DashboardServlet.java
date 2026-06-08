@@ -43,16 +43,19 @@ public class DashboardServlet extends HttpServlet {
         }
         String yearlyRevenueJson = sj.toString();
 
+        // --- ĐOẠN ĐẨY DỮ LIỆU TỒN KHO SANG JSP ---
+        request.setAttribute("inventoryList", productDAO.getInventoryProducts());
+        request.setAttribute("slowMovingList", productDAO.getSlowMovingProducts());
+        // ----------------------------------------
+
         request.setAttribute("revenue", monthlyRevenue);
         request.setAttribute("productCount", productCount);
         request.setAttribute("orderCount", orderCount);
         request.setAttribute("yearlyRevenueJson", yearlyRevenueJson);
 
         request.setAttribute("contentPage", "/WEB-INF/admin/dashboard.jsp");
-
         request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

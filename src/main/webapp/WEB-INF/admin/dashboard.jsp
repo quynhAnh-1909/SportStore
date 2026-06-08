@@ -7,17 +7,22 @@
 
 <div class="row g-4">
     <div class="col-md-4">
-        <div class="dashboard-card">
+        <div class="dashboard-card" data-bs-toggle="collapse" data-bs-target="#collapseProductDetails" aria-expanded="false" aria-controls="collapseProductDetails" style="cursor: pointer;">
             <h5><i class="fas fa-box text-danger me-2"></i>Tổng sản phẩm</h5>
-            <h2>${productCount}</h2>
+            <h2>
+                ${productCount}
+                <small style="font-size: 12px; color: #6c757d; font-weight: normal;">(Bấm để xem chi tiết)</small>
+            </h2>
         </div>
     </div>
+
     <div class="col-md-4">
         <div class="dashboard-card">
             <h5><i class="fas fa-shopping-cart text-danger me-2"></i>Tổng đơn hàng</h5>
             <h2>${orderCount}</h2>
         </div>
     </div>
+
     <div class="col-md-4">
         <div class="dashboard-card" data-bs-toggle="collapse" data-bs-target="#collapseChart" aria-expanded="false" aria-controls="collapseChart" style="cursor: pointer;">
             <h5><i class="fas fa-money-bill-wave text-danger me-2"></i>Doanh thu tháng này</h5>
@@ -35,7 +40,63 @@
     </div>
 </div>
 
-<div class="row mt-2">
+<div class="collapse mt-4" id="collapseProductDetails">
+    <div class="dashboard-box bg-light p-4 rounded shadow-sm">
+        <h4 class="text-danger mb-4"><i class="fas fa-boxes me-2"></i>Thống Kê Chi Tiết Kho Hàng Thực Tế</h4>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-secondary text-white fw-bold">📦 Sản phẩm tồn kho nhiều</div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                            <tr><th>Sản phẩm</th><th>Tồn kho</th></tr>
+                            </thead>
+                            <tbody>
+                            <c:forEach var="p" items="${inventoryList}">
+                                <tr>
+                                    <td><c:out value="${p.name}"/></td>
+                                    <td><span class="badge bg-secondary">${p.stockQuantity}</span></td>
+                                </tr>
+                            </c:forEach>
+                            <c:if test="${empty inventoryList}">
+                                <tr><td colspan="2" class="text-center text-muted">Không có dữ liệu</td></tr>
+                            </c:if>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-warning text-dark fw-bold">⚠️ Sản phẩm ít/Sắp hết hàng</div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                            <tr><th>Sản phẩm</th><th>Còn lại</th></tr>
+                            </thead>
+                            <tbody>
+                            <c:forEach var="p" items="${slowMovingList}">
+                                <tr>
+                                    <td><c:out value="${p.name}"/></td>
+                                    <td><span class="badge bg-danger">${p.stockQuantity}</span></td>
+                                </tr>
+                            </c:forEach>
+                            <c:if test="${empty slowMovingList}">
+                                <tr><td colspan="2" class="text-center text-muted">Không có dữ liệu</td></tr>
+                            </c:if>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
     <div class="col-md-8">
         <div class="dashboard-box">
             <h4 class="text-danger">🔥 Top sản phẩm bán chạy</h4>

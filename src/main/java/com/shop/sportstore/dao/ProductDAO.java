@@ -63,7 +63,6 @@ public class ProductDAO extends DBConnection {
         return list;
     }
 
-    //get product by id
     public Product getProductById(int id) {
 
         String sql = """
@@ -577,6 +576,62 @@ public class ProductDAO extends DBConnection {
             e.printStackTrace();
         }
 
+        return list;
+    }
+    public List<Product> getInventoryProducts() {
+        List<Product> list = new ArrayList<>();
+        String sql = "SELECT * FROM products WHERE stock_quantity > 0 ORDER BY stock_quantity DESC LIMIT 5";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapResultSetToProduct(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    public List<Product> getSlowMovingProducts() {
+        List<Product> list = new ArrayList<>();
+        String sql = "SELECT * FROM products ORDER BY stock_quantity ASC LIMIT 5";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapResultSetToProduct(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Product> getWeeklyHotProducts() {
+        List<Product> list = new ArrayList<>();
+        String sql = """
+            SELECT p.*, SUM(od.Quantity) AS WeeklySold 
+            FROM orderdetails od 
+            JOIN orders o ON od.OrderId = o.Id 
+            JOIN products p ON od.ProductId = p.id 
+            WHERE o.Status = 'COMPLETED' AND o.CreatedAt >= NOW() - INTERVAL 7 DAY 
+            GROUP BY p.id, p.name, p.brand, p.price, p.stock_quantity, p.size, p.color, p.description, p.image_url, p.category_id
+            ORDER BY WeeklySold DESC LIMIT 5
+        """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Product p = mapResultSetToProduct(rs);
+                p.setPrice(rs.getDouble("WeeklySold"));
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 }

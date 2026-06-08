@@ -32,8 +32,8 @@ public class OrderDAO extends DBConnection {
         }
         return count;
     }
-    public double calculateMonthlyRevenue(int month, int year) {
-        double total = 0;
+    public long calculateMonthlyRevenue(int month, int year) {
+        long total = 0;
         String sql = "SELECT SUM(TotalPrice) FROM orders WHERE Status = 'COMPLETED' AND MONTH(CreatedAt) = ? AND YEAR(CreatedAt) = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -43,7 +43,7 @@ public class OrderDAO extends DBConnection {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    total = rs.getDouble(1);
+                    total = (long) rs.getDouble(1);
                 }
             }
         } catch (Exception e) {
