@@ -12,7 +12,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        /* Tối ưu một chút hiệu ứng cho thẻ card khuyến mãi */
         .card-promotion {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }

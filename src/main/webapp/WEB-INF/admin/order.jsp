@@ -12,7 +12,6 @@
                 <i class="fas fa-box me-2"></i> Quản lý đơn hàng
             </h4>
             <div class="d-flex gap-2">
-                <!-- Hiển thị nút Xác nhận tất cả nếu có đơn hàng đang chờ xử lý -->
                 <c:if test="${pendingCount > 0}">
                     <form action="${pageContext.request.contextPath}/admin/orders"
                           method="post"
@@ -253,7 +252,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. Khởi tạo Datatable chính xác
         const table = $('#orderTable').DataTable({
             "pageLength": 10,
             "lengthChange": false,
@@ -270,16 +268,12 @@
                 "zeroRecords": "Không tìm thấy dữ liệu khớp"
             }
         });
-
-        // 2. Đánh số thứ tự (STT) tự động tăng
         table.on('order.dt search.dt', function () {
             let i = 1;
             table.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
                 this.data(i++);
             });
         }).draw();
-
-        // 3. Xử lý Ajax gửi yêu cầu và thông báo Toast cho nút "Xác nhận tất cả"
         const confirmAllForm = document.getElementById('confirmAllForm');
         if (confirmAllForm) {
             confirmAllForm.addEventListener('submit', function(event) {
@@ -287,8 +281,6 @@
 
                 const submitBtn = document.getElementById('btnConfirmAll');
                 const originalBtnText = submitBtn.innerHTML;
-
-                // Tạo hiệu ứng loading chờ xử lý
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
 
@@ -301,7 +293,6 @@
                 })
                         .then(response => {
                             if (response.ok) {
-                                // Trường hợp Backend trả về JSON thành công hoặc text trống
                                 return response.json().catch(() => {
                                     return { success: true, message: "Đã phê duyệt hàng loạt đơn hàng chờ xử lý thành công!" };
                                 });
@@ -312,7 +303,6 @@
                         .then(data => {
                             if (data.success || data.status === "success") {
                                 showToast(data.message || "Xác nhận tất cả thành công!", "#198754");
-                                // Tự động tải lại trang sau 1.5 giây để cập nhật toàn bộ trạng thái mới
                                 setTimeout(() => {
                                     location.reload();
                                 }, 1500);
@@ -330,8 +320,6 @@
                         });
             });
         }
-
-        // 4. Xử lý Ajax các form hành động đơn lẻ trong bảng (Xác nhận, Hủy, Hoàn tiền,...)
         const ajaxForms = document.querySelectorAll('.ajax-form');
         ajaxForms.forEach(form => {
             form.addEventListener('submit', function(event) {
@@ -376,8 +364,6 @@
                         });
             });
         });
-
-        // 5. Xử lý Modal theo dõi hành trình Giao Hàng Nhanh (GHN)
         const trackingModalElement = document.getElementById('trackingModal');
         if (trackingModalElement) {
             const trackingModal = new bootstrap.Modal(trackingModalElement);

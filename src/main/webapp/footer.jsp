@@ -109,7 +109,6 @@
             <p>Hotline: 1900 6886</p>
         </div>
 
-        <!-- CHÍNH SÁCH -->
         <div class="footer-column">
             <h4 class="title-menu">CHÍNH SÁCH</h4>
 
@@ -119,8 +118,6 @@
                 <li><a href="${pageContext.request.contextPath}/guide">Hướng dẫn giao hàng</a></li>
             </ul>
         </div>
-
-        <!-- MẠNG XÃ HỘI -->
         <div class="footer-column">
             <h4 class="title-menu">MẠNG XÃ HỘI</h4>
 
@@ -131,8 +128,6 @@
                 <a href="https://www.instagram.com/hagl_fc/" target="_blank" class="ig">◎</a>
             </div>
         </div>
-
-        <!-- THANH TOÁN -->
         <div class="footer-column">
             <h4 class="title-menu">PHƯƠNG THỨC THANH TOÁN</h4>
 
