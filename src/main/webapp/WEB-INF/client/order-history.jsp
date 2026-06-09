@@ -2,71 +2,67 @@
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Lịch sử đơn hàng</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #f8f9fa; }
-        .text-danger-custom { color: #d81f19 !important; }
-        .btn-danger-custom {
-            background-color: #d81f19 !important;
-            border-color: #d81f19 !important;
-            color: #ffffff !important;
-        }
-        .btn-danger-custom:hover {
-            background-color: #b31410 !important;
-            border-color: #b31410 !important;
-        }
-        .table-danger-custom {
-            background-color: #fce8e6 !important;
-            color: #a81c18 !important;
-        }
-        .bg-danger-subtle-custom { background-color: #fce8e6 !important; }
-        .border-danger-custom { border-color: #f5c2c0 !important; }
-        .bg-warning-subtle { background-color: #fff3cd !important; }
-        .bg-primary-subtle { background-color: #cfe2ff !important; }
-        .bg-info-subtle { background-color: #cff4fc !important; }
 
-        /* CSS cho hệ thống Tab mượt mà */
-        .nav-tabs .nav-link { color: #495057; font-weight: 500; border: none; cursor: pointer; }
-        .nav-tabs .nav-link.active {
-            color: #d81f19 !important;
-            border-bottom: 3px solid #d81f19 !important;
-            background: none;
-        }
+<style>
+    .text-danger-custom { color: #d81f19 !important; }
 
-        /* CSS Custom cho phân trang */
-        .pagination .page-item.active .page-link {
-            background-color: #d81f19 !important;
-            border-color: #d81f19 !important;
-            color: #ffffff !important;
-        }
-        .pagination .page-link {
-            color: #495057;
-        }
-        .pagination .page-link:hover {
-            color: #d81f19;
-        }
-    </style>
-</head>
-<body>
+    .btn-danger-custom{
+        background-color:#d81f19 !important;
+        border-color:#d81f19 !important;
+        color:#fff !important;
+    }
+
+    .btn-danger-custom:hover{
+        background-color:#b31410 !important;
+        border-color:#b31410 !important;
+    }
+
+    .table-danger-custom{
+        background-color:#fce8e6 !important;
+        color:#a81c18 !important;
+    }
+
+    .bg-danger-subtle-custom{
+        background-color:#fce8e6 !important;
+    }
+
+    .border-danger-custom{
+        border-color:#f5c2c0 !important;
+    }
+
+    .bg-warning-subtle{
+        background-color:#fff3cd !important;
+    }
+
+    .bg-primary-subtle{
+        background-color:#cfe2ff !important;
+    }
+
+    .bg-info-subtle{
+        background-color:#cff4fc !important;
+    }
+
+    #orderTabs .nav-link{
+        color:#495057;
+        font-weight:500;
+        border:none;
+        background:none;
+        transition:all .2s;
+        cursor:pointer;
+    }
+
+    #orderTabs .nav-link.active{
+        color:#d81f19 !important;
+        border-bottom:3px solid #d81f19 !important;
+        font-weight:600;
+    }
+
+    .order-row{
+        transition:opacity .2s;
+    }
+</style>
 <div class="container my-5 py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold mb-0 text-danger-custom">
-            <a href="${pageContext.request.contextPath}/order-history" class="text-danger-custom text-decoration-none">
-                <i class="fas fa-history me-2"></i>Lịch sử đơn hàng
-            </a>
-        </h2>
-        <a href="${pageContext.request.contextPath}/" class="btn btn-danger-custom fw-bold shadow-sm">
-            <i class="fas fa-cart-plus me-2"></i>Mua sắm thêm
-        </a>
-    </div>
 
-    <%-- Thông báo hệ thống --%>
     <c:if test="${not empty sessionScope.successMsg}">
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="fas fa-check-circle me-2"></i> <strong>Thành công!</strong> ${sessionScope.successMsg}
@@ -82,30 +78,27 @@
         </div>
         <c:remove var="errorMsg" scope="session" />
     </c:if>
-
-    <%-- Thanh chia Tab --%>
     <ul class="nav nav-tabs mb-4 bg-white rounded shadow-sm p-2" id="orderTabs" role="tablist">
-        <li class="nav-item">
-            <button class="nav-link active" data-filter="all">Tất cả</button>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-filter="all" type="button">Tất cả</button>
         </li>
-        <li class="nav-item">
-            <button class="nav-link" data-filter="pending">Chờ xử lý</button>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-filter="pending" type="button">Chờ xử lý</button>
         </li>
-        <li class="nav-item">
-            <button class="nav-link" data-filter="shipping">Đang giao</button>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-filter="shipping" type="button">Đang giao</button>
         </li>
-        <li class="nav-item">
-            <button class="nav-link" data-filter="completed">Hoàn tất</button>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-filter="completed" type="button">Hoàn tất</button>
         </li>
-        <li class="nav-item">
-            <button class="nav-link" data-filter="cancelled">Đã hủy</button>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-filter="cancelled" type="button">Đã hủy</button>
         </li>
-        <li class="nav-item">
-            <button class="nav-link" data-filter="refund">Trả hàng/Hoàn tiền</button>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-filter="refund" type="button">Trả hàng/Hoàn tiền</button>
         </li>
     </ul>
 
-    <%-- Xử lý hiển thị vùng dữ liệu bảng --%>
     <c:choose>
         <c:when test="${empty orders}">
             <div class="alert alert-info shadow-sm border-0 py-4">
@@ -114,13 +107,12 @@
             </div>
         </c:when>
         <c:otherwise>
-            <%-- Khung thông báo rỗng khi bộ lọc JS không tìm thấy hàng nào tương thích --%>
-            <div id="emptyFilterAlert" class="alert alert-info shadow-sm border-0 py-4 d-none">
+            <div id="emptyFilterAlert" class="alert alert-info shadow-sm border-0 py-4 d-none animate__animated animate__fadeIn">
                 <i class="fas fa-info-circle me-2 fs-5"></i> Không có đơn hàng nào thuộc trạng thái này.
             </div>
 
-            <div id="orderArea" class="table-responsive shadow-sm rounded mb-4">
-                <table class="table table-hover align-middle bg-white mb-0" id="orderTable">
+            <div id="orderArea" class="table-responsive shadow-sm rounded">
+                <table class="table table-hover align-middle bg-white mb-0">
                     <thead class="table-danger-custom">
                     <tr>
                         <th>Mã đơn</th>
@@ -136,7 +128,6 @@
                     <tbody>
                     <c:forEach var="item" items="${orders}">
                         <c:set var="statusLower" value="${not empty item.status ? fn:toLowerCase(item.status) : 'pending'}" />
-
                         <tr class="order-row"
                             data-status="${statusLower}"
                             data-refund="${not empty item.refundStatus ? 'has-refund' : 'none'}">
@@ -208,6 +199,7 @@
                                 <c:if test="${not empty item.ghnCode}">
                                     <a href="https://tracking.ghn.dev/?order_code=${item.ghnCode}"
                                        target="_blank"
+                                       rel="noopener noreferrer"
                                        class="btn btn-sm btn-warning text-dark shadow-sm ms-1" title="Tra cứu hành trình đơn hàng trên GHN">
                                         <i class="fas fa-truck"></i>
                                     </a>
@@ -215,11 +207,19 @@
                             </td>
                             <td>
                                 <jsp:useBean id="now" class="java.util.Date"/>
-                                <c:set var="timeDiff" value="${now.time - item.createdAt.time}" />
-                                <c:set var="isUnder30Mins" value="${timeDiff < (30 * 60 * 1000)}" />
+                                <c:set var="isUnder30Mins" value="false"/>
+
+                                <c:if test="${not empty item.createdAt}">
+                                    <c:set var="timeDiff"
+                                           value="${now.time - item.createdAt.time}" />
+
+                                    <c:set var="isUnder30Mins"
+                                           value="${timeDiff lt 1800000}" />
+                                </c:if>
                                 <c:choose>
                                     <c:when test="${(statusLower eq 'pending' or statusLower eq 'chờ xác nhận') && isUnder30Mins}">
-                                        <button type="button" class="btn btn-sm btn-danger w-100" onclick="openCancelModal('${item.orderCode}')">
+                                        <button type="button" class="btn btn-sm btn-danger w-100" data-order-code="${item.orderCode}"
+                                                onclick="openCancelModal(this.dataset.orderCode)">
                                             <i class="fas fa-times me-1"></i>Hủy đơn
                                         </button>
                                     </c:when>
@@ -266,17 +266,9 @@
                     </tbody>
                 </table>
             </div>
-
-            <%-- Thanh điều hướng phân trang --%>
-            <nav aria-label="Order pagination" id="paginationWrapper">
-                <ul class="pagination justify-content-center" id="paginationNav">
-                </ul>
-            </nav>
         </c:otherwise>
     </c:choose>
 </div>
-
-<%-- Các Modal giữ nguyên không thay đổi --%>
 <div class="modal fade" id="refundModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -298,7 +290,6 @@
         </div>
     </div>
 </div>
-
 <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -338,188 +329,193 @@
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
+        console.log("Order History Loaded");
+
         const tabButtons = document.querySelectorAll("#orderTabs .nav-link");
-        const orderRows = document.querySelectorAll(".order-row");
-        const orderArea = document.getElementById("orderArea");
-        const emptyAlert = document.getElementById("emptyFilterAlert");
-        const paginationNav = document.getElementById("paginationNav");
-        const paginationWrapper = document.getElementById("paginationWrapper");
 
-        const rowsPerPage = 10;
-        let currentPage = 1;
-        let filteredRows = [];
-
-        function displayPage(page) {
-            currentPage = page;
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-
-            orderRows.forEach(row => row.style.display = "none");
-
-            filteredRows.forEach((row, index) => {
-                if (index >= startIndex && index < endIndex) {
-                    row.style.display = "";
-                }
-            });
-
-            const pageItems = paginationNav.querySelectorAll(".page-number");
-            pageItems.forEach(item => {
-                if (parseInt(item.getAttribute("data-page")) === currentPage) {
-                    item.classList.add("active");
-                } else {
-                    item.classList.remove("active");
-                }
-            });
-
-            // Lấy tổng số trang thực tế hoặc tối thiểu là 3 trang giả lập mẫu
-            const totalPages = Math.max(3, Math.ceil(filteredRows.length / rowsPerPage));
-            const prevBtn = document.getElementById("prevPageItem");
-            const nextBtn = document.getElementById("nextPageItem");
-
-            if (prevBtn) {
-                if (currentPage === 1) prevBtn.classList.add("disabled");
-                else prevBtn.classList.remove("disabled");
-            }
-            if (nextBtn) {
-                if (currentPage === totalPages) nextBtn.classList.add("disabled");
-                else nextBtn.classList.remove("disabled");
-            }
-        }
-
-        // --- HÀM ĐÃ ĐƯỢC FIX ĐỂ LUÔN HIỆN NÚT 1, 2, 3 ---
-        function setupPagination() {
-            paginationNav.innerHTML = "";
-
-            // Tính số trang dựa trên dữ liệu, nhưng ép buộc tối thiểu là 3 trang để luôn hiện nút 1, 2, 3
-            const totalPages = Math.max(3, Math.ceil(filteredRows.length / rowsPerPage));
-
-            if(paginationWrapper) paginationWrapper.classList.remove("d-none");
-
-            // Nút "Trước"
-            const prevLi = document.createElement("li");
-            prevLi.className = "page-item";
-            prevLi.id = "prevPageItem";
-            prevLi.innerHTML = `<a class="page-link" href="javascript:void(0)"><i class="fas fa-chevron-left"></i></a>`;
-            prevLi.addEventListener("click", function() {
-                if (currentPage > 1) displayPage(currentPage - 1);
-            });
-            paginationNav.appendChild(prevLi);
-
-            // Luôn lặp để tạo ít nhất 3 nút (1, 2, 3)
-            for (let i = 1; i <= totalPages; i++) {
-                const li = document.createElement("li");
-                li.className = "page-item page-number";
-                li.setAttribute("data-page", i);
-                li.innerHTML = `<a class="page-link" href="javascript:void(0)">${i}</a>`;
-                li.addEventListener("click", function () {
-                    displayPage(i);
-                });
-                paginationNav.appendChild(li);
-            }
-
-            // Nút "Sau"
-            const nextLi = document.createElement("li");
-            nextLi.className = "page-item";
-            nextLi.id = "nextPageItem";
-            nextLi.innerHTML = `<a class="page-link" href="javascript:void(0)"><i class="fas fa-chevron-right"></i></a>`;
-            nextLi.addEventListener("click", function() {
-                if (currentPage < totalPages) displayPage(currentPage + 1);
-            });
-            paginationNav.appendChild(nextLi);
-        }
-
-        function filterOrders(filterValue) {
-            filteredRows = [];
-
-            orderRows.forEach(row => {
-                const status = row.getAttribute("data-status");
-                const refund = row.getAttribute("data-refund");
-                let isMatch = false;
-
-                if (filterValue === "all") {
-                    isMatch = true;
-                } else if (filterValue === "pending") {
-                    isMatch = (status === "pending" || status === "chờ xác nhận" || status === "confirmed" || status === "0");
-                } else if (filterValue === "shipping") {
-                    isMatch = (status === "shipping" || status === "đang giao");
-                } else if (filterValue === "completed") {
-                    isMatch = (status === "completed" || status === "hoàn tất" || status === "delivered" || status === "đã giao");
-                } else if (filterValue === "cancelled") {
-                    isMatch = (status === "cancelled" || status === "đã hủy");
-                } else if (filterValue === "refund") {
-                    isMatch = (refund === "has-refund");
-                }
-
-                if (isMatch) {
-                    filteredRows.push(row);
-                } else {
-                    row.style.display = "none";
-                }
-            });
-
-            // Khi ép phân trang mẫu, bảng vẫn hiển thị và thanh điều hướng luôn mở ra
-            if (filteredRows.length === 0) {
-                if(orderArea) orderArea.classList.add("d-none");
-                if(emptyAlert) emptyAlert.classList.remove("d-none");
-                // Giữ lại thanh điều hướng mẫu cho đẹp giao diện
-                setupPagination();
-                const pageItems = paginationNav.querySelectorAll(".page-number");
-                pageItems.forEach(item => {
-                    if (parseInt(item.getAttribute("data-page")) === 1) item.classList.add("active");
-                });
-            } else {
-                if(orderArea) orderArea.classList.remove("d-none");
-                if(emptyAlert) emptyAlert.classList.add("d-none");
-                setupPagination();
-                displayPage(1);
-            }
-        }
+        console.log("Tab count:", tabButtons.length);
 
         tabButtons.forEach(button => {
+
             button.addEventListener("click", function () {
-                tabButtons.forEach(btn => btn.classList.remove("active"));
+
+                tabButtons.forEach(btn =>
+                        btn.classList.remove("active")
+                );
+
                 this.classList.add("active");
 
-                const filterValue = this.getAttribute("data-filter");
-                filterOrders(filterValue);
+                filterTableRows(
+                        this.dataset.filter
+                );
             });
+
         });
 
-        filterOrders("all");
     });
 
-    function openCancelModal(orderCode) {
-        document.getElementById('cancelOrderCode').value = orderCode;
-        document.getElementById('displayOrderCode').innerText = '#' + orderCode;
-        document.getElementById('cancelReason').value = "";
-        document.getElementById('otherReason').value = "";
-        document.getElementById('otherReasonFieldWrapper').classList.add('d-none');
-        document.getElementById('otherReason').removeAttribute('required');
-        new bootstrap.Modal(document.getElementById('cancelOrderModal')).show();
-    }
+    function filterTableRows(filterValue) {
 
-    function toggleOtherReasonField() {
-        var selectElement = document.getElementById('cancelReason');
-        var wrapper = document.getElementById('otherReasonFieldWrapper');
-        var textarea = document.getElementById('otherReason');
-        if (selectElement.value === "Khác") {
-            wrapper.classList.remove('d-none');
-            textarea.setAttribute('required', 'required');
-            textarea.focus();
-        } else {
-            wrapper.classList.add('d-none');
-            textarea.removeAttribute('required');
+        const rows =
+                document.querySelectorAll(".order-row");
+
+        const alertEmpty =
+                document.getElementById("emptyFilterAlert");
+
+        const orderArea =
+                document.getElementById("orderArea");
+
+        let hasVisibleRow = false;
+
+        rows.forEach(row => {
+
+            const status =
+                    row.dataset.status;
+
+            const refund =
+                    row.dataset.refund;
+
+            let isMatch = false;
+
+            switch (filterValue) {
+
+                case "all":
+                    isMatch = true;
+                    break;
+
+                case "pending":
+                    isMatch =
+                            status === "pending" ||
+                            status === "chờ xác nhận";
+                    break;
+
+                case "shipping":
+                    isMatch =
+                            status === "shipping" ||
+                            status === "đang giao";
+                    break;
+
+                case "completed":
+                    isMatch =
+                            status === "completed" ||
+                            status === "delivered" ||
+                            status === "hoàn tất" ||
+                            status === "đã giao";
+                    break;
+
+                case "cancelled":
+                    isMatch =
+                            status === "cancelled" ||
+                            status === "đã hủy";
+                    break;
+
+                case "refund":
+                    isMatch =
+                            refund === "has-refund";
+                    break;
+            }
+
+            row.style.display =
+                    isMatch ? "" : "none";
+
+            if(isMatch){
+                hasVisibleRow = true;
+            }
+        });
+
+        if(alertEmpty && orderArea){
+
+            if(hasVisibleRow){
+
+                alertEmpty.classList.add("d-none");
+                orderArea.classList.remove("d-none");
+
+            }else{
+
+                alertEmpty.classList.remove("d-none");
+                orderArea.classList.add("d-none");
+
+            }
         }
+    }
+    function openCancelModal(orderCode) {
+
+        document.getElementById("cancelOrderCode").value =
+                orderCode;
+
+        document.getElementById("displayOrderCode").innerText =
+                orderCode;
+
+        const modal =
+                new bootstrap.Modal(
+                        document.getElementById("cancelOrderModal")
+                );
+
+        modal.show();
     }
 
     function openRefundModal(orderId) {
-        document.getElementById('refundOrderId').value = orderId;
-        new bootstrap.Modal(document.getElementById('refundModal')).show();
+
+        document.getElementById("refundOrderId").value =
+                orderId;
+
+        const modal =
+                new bootstrap.Modal(
+                        document.getElementById("refundModal")
+                );
+
+        modal.show();
     }
+    function toggleOtherReasonField() {
+
+        const reason =
+                document.getElementById("cancelReason");
+
+        const wrapper =
+                document.getElementById("otherReasonFieldWrapper");
+
+        const other =
+                document.getElementById("otherReason");
+
+        if (reason.value === "Khác") {
+
+            wrapper.classList.remove("d-none");
+            other.required = true;
+
+        } else {
+
+            wrapper.classList.add("d-none");
+            other.required = false;
+            other.value = "";
+        }
+    }
+    document
+            .getElementById("cancelOrderModal")
+            .addEventListener("hidden.bs.modal", function () {
+
+                document.getElementById("cancelReason").selectedIndex = 0;
+
+                document
+                        .getElementById("otherReasonFieldWrapper")
+                        .classList.add("d-none");
+
+                document
+                        .getElementById("otherReason")
+                        .value = "";
+            });
+
+    document
+            .getElementById("refundModal")
+            .addEventListener("hidden.bs.modal", function () {
+
+                const textarea =
+                        this.querySelector("textarea");
+
+                if(textarea){
+                    textarea.value = "";
+                }
+            });
 </script>
-</body>
-</html>
