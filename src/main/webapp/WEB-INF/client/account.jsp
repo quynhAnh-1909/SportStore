@@ -146,6 +146,40 @@
             background-color: #d81f19;
             border-radius: 3px;
         }
+
+
+        .badge-tier {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            display: inline-block;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            margin-top: 8px;
+        }
+        .tier-dong { background: linear-gradient(135deg, #a770ef, #cf8bf3); color: white; }
+        .tier-bac { background: linear-gradient(135deg, #bdc3c7, #2c3e50); color: white; }
+        .tier-vang { background: linear-gradient(135deg, #ffe259, #ffa751); color: #5d4037; }
+        .tier-kimcuong { background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; }
+
+        .spending-box {
+            background: #ffffff;
+            border: 1px solid #ebedf0;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .progress-sm {
+            height: 8px;
+            border-radius: 10px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+        .progress-sm .progress-bar {
+            background: linear-gradient(135deg, #d81f19, #ff4d4f);
+        }
     </style>
 </head>
 <body>
@@ -185,19 +219,74 @@
 
         <div class="profile-body">
             <div class="row g-4 align-items-center">
+
+
                 <div class="col-lg-4">
-                    <div class="profile-info-box avatar-wrapper">
-                        <img src="${not empty user.avatar
-                                ? user.avatar
-                                : pageContext.request.contextPath.concat('/resources/default-avatar.png')}"
-                             class="avatar"
-                             alt="Avatar">
-                        <h5 class="mt-3 fw-bold">
+                    <div class="profile-info-box avatar-wrapper d-flex flex-column align-items-center justify-content-center text-center">
+
+                        <div class="position-relative mb-3">
+                            <c:choose>
+                                <c:when test="${not empty user.avatar and !fn:contains(user.avatar, 'default-avatar.png')}">
+                                    <img src="${pageContext.request.contextPath}${user.avatar}"
+                                         class="avatar"
+                                         alt="Avatar"
+                                         onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/resources/default-avatar.png';">
+                                </c:when>
+                                <c:otherwise>
+                                    <img src="${pageContext.request.contextPath}/resources/default-avatar.png"
+                                         class="avatar"
+                                         alt="Default Avatar">
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+
+                        <h5 class="mt-2 fw-bold mb-1 text-dark">
                             ${user.fullName}
                         </h5>
-                        <p class="text-muted mb-0">
+                        <p class="text-muted small mb-3">
                             ${user.email}
                         </p>
+
+                        <div class="mb-3">
+                            <c:choose>
+                                <c:when test="${fn:toLowerCase(user.tierName) == 'bạc'}">
+                                    <span class="badge-tier tier-bac"><i class="fas fa-medal me-1"></i> Thành viên Bạc</span>
+                                </c:when>
+                                <c:when test="${fn:toLowerCase(user.tierName) == 'vàng'}">
+                                    <span class="badge-tier tier-vang"><i class="fas fa-crown me-1"></i> Thành viên Vàng</span>
+                                </c:when>
+                                <c:when test="${fn:toLowerCase(user.tierName) == 'kim cương'}">
+                                    <span class="badge-tier tier-kimcuong"><i class="fas fa-gem me-1"></i> Thành viên Kim Cương</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge-tier tier-dong"><i class="fas fa-award me-1"></i> Thành viên Đồng</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+
+                        <div class="spending-box shadow-sm w-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small"><i class="fas fa-wallet me-1"></i> Tổng chi tiêu:</span>
+                                <strong class="text-danger">
+                                    <fmt:formatNumber value="${not empty user.totalSpending ? user.totalSpending : 0}" type="currency" currencySymbol="đ" maxFractionDigits="0"/>
+                                </strong>
+                            </div>
+
+                            <c:if test="${not empty nextTierProgress}">
+                                <div class="progress progress-sm mb-1" style="height: 8px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                         role="progressbar"
+                                         style="width: ${nextTierProgress}%"
+                                         aria-valuenow="${nextTierProgress}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"></div>
+                                </div>
+                                <div class="d-flex justify-content-between" style="font-size: 11px;">
+                                    <span class="text-muted">Tiến trình lên hạng</span>
+                                    <span class="fw-bold text-dark">${nextTierProgress}%</span>
+                                </div>
+                            </c:if>
+                        </div>
                     </div>
                 </div>
 
@@ -294,7 +383,7 @@
 
     <div class="divider"></div>
 
-    <%-- Khối chứa hệ thống quản lý danh sách của Khách hàng --%>
+    <%-- Quản lý Tab --%>
     <ul class="nav nav-tabs custom-tabs mb-4" id="accountTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="order-tab" data-bs-toggle="tab" data-bs-target="#order-content" type="button" role="tab" aria-controls="order-content" aria-selected="true">
@@ -329,13 +418,8 @@
         const phoneInput = document.getElementById("phoneInput") ? document.getElementById("phoneInput").value.trim() : "";
         const errorDiv = document.getElementById("phoneError");
 
-        if (errorDiv) {
-            errorDiv.innerText = "";
-        }
-
-        if (phoneInput === "") {
-            return true;
-        }
+        if (errorDiv) { errorDiv.innerText = ""; }
+        if (phoneInput === "") { return true; }
 
         const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
         if (!phoneRegex.test(phoneInput)) {
@@ -344,13 +428,11 @@
             }
             return false;
         }
-
         return true;
     }
 
     function togglePassword(id, icon){
         const input = document.getElementById(id);
-
         if(input.type === "password"){
             input.type = "text";
             icon.classList.remove("fa-eye");
@@ -362,9 +444,7 @@
         }
     }
 
-    // Lắng nghe sự kiện hiển thị lại dữ liệu khi đổi qua lại giữa Tab lớn (Tránh lỗi mất dòng)
     document.getElementById('order-tab').addEventListener('shown.bs.tab', function () {
-        // Tìm nút trạng thái đang được chọn trong file order-history.jsp và kích hoạt lại bộ lọc
         const activeSubTab = document.querySelector("#orderTabs .nav-link.active");
         if (activeSubTab && typeof filterTableRows === "function") {
             filterTableRows(activeSubTab.getAttribute("data-filter"));
@@ -372,7 +452,6 @@
     });
 </script>
 
-<%-- Lắng nghe hiển thị thông báo SweetAlert2 --%>
 <c:if test="${not empty sessionScope.passwordSuccess or not empty passwordSuccess}">
     <script>
         Swal.fire({
