@@ -8,24 +8,20 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.Scanner;
 
 public class UserDAO extends DBConnection {
 
-
     public User checkLogin(String email, String password) {
-
         String sql = "SELECT * FROM users WHERE LOWER(email) = LOWER(?)";
-
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
 
             ps.setString(1, email.trim());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String dbPassword = rs.getString("password");
-
 
                     if (dbPassword != null && dbPassword.trim().equals(password.trim())) {
                         return mapResultSetToUser(rs);
@@ -44,7 +40,6 @@ public class UserDAO extends DBConnection {
     }
 
     public boolean registerUser(User user) {
-
         String sql = "INSERT INTO users (full_name, email, password, phone_number, gender, role, provider, status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
 
@@ -59,15 +54,10 @@ public class UserDAO extends DBConnection {
                 phone = phone.replaceAll("\\s+", "");
             }
             ps.setString(4, phone);
-
-            ps.setString(5, user.getGioiTinh()); 
-            ps.setString(4, user.getPhoneNumber());
             ps.setString(5, user.getGioiTinh());
-
 
             String role = (user.getRole() == null || user.getRole().trim().isEmpty()) ? "USER" : user.getRole();
             ps.setString(6, role);
-
             ps.setString(7, "LOCAL");
 
             int rowsAffected = ps.executeUpdate();
@@ -83,7 +73,6 @@ public class UserDAO extends DBConnection {
     }
 
     public User findByEmail(String email) {
-
         String sql = "SELECT * FROM users WHERE LOWER(email) = LOWER(?)";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -99,26 +88,13 @@ public class UserDAO extends DBConnection {
         return null;
     }
 
-    public User findOrCreateSocialUser(
-            String email,
-            String name,
-            String provider,
-            String avatar) {
-
+    public User findOrCreateSocialUser(String email, String name, String provider, String avatar) {
         User user = findByEmail(email);
 
         if (user == null) {
-
-            String sql =
-                    "INSERT INTO users " +
-                            "(full_name, email, password, role, provider, avatar) " +
-                            "VALUES (?, ?, '', 'USER', ?, ?)";
-
+            String sql = "INSERT INTO users (full_name, email, password, role, provider, avatar) VALUES (?, ?, '', 'USER', ?, ?)";
             try (Connection conn = getConnection();
-                 PreparedStatement ps =
-                         conn.prepareStatement(
-                                 sql,
-                                 Statement.RETURN_GENERATED_KEYS)) {
+                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
                 ps.setString(1, name);
                 ps.setString(2, email);
@@ -128,11 +104,8 @@ public class UserDAO extends DBConnection {
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
-
                     if (rs.next()) {
-
                         user = new User();
-
                         user.setUserId(rs.getInt(1));
                         user.setFullName(name);
                         user.setEmail(email);
@@ -140,23 +113,16 @@ public class UserDAO extends DBConnection {
                         user.setProvider(provider);
                         user.setAvatar(avatar);
                         user.setStatus(true);
+                        user.setLoyal(false);
                     }
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         } else {
-
-            String sql =
-                    "UPDATE users " +
-                            "SET avatar = ?, provider = ? " +
-                            "WHERE email = ?";
-
+            String sql = "UPDATE users SET avatar = ?, provider = ? WHERE email = ?";
             try (Connection conn = getConnection();
-                 PreparedStatement ps =
-                         conn.prepareStatement(sql)) {
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
                 ps.setString(1, avatar);
                 ps.setString(2, provider);
@@ -166,14 +132,13 @@ public class UserDAO extends DBConnection {
 
                 user.setAvatar(avatar);
                 user.setProvider(provider);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
         return user;
     }
+
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User user = new User();
@@ -185,8 +150,17 @@ public class UserDAO extends DBConnection {
         user.setRole(rs.getString("role"));
         user.setAvatar(rs.getString("avatar"));
         user.setProvider(rs.getString("provider"));
+        user.setAddress(rs.getString("address"));
 
         user.setStatus(rs.getInt("status") == 1 || rs.getBoolean("status"));
+
+
+        try {
+            user.setLoyal(rs.getInt("is_loyal") == 1);
+            user.setLoyalDate(rs.getTimestamp("loyal_date"));
+        } catch (SQLException e) {
+            System.out.println("⚠️ Cột is_loyal hoặc loyal_date chưa có giá trị hoặc chưa đồng bộ cấu trúc bảng.");
+        }
 
         try {
             user.setGioiTinh(rs.getString("gender"));
@@ -197,34 +171,40 @@ public class UserDAO extends DBConnection {
     }
 
     public User getUserById(int id) throws SQLException {
-
         System.out.println("SEARCH USER ID = " + id);
-
-        String sql =
-                "SELECT * FROM users WHERE user_id = ?";
-
+        String sql = "SELECT * FROM users WHERE user_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-
             try (ResultSet rs = ps.executeQuery()) {
-
                 if (rs.next()) {
-
                     System.out.println("FOUND USER IN DB");
-
                     return mapResultSetToUser(rs);
                 }
-
                 System.out.println("NOT FOUND USER IN DB");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
+    }
+
+
+    public boolean checkLoyalStatus(int userId) {
+        String sql = "SELECT is_loyal FROM users WHERE user_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("is_loyal") == 1;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean lockUserAccount(int userId) {
@@ -245,12 +225,10 @@ public class UserDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fullName);
 
-
             if (phone != null) {
                 phone = phone.replaceAll("\\s+", "");
             }
             ps.setString(2, phone);
-
             ps.setString(3, address);
             ps.setInt(4, userId);
             return ps.executeUpdate() > 0;
@@ -265,12 +243,10 @@ public class UserDAO extends DBConnection {
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-
             if (newPhone != null) {
                 newPhone = newPhone.replaceAll("\\s+", "");
             }
             ps.setString(1, newPhone);
-
             ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -280,59 +256,21 @@ public class UserDAO extends DBConnection {
     }
 
     public boolean updatePassword(String email, String newPassword) {
-
-        String sql =
-                "UPDATE users SET password = ? WHERE email = ?";
-
+        String sql = "UPDATE users SET password = ? WHERE email = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, newPassword);
             ps.setString(2, email);
-
             return ps.executeUpdate() > 0;
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return false;
     }
 
-    private void verifyOTP(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            HttpSession session)
-            throws IOException {
-
-        String userOTP =
-                request.getParameter("otp");
-
-        String sessionOTP =
-                (String)session.getAttribute("OTP");
-
-        response.setContentType("application/json");
-
-        if(sessionOTP != null &&
-                sessionOTP.equals(userOTP)){
-
-            response.getWriter().write(
-                    "{\"success\":true}"
-            );
-
-        }else{
-
-            response.getWriter().write(
-                    "{\"success\":false}"
-            );
-        }
-    }
-
     public boolean changePassword(int userId, String newPassword) {
-
-        String sql =
-                "UPDATE users SET password = ? WHERE user_id = ?";
-
+        String sql = "UPDATE users SET password = ? WHERE user_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -340,16 +278,11 @@ public class UserDAO extends DBConnection {
             ps.setInt(2, userId);
 
             int result = ps.executeUpdate();
-
             System.out.println("UPDATE RESULT = " + result);
-
             return result > 0;
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return false;
     }
-
 }

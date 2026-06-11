@@ -8,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Tài khoản cá nhân</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link class="sheet" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body{
@@ -147,7 +147,6 @@
             border-radius: 3px;
         }
 
-
         .badge-tier {
             padding: 6px 14px;
             border-radius: 50px;
@@ -186,9 +185,25 @@
 
 <jsp:include page="/WEB-INF/layout/index.jsp" />
 
+
+<script>
+    function toggleLoyaltyContent() {
+        console.log("Hàm kích hoạt đã chạy thành công!");
+        var contentArea = document.getElementById('loyaltyContentArea');
+        if (contentArea) {
+            if (contentArea.classList.contains('d-none')) {
+                contentArea.classList.remove('d-none');
+            } else {
+                contentArea.classList.add('d-none');
+            }
+        } else {
+            console.log("Không tìm thấy loyaltyContentArea");
+        }
+    }
+</script>
+
 <div class="container py-5">
 
-    <%-- Thông báo hệ thống --%>
     <c:if test="${not empty sessionScope.successMsg}">
         <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
             <i class="fas fa-check-circle me-2"></i> ${sessionScope.successMsg}
@@ -218,8 +233,7 @@
         </div>
 
         <div class="profile-body">
-            <div class="row g-4 align-items-center">
-
+            <div class="row g-4 align-items-start">
 
                 <div class="col-lg-4">
                     <div class="profile-info-box avatar-wrapper d-flex flex-column align-items-center justify-content-center text-center">
@@ -241,10 +255,10 @@
                         </div>
 
                         <h5 class="mt-2 fw-bold mb-1 text-dark">
-                            ${user.fullName}
+                            <c:out value="${user.fullName}" default="Khách hàng" />
                         </h5>
                         <p class="text-muted small mb-3">
-                            ${user.email}
+                            <c:out value="${user.email}" />
                         </p>
 
                         <div class="mb-3">
@@ -272,29 +286,86 @@
                                 </strong>
                             </div>
 
-                            <c:if test="${not empty nextTierProgress}">
-                                <div class="progress progress-sm mb-1" style="height: 8px;">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
-                                         role="progressbar"
-                                         style="width: ${nextTierProgress}%"
-                                         aria-valuenow="${nextTierProgress}"
-                                         aria-valuemin="0"
-                                         aria-valuemax="100"></div>
-                                </div>
-                                <div class="d-flex justify-content-between" style="font-size: 11px;">
-                                    <span class="text-muted">Tiến trình lên hạng</span>
-                                    <span class="fw-bold text-dark">${nextTierProgress}%</span>
-                                </div>
-                            </c:if>
+                            <c:choose>
+                                <c:when test="${empty user.loyal || !user.loyal}">
+                                    <div class="p-2 mt-3 text-center rounded" style="background-color: #f8f9fa; border: 1px dashed #d81f19;">
+                                        <p class="small text-muted mb-2" style="font-size: 12px; line-height: 1.4;">
+                                            Trở thành <strong>Khách hàng quen</strong> để nhận đặc quyền tích lũy thăng hạng & giảm giá lên tới 10%!
+                                        </p>
+                                        <button type="button" class="btn btn-sm btn-danger w-100 fw-bold border-0"
+                                                onclick="toggleLoyaltyContent()"
+                                                style="background: linear-gradient(135deg, #d81f19, #ff4d4f); border-radius: 8px; padding: 8px 0; position: relative; z-index: 999;">
+                                            <i class="fas fa-crown me-1"></i> Tìm Hiểu & Kích Hoạt
+                                        </button>
+                                    </div>
+
+                                    <div id="loyaltyContentArea" class="d-none mt-3 text-start">
+                                        <div class="card card-body border-danger p-3 bg-white shadow-sm" style="border-radius: 12px; font-size: 13px;">
+                                            <h6 class="fw-bold text-danger mb-2"><i class="fas fa-gem me-1"></i> Điều kiện & Quyền lợi:</h6>
+                                            <p class="text-muted mb-3" style="font-size: 11px; line-height: 1.4;">Hệ thống tự động tính lũy điểm từ tất cả đơn hàng thành công (`COMPLETED`):</p>
+
+                                            <div class="table-responsive mb-3">
+                                                <table class="table table-sm table-bordered text-center mb-0" style="font-size: 11px;">
+                                                    <thead class="table-dark">
+                                                    <tr>
+                                                        <th>Hạng</th>
+                                                        <th>Mức tích lũy</th>
+                                                        <th>Ưu đãi</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td class="fw-bold text-secondary">BẠC</td>
+                                                        <td>Từ 5M đ</td>
+                                                        <td class="text-danger fw-bold">Giảm 2%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold text-warning" style="color:#ffa751 !important;">VÀNG</td>
+                                                        <td>Từ 15M đ</td>
+                                                        <td class="text-danger fw-bold">Giảm 5%</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="fw-bold text-primary">KIM CƯƠNG</td>
+                                                        <td>Từ 40M đ</td>
+                                                        <td class="text-danger fw-bold">Giảm 10%</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <form action="${pageContext.request.contextPath}/register-loyalty" method="POST" class="m-0">
+                                                <button type="submit" class="btn btn-sm btn-success w-100 fw-bold border-0 shadow-sm py-2" style="border-radius: 8px;">
+                                                    <i class="fas fa-check-circle me-1"></i> Đồng Ý & Kích Hoạt Ngay
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </c:when>
+
+                                <c:otherwise>
+                                    <c:if test="${not empty nextTierProgress}">
+                                        <div class="progress progress-sm mb-1 mt-3" style="height: 8px;">
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                                 role="progressbar"
+                                                 style="width: ${nextTierProgress}%"
+                                                 aria-valuenow="${nextTierProgress}"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between" style="font-size: 11px;">
+                                            <span class="text-muted">Tiến trình lên hạng</span>
+                                            <span class="fw-bold text-dark">${nextTierProgress}%</span>
+                                        </div>
+                                    </c:if>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-8">
                     <div class="profile-info-box">
-                        <h2 class="section-title">
-                            Thông tin cá nhân
-                        </h2>
+                        <h2 class="section-title">Thông tin cá nhân</h2>
 
                         <form action="${pageContext.request.contextPath}/account"
                               method="post"
@@ -325,7 +396,7 @@
                                 <label class="info-label">Địa chỉ của bạn</label>
                                 <input type="text"
                                        name="address"
-                                       value="${sessionScope.user.address}"
+                                       value="${user.address}"
                                        class="form-control"
                                        placeholder="Ví dụ: 123 Nguyễn Trãi, Quận 1, TP. Hồ Chí Minh">
                             </div>
@@ -383,7 +454,6 @@
 
     <div class="divider"></div>
 
-    <%-- Quản lý Tab --%>
     <ul class="nav nav-tabs custom-tabs mb-4" id="accountTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="order-tab" data-bs-toggle="tab" data-bs-target="#order-content" type="button" role="tab" aria-controls="order-content" aria-selected="true">

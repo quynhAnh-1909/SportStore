@@ -16,7 +16,8 @@ public class User implements Serializable {
     private boolean status = true;
     private String memberLevel;
     private String gioiTinh;
-
+    private boolean isLoyal = false;
+    private java.util.Date loyalDate;
     private String tierName;
     private double totalSpending;
 
@@ -144,7 +145,21 @@ public class User implements Serializable {
     public void setTotalSpending(double totalSpending) {
         this.totalSpending = totalSpending;
     }
+    public boolean isLoyal() {
+        return isLoyal;
+    }
 
+    public void setLoyal(boolean loyal) {
+        this.isLoyal = loyal;
+    }
+
+    public java.util.Date getLoyalDate() {
+        return loyalDate;
+    }
+
+    public void setLoyalDate(java.util.Date loyalDate) {
+        this.loyalDate = loyalDate;
+    }
     @Override
     public String toString() {
         return "User{" +
