@@ -16,6 +16,11 @@ public class User implements Serializable {
     private boolean status = true;
     private String memberLevel;
     private String gioiTinh;
+    private boolean isLoyal = false;
+    private java.util.Date loyalDate;
+    private String tierName;
+    private double totalSpending;
+
     public User() {
     }
 
@@ -124,6 +129,37 @@ public class User implements Serializable {
         this.gioiTinh = gioiTinh;
     }
 
+
+    public String getTierName() {
+        return tierName;
+    }
+
+    public void setTierName(String tierName) {
+        this.tierName = tierName;
+    }
+
+    public double getTotalSpending() {
+        return totalSpending;
+    }
+
+    public void setTotalSpending(double totalSpending) {
+        this.totalSpending = totalSpending;
+    }
+    public boolean isLoyal() {
+        return isLoyal;
+    }
+
+    public void setLoyal(boolean loyal) {
+        this.isLoyal = loyal;
+    }
+
+    public java.util.Date getLoyalDate() {
+        return loyalDate;
+    }
+
+    public void setLoyalDate(java.util.Date loyalDate) {
+        this.loyalDate = loyalDate;
+    }
     @Override
     public String toString() {
         return "User{" +
@@ -134,6 +170,8 @@ public class User implements Serializable {
                 ", gioiTinh='" + gioiTinh + '\'' +
                 ", role='" + role + '\'' +
                 ", status=" + status +
+                ", tierName='" + tierName + '\'' +
+                ", totalSpending=" + totalSpending +
                 '}';
     }
 }

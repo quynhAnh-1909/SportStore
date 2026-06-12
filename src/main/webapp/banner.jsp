@@ -252,39 +252,3 @@
         padding-left:6px;
     }
 </style>
-
-<!-- ===== SCRIPT ===== -->
-<script>
-    // document.addEventListener("DOMContentLoaded", function () {
-    //
-    //     const menu = document.querySelector('.category-menu');
-    //     const title = document.querySelector('.menu-title');
-    //     const mega = document.querySelector('.mega-menu');
-    //
-    //     if (!menu || !title || !mega) return;
-    //
-    //     let open = false;
-    //
-    //     title.addEventListener('click', (e) => {
-    //         e.stopPropagation();
-    //         open = !open;
-    //         mega.style.display = open ? 'grid' : 'none';
-    //     });
-    //
-    //     menu.addEventListener('mouseenter', () => {
-    //         mega.style.display = 'grid';
-    //         open = true;
-    //     });
-    //
-    //     menu.addEventListener('mouseleave', () => {
-    //         mega.style.display = 'none';
-    //         open = false;
-    //     });
-    //
-    //     document.addEventListener('click', () => {
-    //         mega.style.display = 'none';
-    //         open = false;
-    //     });
-    //
-    // });
-</script>

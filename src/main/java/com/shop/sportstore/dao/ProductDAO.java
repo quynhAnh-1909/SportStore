@@ -63,47 +63,33 @@ public class ProductDAO extends DBConnection {
         return list;
     }
 
-    //get product by id
     public Product getProductById(int id) {
-
         String sql = """
-        SELECT p.*, c.name AS categoryName
-        FROM products p
-        LEFT JOIN category c ON p.category_id = c.id
-        WHERE p.id=?
-    """;
-
+            SELECT p.*, c.name AS categoryName,
+                   IFNULL((SELECT SUM(od.Quantity) 
+                           FROM orderdetails od 
+                           JOIN orders o ON od.OrderId = o.Id 
+                           WHERE od.ProductId = p.id AND o.Status = 'COMPLETED'), 0) AS soldQuantity
+            FROM products p
+            LEFT JOIN category c ON p.category_id = c.id
+            WHERE p.id=?
+        """;
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, id);
-
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-
-                Product p = mapResultSetToProduct(rs);
-
-                p.setCategoryName(
-                        rs.getString("categoryName")
-                );
-
-                VoucherDAO voucherDAO =
-                        new VoucherDAO(conn);
-
-                p.setVouchers(
-                        voucherDAO.getByProductId(
-                                p.getId()
-                        )
-                );
-
-                return p;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Product p = mapResultSetToProduct(rs);
+                    p.setCategoryName(rs.getString("categoryName"));
+                    p.setSoldQuantity(rs.getInt("soldQuantity"));
+                    VoucherDAO voucherDAO = new VoucherDAO(conn);
+                    p.setVouchers(voucherDAO.getByProductId(p.getId()));
+                    return p;
+                }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
     }
     //search
@@ -579,4 +565,56 @@ public class ProductDAO extends DBConnection {
 
         return list;
     }
+    public List<Product> getInventoryProducts() {
+        List<Product> list = new ArrayList<>();
+        String sql = "SELECT * FROM products WHERE stock_quantity > 0 ORDER BY stock_quantity DESC LIMIT 5";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapResultSetToProduct(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    public List<Product> getSlowMovingProducts() {
+        List<Product> list = new ArrayList<>();
+        String sql = "SELECT * FROM products ORDER BY stock_quantity ASC LIMIT 5";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapResultSetToProduct(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    public void decreaseStock(int productId, int quantity, Connection conn) throws SQLException {
+        String sql = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            ps.setInt(3, quantity);
+            int rows = ps.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Sản phẩm ID " + productId + " không đủ số lượng trong kho!");
+            }
+        }
+    }
+
+    public void increaseStock(int productId, int quantity, Connection conn) throws SQLException {
+        String sql = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            ps.executeUpdate();
+        }
+    }
+
 }

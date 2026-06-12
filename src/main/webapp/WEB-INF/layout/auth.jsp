@@ -2,6 +2,10 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <c:set var="root" value="${pageContext.request.contextPath}"/>
+<c:set var="currentUri" value="${requestScope['jakarta.servlet.forward.request_uri']}"/>
+<c:if test="${empty currentUri}">
+    <c:set var="currentUri" value="${pageContext.request.requestURI}"/>
+</c:if>
 
 <style>
     .overlay {
@@ -14,7 +18,7 @@
         display: none;
         justify-content: center;
         align-items: center;
-        z-index: 999;
+        z-index: 9999;
     }
 
     .auth-box {
@@ -25,7 +29,7 @@
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         position: relative;
         animation: fadeIn .3s ease;
-        z-index: 1000;
+        z-index: 10000;
     }
 
     @keyframes fadeIn {
@@ -90,7 +94,6 @@
         background-color: white !important;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
-
 
     .input-success {
         border-color: #2ed573 !important;
@@ -161,13 +164,17 @@
         margin-top: 15px;
     }
 
+
     .password-wrapper {
         position: relative;
+        display: block;
+        width: 100%;
     }
 
     .password-wrapper input {
-        padding-right: 40px;
+        padding-right: 45px;
     }
+
 
     .toggle-eye {
         position: absolute;
@@ -175,9 +182,11 @@
         top: 50%;
         transform: translateY(-50%);
         cursor: pointer;
-        z-index: 1002;
+        z-index: 10005;
         font-size: 18px;
         user-select: none;
+        padding: 5px;
+        transition: opacity 0.2s ease;
     }
 
     .gender-group {
@@ -203,7 +212,6 @@
         margin: 0;
     }
 
-
     .password-requirements {
         background-color: #f9f9f9;
         padding: 10px 12px;
@@ -219,24 +227,7 @@
         display: flex;
         align-items: center;
         gap: 5px;
-        transition: color 0.2s ease;
     }
-
-    .forgot-password{
-        text-align:center;
-        margin-top:10px;
-    }
-
-    .forgot-password a{
-        color:#0d6efd;
-        text-decoration:none;
-        font-size:14px;
-    }
-
-    .forgot-password a:hover{
-        text-decoration:underline;
-    }
-
 
     .req-invalid { color: #ea3838; }
     .req-valid { color: #2ed573; font-weight: 500; }
@@ -247,7 +238,7 @@
         <div class="close-btn" onclick="closeAuth()">✖</div>
 
         <div class="logo">
-            <img src="${root}/resources/sport_store.jpg">
+            <img src="${root}/resources/sport_store.jpg" alt="Logo">
         </div>
 
         <div class="auth-tabs">
@@ -256,9 +247,11 @@
         </div>
 
         <form id="loginForm" action="${root}/login" method="post" onsubmit="return validateLogin()">
+            <input type="hidden" name="redirectUri" value="${currentUri}">
+
             <div class="form-group">
                 <label>Email <span class="required">*</span></label>
-                <input type="email" name="email" id="loginEmail" value="${activeTab == 'login' && oldUser != null ? oldUser.email : ''}">
+                <input type="text" name="email" id="loginEmail" oninput="checkDetailedEmail(this, 'loginEmailError')" value="${activeTab == 'login' && oldUser != null ? oldUser.email : ''}">
                 <div class="error" id="loginEmailError"></div>
             </div>
 
@@ -276,24 +269,20 @@
             </c:if>
 
             <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
-            <div class="forgot-password">
-                <a href="#"
-                   onclick="openForgotModal();return false;">
-                    Quên mật khẩu?
-                </a>
-            </div>
         </form>
 
         <form id="registerForm" action="${root}/register" method="post" onsubmit="return validateRegister()" style="display:none;">
+            <input type="hidden" name="redirectUri" value="${currentUri}">
+
             <div class="form-group">
                 <label>Họ tên <span class="required">*</span></label>
-                <input type="text" name="hoTen" id="regName" value="${activeTab == 'register' && oldUser != null ? oldUser.fullName : ''}">
+                <input type="text" name="fullName" id="regName" value="${activeTab == 'register' && oldUser != null ? oldUser.fullName : ''}">
                 <div class="error" id="regNameError"></div>
             </div>
 
             <div class="form-group">
                 <label>Email <span class="required">*</span></label>
-                <input type="email" name="email" id="regEmail" value="${activeTab == 'register' && oldUser != null ? oldUser.email : ''}">
+                <input type="text" name="email" id="regEmail" oninput="checkDetailedEmail(this, 'regEmailError')" value="${activeTab == 'register' && oldUser != null ? oldUser.email : ''}">
                 <div class="error" id="regEmailError"></div>
             </div>
 
@@ -321,7 +310,7 @@
                     <input type="password" id="regConfirmPass" oninput="matchConfirmPassword()">
                     <span class="toggle-eye" onclick="togglePassword('regConfirmPass', this)">👁️</span>
                 </div>
-                <div id="regConfirmPassError"></div>
+                <div class="error" id="regConfirmPassError"></div>
             </div>
 
             <div class="form-group">
@@ -341,8 +330,8 @@
 
             <div class="form-group">
                 <label>Số điện thoại</label>
-                <input type="text" name="soDienThoai" id="regPhone" value="${activeTab == 'register' && oldUser != null ? oldUser.phoneNumber : ''}">
-                <div class="error" id="regPhoneError"></div>
+                <input type="text" name="soDienThoai" id="regPhone" oninput="checkPhoneLocation(this)" value="${activeTab == 'register' && oldUser != null ? oldUser.phoneNumber : ''}">
+                <div id="regPhoneError"></div>
             </div>
 
             <c:if test="${not empty errorMessage && activeTab == 'register'}">
@@ -354,10 +343,10 @@
 
         <div class="social-login">
             <div class="social-btn" onclick="location.href='${root}/login-google'">
-                <img src="${root}/resources/gg.jpg"> Google
+                <img src="${root}/resources/gg.jpg" alt="Google"> Google
             </div>
             <div class="social-btn" onclick="location.href='${root}/login-facebook'">
-                <img src="${root}/resources/fb.jpg"> Facebook
+                <img src="${root}/resources/fb.jpg" alt="Facebook"> Facebook
             </div>
         </div>
 
@@ -365,124 +354,6 @@
             Chưa có tài khoản? <a href="#" onclick="switchTab('register');return false;">Đăng ký</a>
         </div>
     </div>
-
-</div>
-
-<div class="overlay" id="forgotOverlay">
-
-    <div class="auth-box">
-
-        <div class="close-btn"
-             onclick="closeForgotModal()">
-            ✖
-        </div>
-
-        <h3>Quên mật khẩu</h3>
-
-        <div class="form-group">
-
-            <label>Email</label>
-
-            <input
-                    type="email"
-                    id="forgotEmail">
-
-        </div>
-
-        <button
-                type="button"
-                class="btn-submit"
-                onclick="sendOTP()">
-
-            Gửi OTP
-
-        </button>
-
-    </div>
-
-</div>
-
-<div class="overlay" id="otpOverlay">
-
-    <div class="auth-box">
-
-        <div class="close-btn"
-             onclick="closeOTPModal()">
-            ✖
-        </div>
-
-        <h2 style="text-align:center">
-            Xác nhận OTP
-        </h2>
-
-        <div class="form-group">
-
-            <label>Mã OTP</label>
-
-            <input
-                    type="text"
-                    id="otpCode"
-                    placeholder="Nhập mã OTP">
-
-        </div>
-
-        <button
-                type="button"
-                class="btn-submit"
-                onclick="verifyOTP()">
-
-            XÁC NHẬN
-
-        </button>
-
-    </div>
-
-</div>
-
-<div class="overlay" id="resetOverlay">
-
-    <div class="auth-box">
-
-        <div class="close-btn"
-             onclick="closeResetModal()">
-            ✖
-        </div>
-
-        <h2 style="text-align:center">
-            Đặt lại mật khẩu
-        </h2>
-
-        <div class="form-group">
-
-            <label>Mật khẩu mới</label>
-
-            <input
-                    type="password"
-                    id="newPassword">
-
-        </div>
-
-        <div class="form-group">
-
-            <label>Xác nhận mật khẩu</label>
-
-            <input
-                    type="password"
-                    id="confirmPassword">
-
-        </div>
-
-        <button
-                type="button"
-                class="btn-submit"
-                onclick="resetPassword()">
-
-            ĐỔI MẬT KHẨU
-
-        </button>
-
-    </div>
-
 </div>
 
 <script>
@@ -526,18 +397,53 @@
     }
 
 
+    function togglePassword(inputId, eyeIcon) {
+        let passwordInput = document.getElementById(inputId);
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            eyeIcon.style.opacity = "0.3";
+        } else {
+            passwordInput.type = "password";
+            eyeIcon.style.opacity = "1";
+        }
+    }
+    function checkDetailedEmail(inputElement, errorElementId) {
+        let value = inputElement.value.trim();
+        let errorBlock = document.getElementById(errorElementId);
+
+        if (value === "") {
+            errorBlock.innerText = "";
+            inputElement.classList.remove("input-success");
+            return false;
+        }
+
+        errorBlock.className = "error";
+        inputElement.classList.remove("input-success");
+
+        if (/\s/.test(value)) { errorBlock.innerText = " Email không được chứa khoảng trắng!"; return false; }
+        if (/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(value)) { errorBlock.innerText = " Email không chứa dấu tiếng Việt!"; return false; }
+        if (!value.includes("@")) { errorBlock.innerText = " Thiếu ký tự '@'"; return false; }
+        if ((value.match(/@/g) || []).length > 1) { errorBlock.innerText = " Chỉ được chứa 1 ký tự '@'!"; return false; }
+
+        let parts = value.split("@");
+        if (parts[0] === "") { errorBlock.innerText = "Thiếu tên người dùng!"; return false; }
+        if (parts[1] === "" || !parts[1].includes(".")) { errorBlock.innerText = "Tên miền không hợp lệ!"; return false; }
+
+        let emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(value)) { errorBlock.innerText = " Định dạng email sai!"; return false; }
+
+        errorBlock.className = "success-text";
+        errorBlock.innerText = " Định dạng email hợp lệ";
+        inputElement.classList.add("input-success");
+        return true;
+    }
+
     function validatePasswordFormat(password) {
         let inputField = document.getElementById("regPass");
         let block = document.getElementById("passRequirementsBlock");
-
-        if (password === "") {
-            block.style.display = "none";
-            inputField.classList.remove("input-success");
-            return;
-        }
-
+        if (password === "") { block.style.display = "none"; return false; }
         block.style.display = "block";
-
 
         let hasLength = password.length >= 6;
         let hasUpper = /[A-Z]/.test(password);
@@ -545,29 +451,26 @@
         let hasNumber = /[0-9]/.test(password);
         let hasSpecial = /[^A-Za-z0-9]/.test(password);
 
-
-        updateRequirementStatus("reqLength", hasLength, "✓ Tối thiểu 6 ký tự", "Tối thiểu 6 ký tự");
-        updateRequirementStatus("reqUppercase", hasUpper, "✓ Có chữ hoa (A-Z)", "Thiếu chữ hoa (A-Z)");
-        updateRequirementStatus("reqLowercase", hasLower, "✓ Có chữ thường (a-z)", "Thiếu chữ thường (a-z)");
-        updateRequirementStatus("reqNumber", hasNumber, "✓ Có chữ số (0-9)", " Thiếu chữ số (0-9)");
-        updateRequirementStatus("reqSpecial", hasSpecial, "✓ Có ký tự đặc biệt", " Thiếu ký tự đặc biệt (@, $, !, ...)");
-
+        updateRequirementStatus("reqLength", hasLength, " Tối thiểu 6 ký tự", "Tối thiểu 6 ký tự");
+        updateRequirementStatus("reqUppercase", hasUpper, " Có chữ hoa (A-Z)", "Thiếu chữ hoa (A-Z)");
+        updateRequirementStatus("reqLowercase", hasLower, " Có chữ thường (a-z)", "Thiếu chữ thường (a-z)");
+        updateRequirementStatus("reqNumber", hasNumber, "Có chữ số (0-9)", " Thiếu chữ số (0-9)");
+        updateRequirementStatus("reqSpecial", hasSpecial, "Có ký tự đặc biệt", " Thiếu ký tự đặc biệt");
 
         if (hasLength && hasUpper && hasLower && hasNumber && hasSpecial) {
             inputField.classList.add("input-success");
+            return true;
         } else {
             inputField.classList.remove("input-success");
+            return false;
         }
     }
 
     function updateRequirementStatus(elementId, isValid, validText, invalidText) {
         let item = document.getElementById(elementId);
-        if (isValid) {
-            item.className = "requirement-item req-valid";
-            item.innerHTML = validText;
-        } else {
-            item.className = "requirement-item req-invalid";
-            item.innerHTML = invalidText;
+        if (item) {
+            item.className = isValid ? "requirement-item req-valid" : "requirement-item req-invalid";
+            item.innerHTML = isValid ? validText : invalidText;
         }
     }
 
@@ -577,293 +480,104 @@
         let displayArea = document.getElementById("regConfirmPassError");
         let confirmInputField = document.getElementById("regConfirmPass");
 
-        if (confirmPass === "") {
-            displayArea.innerHTML = "";
-            confirmInputField.classList.remove("input-success");
-            return;
-        }
+        if (confirmPass === "") { displayArea.innerHTML = ""; return false; }
 
         if (pass === confirmPass) {
             displayArea.className = "success-text";
-            displayArea.innerHTML = "✓ Mật khẩu chính xác";
+            displayArea.innerHTML = " Mật khẩu chính xác";
             confirmInputField.classList.add("input-success");
+            return true;
         } else {
             displayArea.className = "error";
-            displayArea.innerHTML = "✘ Mật khẩu xác nhận không trùng khớp!";
+            displayArea.innerHTML = " Mật khẩu xác nhận không trùng khớp!";
             confirmInputField.classList.remove("input-success");
+            return false;
+        }
+    }
+
+    function checkPhoneLocation(inputElement) {
+        let displayArea = document.getElementById("regPhoneError");
+        let rawPhone = inputElement.value.replace(/\D/g, '');
+        if (rawPhone.length > 10) rawPhone = rawPhone.substr(0, 10);
+
+        let formattedPhone = "";
+        if (rawPhone.length > 0) {
+            if (rawPhone.length <= 4) formattedPhone = rawPhone;
+            else if (rawPhone.length <= 7) formattedPhone = rawPhone.substr(0, 4) + " " + rawPhone.substr(4);
+            else formattedPhone = rawPhone.substr(0, 4) + " " + rawPhone.substr(4, 3) + " " + rawPhone.substr(7);
+        }
+        inputElement.value = formattedPhone;
+
+        if (rawPhone === "") { displayArea.innerHTML = ""; return false; }
+        if (rawPhone.length < 10) { displayArea.className = "error"; displayArea.innerText = " Đang nhập... (Cần đủ 10 số)"; return false; }
+
+        let carrier = "";
+        let prefix3 = rawPhone.substr(0, 3);
+        if (["032", "033", "034", "035", "036", "037", "038", "039", "086", "096", "097", "098"].includes(prefix3)) carrier = "Viettel";
+        else if (["070", "076", "077", "078", "079", "089", "090", "093"].includes(prefix3)) carrier = "MobiFone";
+        else if (["081", "082", "083", "084", "085", "088", "091", "094"].includes(prefix3)) carrier = "VinaPhone";
+
+        if (carrier !== "") {
+            displayArea.className = "success-text";
+            displayArea.innerText = " SĐT hợp lệ - " + carrier;
+            inputElement.classList.add("input-success");
+            return true;
+        } else {
+            displayArea.className = "error";
+            displayArea.innerText = " Đầu số không tồn tại!";
+            inputElement.classList.remove("input-success");
+            return false;
         }
     }
 
     function validateLogin() {
-        let valid = true;
-        document.getElementById("loginEmailError").innerText = "";
-        document.getElementById("loginPassError").innerText = "";
-
-        let email = document.getElementById("loginEmail").value.trim();
+        let emailInput = document.getElementById("loginEmail");
+        let emailError = document.getElementById("loginEmailError");
         let pass = document.getElementById("loginPass").value.trim();
-        let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        let emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-        if (email === "") {
-            document.getElementById("loginEmailError").innerText = "Vui lòng nhập email";
-            valid = false;
-        } else if (!emailRegex.test(email)) {
-            document.getElementById("loginEmailError").innerText = "Email không hợp lệ";
-            valid = false;
+        if (emailInput.value.trim() === "" || !emailRegex.test(emailInput.value.trim())) {
+            emailError.className = "error";
+            emailError.innerText = "Email không đúng định dạng!";
+            return false;
         }
         if (pass === "") {
             document.getElementById("loginPassError").innerText = "Vui lòng nhập mật khẩu";
-            valid = false;
+            return false;
         }
-        return valid;
+        return true;
     }
 
     function validateRegister() {
-        let valid = true;
-        document.getElementById("regNameError").innerText = "";
-        document.getElementById("regEmailError").innerText = "";
-        document.getElementById("regPassError").innerText = "";
-        document.getElementById("regConfirmPassError").innerHTML = "";
-        document.getElementById("regGenderError").innerText = "";
-        document.getElementById("regPhoneError").innerText = "";
-
         let name = document.getElementById("regName").value.trim();
-        let email = document.getElementById("regEmail").value.trim();
-        let pass = document.getElementById("regPass").value.trim();
-        let confirmPass = document.getElementById("regConfirmPass").value.trim();
-        let phone = document.getElementById("regPhone").value.trim();
-        let isMaleChecked = document.getElementById("genderMale").checked;
-        let isFemaleChecked = document.getElementById("genderFemale").checked;
+        let emailInput = document.getElementById("regEmail");
+        let passValue = document.getElementById("regPass").value;
+        let confirmPassValue = document.getElementById("regConfirmPass").value;
+        let confirmError = document.getElementById("regConfirmPassError");
+        let phoneField = document.getElementById("regPhone");
 
-        let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        let phoneRegex = /^[0-9]{9,12}$/;
+        if (name === "") { document.getElementById("regNameError").innerText = "Vui lòng nhập họ tên"; return false; }
 
-        if (name === "") {
-            document.getElementById("regNameError").innerText = "Vui lòng nhập họ tên";
-            valid = false;
-        }
-        if (email === "") {
-            document.getElementById("regEmailError").innerText = "Vui lòng nhập email";
-            valid = false;
-        } else if (!emailRegex.test(email)) {
-            document.getElementById("regEmailError").innerText = "Email không hợp lệ";
-            valid = false;
-        }
+        if (!checkDetailedEmail(emailInput, 'regEmailError')) { return false; }
 
+        if (!validatePasswordFormat(passValue)) { return false; }
 
-        let hasLength = pass.length >= 6;
-        let hasUpper = /[A-Z]/.test(pass);
-        let hasLower = /[a-z]/.test(pass);
-        let hasNumber = /[0-9]/.test(pass);
-        let hasSpecial = /[^A-Za-z0-9]/.test(pass);
+        if (confirmPassValue === "") {
+            confirmError.className = "error";
+            confirmError.innerHTML = "Vui lòng xác nhận lại mật khẩu!";
+            return false;
+        }
+        if (passValue !== confirmPassValue) { return false; }
 
-        if (!hasLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
-            document.getElementById("regPassError").innerText = "Mật khẩu chưa đạt yêu cầu bảo mật định dạng!";
-            valid = false;
-        }
-        if (confirmPass === "") {
-            document.getElementById("regConfirmPassError").className = "error";
-            document.getElementById("regConfirmPassError").innerText = "Vui lòng xác nhận lại mật khẩu";
-            valid = false;
-        } else if (pass !== confirmPass) {
-            document.getElementById("regConfirmPassError").className = "error";
-            document.getElementById("regConfirmPassError").innerText = "Mật khẩu xác nhận không trùng khớp!";
-            valid = false;
-        }
-        if (!isMaleChecked && !isFemaleChecked) {
-            document.getElementById("regGenderError").innerText = "Vui lòng chọn giới tính";
-            valid = false;
-        }
-        if (phone !== "" && !phoneRegex.test(phone)) {
-            document.getElementById("regPhoneError").innerText = "Số điện thoại không hợp lệ";
-            valid = false;
-        }
-        return valid;
+        if (phoneField.value !== "" && !phoneField.classList.contains("input-success")) { return false; }
+
+        return true;
     }
 
-    function togglePassword(inputId, iconElement) {
-        let input = document.getElementById(inputId);
-        if (input.type === "password") {
-            input.type = "text";
-            iconElement.innerHTML = "🙈";
-        } else {
-            input.type = "password";
-            iconElement.innerHTML = "👁️";
-        }
-    }
-
-    window.onload = function() {
+    window.addEventListener('DOMContentLoaded', (event) => {
         <c:if test="${not empty errorMessage}">
         let targetTab = '${activeTab != null ? activeTab : "login"}';
         openAuth(targetTab);
         </c:if>
-    };
-
-    function openForgotModal(){
-        document.getElementById("forgotOverlay")
-                .style.display="flex";
-    }
-
-    function closeForgotModal(){
-        document.getElementById("forgotOverlay")
-                .style.display="none";
-    }
-
-    function openOTPModal(){
-        document.getElementById("otpOverlay")
-                .style.display="flex";
-    }
-
-    function closeOTPModal(){
-        document.getElementById("otpOverlay")
-                .style.display="none";
-    }
-
-    function openResetModal(){
-        document.getElementById("resetOverlay")
-                .style.display="flex";
-    }
-
-    function closeResetModal(){
-        document.getElementById("resetOverlay")
-                .style.display="none";
-    }
-
-    async function sendOTP(){
-
-        let email =
-                document.getElementById(
-                        "forgotEmail"
-                ).value;
-
-        let response =
-                await fetch(
-                        "${root}/forgot-password",
-                        {
-                            method:"POST",
-
-                            headers:{
-                                "Content-Type":
-                                        "application/x-www-form-urlencoded"
-                            },
-
-                            body:
-                                    "email="
-                                    + encodeURIComponent(email)
-                        }
-                );
-
-        let result =
-                await response.json();
-
-        if(result.success){
-
-            alert("OTP đã gửi tới email");
-
-            closeForgotModal();
-
-            openOTPModal();
-
-        }else{
-
-            alert(result.message);
-        }
-    }
-
-    async function verifyOTP(){
-
-        let otp =
-                document.getElementById(
-                        "otpCode"
-                ).value;
-
-        let response =
-                await fetch(
-                        "${root}/verify-otp",
-                        {
-                            method:"POST",
-
-                            headers:{
-                                "Content-Type":
-                                        "application/x-www-form-urlencoded"
-                            },
-
-                            body:
-                                    "otp="
-                                    + encodeURIComponent(otp)
-                        }
-                );
-
-        let result =
-                await response.json();
-
-        if(result.success){
-
-            closeOTPModal();
-
-            openResetModal();
-
-        }else{
-
-            alert("OTP không đúng");
-        }
-    }
-
-    async function resetPassword(){
-
-        let pass =
-                document.getElementById(
-                        "newPassword"
-                ).value;
-
-        let confirm =
-                document.getElementById(
-                        "confirmPassword"
-                ).value;
-
-        if(pass !== confirm){
-
-            alert(
-                    "Mật khẩu xác nhận không khớp"
-            );
-
-            return;
-        }
-
-        let response =
-                await fetch(
-                        "${root}/reset-password",
-                        {
-                            method:"POST",
-
-                            headers:{
-                                "Content-Type":
-                                        "application/x-www-form-urlencoded"
-                            },
-
-                            body:
-                                    "password="
-                                    + encodeURIComponent(pass)
-                        }
-                );
-
-        let result =
-                await response.json();
-
-        if(result.success){
-
-            alert(
-                    "Đổi mật khẩu thành công"
-            );
-
-            closeResetModal();
-
-            openAuth("login");
-
-        }else{
-
-            alert(
-                    "Không thể đổi mật khẩu"
-            );
-        }
-    }
+    });
 </script>

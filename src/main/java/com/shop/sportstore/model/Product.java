@@ -1,6 +1,5 @@
 package com.shop.sportstore.model;
 
-
 import java.util.List;
 
 public class Product {
@@ -10,6 +9,7 @@ public class Product {
     private String brand;
     private double price;
     private int stockQuantity;
+    private int soldQuantity;
     private String size;
     private String color;
     private String description;
@@ -19,6 +19,8 @@ public class Product {
     private String categoryName;
     private List<Voucher> vouchers;
 
+    public Product() {
+    }
 
     public Product(int id, String name, double price, String imageUrl) {
         this.id = id;
@@ -27,41 +29,20 @@ public class Product {
         this.imageUrl = imageUrl;
     }
 
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    // Constructor rỗng
-    public Product() {
-    }
-
-    // Constructor đầy đủ
     public Product(int id, String name, String brand, double price,
-                   int stockQuantity, String size, String color,
+                   int stockQuantity, int soldQuantity, String size, String color,
                    String description, String imageUrl, int categoryId) {
         this.id = id;
         this.name = name;
         this.brand = brand;
         this.price = price;
         this.stockQuantity = stockQuantity;
+        this.soldQuantity = soldQuantity;
         this.size = size;
         this.color = color;
         this.description = description;
         this.imageUrl = imageUrl;
         this.categoryId = categoryId;
-    }
-
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
     }
 
     public int getId() {
@@ -104,6 +85,14 @@ public class Product {
         this.stockQuantity = stockQuantity;
     }
 
+    public int getSoldQuantity() {
+        return soldQuantity;
+    }
+
+    public void setSoldQuantity(int soldQuantity) {
+        this.soldQuantity = soldQuantity;
+    }
+
     public String getSize() {
         return size;
     }
@@ -143,6 +132,23 @@ public class Product {
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
     }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
     public List<Voucher> getVouchers() {
         return vouchers;
     }
@@ -150,5 +156,4 @@ public class Product {
     public void setVouchers(List<Voucher> vouchers) {
         this.vouchers = vouchers;
     }
-
 }

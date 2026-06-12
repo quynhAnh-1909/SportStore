@@ -35,15 +35,30 @@ public class AccountServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
-            if (user.getAvatar() == null) {
+
+
+            if (user.getAvatar() == null || user.getAvatar().trim().isEmpty()) {
                 user.setAvatar("/resources/default-avatar.png");
             }
-            request.setAttribute("user", user);
+
+
+            try {
+                boolean currentLoyalStatus = userDAO.checkLoyalStatus(user.getUserId());
+                user.setLoyal(currentLoyalStatus);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             List<Order> listOrders = orderDAO.getOrdersByUser(user.getUserId());
             request.setAttribute("orders", listOrders);
+
+
+            calculateUserTier(user, request);
+
+            request.setAttribute("user", user);
             request.getRequestDispatcher("/WEB-INF/client/account.jsp").forward(request, response);
         } else {
-            response.sendRedirect(request.getContextPath() + "/authjsp");
+            response.sendRedirect(request.getContextPath() + "/auth.jsp");
         }
     }
 
@@ -54,7 +69,7 @@ public class AccountServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/authjsp");
+            response.sendRedirect(request.getContextPath() + "/auth.jsp");
             return;
         }
 
@@ -64,7 +79,7 @@ public class AccountServlet extends HttpServlet {
         if ("editProfile".equals(action)) {
             String fullName = getParamFromMultipart(request, "fullName");
             String phone = getParamFromMultipart(request, "phone");
-            String address = getParamFromMultipart(request, "address"); // Đọc địa chỉ từ form
+            String address = getParamFromMultipart(request, "address");
 
             if (fullName == null || fullName.trim().isEmpty()) {
                 fullName = user.getFullName();
@@ -73,7 +88,6 @@ public class AccountServlet extends HttpServlet {
                 phone = user.getPhoneNumber();
             }
 
-
             String phoneRegex = "^(0[3|5|7|8|9])+([0-9]{8})$";
             if (!phone.trim().isEmpty() && !phone.matches(phoneRegex)) {
                 session.setAttribute("errorMsg", "Cập nhật thất bại! Số điện thoại không đúng cấu trúc.");
@@ -81,18 +95,17 @@ public class AccountServlet extends HttpServlet {
                 return;
             }
 
-
             String finalAddress = (address != null && !address.trim().isEmpty()) ? address.trim() : null;
 
             try {
-
                 boolean isUpdated = userDAO.updateBasicInfo(user.getUserId(), fullName, phone, finalAddress);
 
                 if (isUpdated) {
-
                     user.setFullName(fullName);
                     user.setPhoneNumber(phone);
                     user.setAddress(finalAddress);
+
+                    calculateUserTier(user, null);
 
                     session.setAttribute("user", user);
                     session.setAttribute("successMsg", "Cập nhật thông tin cá nhân thành công!");
@@ -106,6 +119,39 @@ public class AccountServlet extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + "/account");
+    }
+
+    private void calculateUserTier(User user, HttpServletRequest request) {
+        double totalSpending = orderDAO.getTotalSpendingByUserId(user.getUserId());
+        user.setTotalSpending(totalSpending);
+
+        String tierName = "Đồng";
+        int nextTierProgress = 0;
+
+        double MOC_BAC = 5000000;
+        double MOC_VANG = 15000000;
+        double MOC_KIM_CUONG = 40000000;
+
+        if (totalSpending >= MOC_KIM_CUONG) {
+            tierName = "Kim Cương";
+            nextTierProgress = 100;
+        } else if (totalSpending >= MOC_VANG) {
+            tierName = "Vàng";
+            double range = MOC_KIM_CUONG - MOC_VANG;
+            nextTierProgress = (int) (((totalSpending - MOC_VANG) / range) * 100);
+        } else if (totalSpending >= MOC_BAC) {
+            tierName = "Bạc";
+            double range = MOC_VANG - MOC_BAC;
+            nextTierProgress = (int) (((totalSpending - MOC_BAC) / range) * 100);
+        } else {
+            tierName = "Đồng";
+            nextTierProgress = (int) ((totalSpending / MOC_BAC) * 100);
+        }
+
+        user.setTierName(tierName);
+        if (request != null) {
+            request.setAttribute("nextTierProgress", nextTierProgress);
+        }
     }
 
     private String getParamFromMultipart(HttpServletRequest request, String paramName) throws ServletException, IOException {

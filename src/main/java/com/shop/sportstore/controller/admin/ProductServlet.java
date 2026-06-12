@@ -1,6 +1,5 @@
 package com.shop.sportstore.controller.admin;
 
-
 import com.shop.sportstore.dao.CategoryDAO;
 import com.shop.sportstore.dao.ProductDAO;
 import com.shop.sportstore.dao.ProductVoucherDAO;
@@ -15,14 +14,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.servlet.http.Part;
 
 @WebServlet("/admin/products")
 @MultipartConfig(
@@ -34,43 +33,27 @@ public class ProductServlet extends HttpServlet {
 
     private ProductDAO dao;
 
-
     @Override
     public void init() {
         dao = new ProductDAO();
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         String action = request.getParameter("action");
-
         if (action == null) action = "list";
 
         switch (action) {
-
-            case "create":
-                showCreateForm(request, response);
-                break;
-
-            case "edit":
-                showEditForm(request, response);
-                break;
-
-            case "delete":
-                deleteProduct(request, response);
-                break;
-
-            case "detail":
-                showDetail(request, response);
-                break;
-
-            default:
-                listProducts(request, response);
-                break;
+            case "create" -> showCreateForm(request, response);
+            case "edit" -> showEditForm(request, response);
+            case "delete" -> deleteProduct(request, response);
+            case "detail" -> showDetail(request, response);
+            default -> listProducts(request, response);
         }
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -85,30 +68,25 @@ public class ProductServlet extends HttpServlet {
 
     private void listProducts(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         List<Product> products = dao.getAllProducts();
-
         CategoryDAO cdao = new CategoryDAO();
         List<Category> categories = cdao.buildTree(cdao.getAllCategories());
 
         request.setAttribute("products", products);
         request.setAttribute("categories", categories);
-
         request.setAttribute("contentPage", "/WEB-INF/admin/products.jsp");
         request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         CategoryDAO cdao = new CategoryDAO();
         List<Category> categories = cdao.buildTree(cdao.getAllCategories());
         String uploadPath = getServletContext().getRealPath("/resources");
         File folder = new File(uploadPath);
 
         List<String> imageList = new ArrayList<>();
-
-        if (folder.exists()) {
+        if (folder.exists() && folder.listFiles() != null) {
             for (File f : folder.listFiles()) {
                 imageList.add(f.getName());
             }
@@ -117,97 +95,70 @@ public class ProductServlet extends HttpServlet {
         request.setAttribute("categories", categories);
         request.setAttribute("imageList", imageList);
         request.setAttribute("contentPage", "/WEB-INF/admin/productCreate.jsp");
-        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
-
 
     private void insertProduct(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-
         try {
-
             Product p = new Product();
-
             p.setName(request.getParameter("name"));
             p.setPrice(Double.parseDouble(request.getParameter("price")));
             p.setStockQuantity(Integer.parseInt(request.getParameter("stockQuantity")));
             p.setUnit(request.getParameter("unit"));
-
 
             String cateId = request.getParameter("categoryId");
             if (cateId != null && !cateId.isEmpty()) {
                 p.setCategoryId(Integer.parseInt(cateId));
             }
 
-
             String imageUrl = request.getParameter("imageUrl");
-
             if (imageUrl != null && !imageUrl.isEmpty()) {
-
                 String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
                 p.setImageUrl(fileName);
-
             } else {
-
-
                 Part filePart = request.getPart("imageFile");
-                String fileName = filePart.getSubmittedFileName();
+                String fileName = filePart != null ? filePart.getSubmittedFileName() : null;
 
                 if (fileName != null && !fileName.isEmpty()) {
-
                     String newFileName = System.currentTimeMillis() + "_" + fileName;
-
-                    String uploadPath = getServletContext().getRealPath("/") + "resources";
+                    String uploadPath = getServletContext().getRealPath("/resources");
 
                     File uploadDir = new File(uploadPath);
                     if (!uploadDir.exists()) uploadDir.mkdirs();
 
                     filePart.write(uploadPath + File.separator + newFileName);
-
                     p.setImageUrl(newFileName);
-
                 } else {
-
                     p.setImageUrl("no-image.png");
                 }
             }
-
-
             dao.insertProduct(p);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        response.sendRedirect(request.getContextPath() + "/admin/products");
+        response.sendRedirect(request.getContextPath() + "/admin/products?msg=success");
     }
-    //SHOW EDIT
-
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        try {
-            Connection conn = DBConnection.getConnection();
-
+        try (Connection conn = DBConnection.getConnection()) {
             int id = Integer.parseInt(request.getParameter("id"));
-            ProductDAO dao = new ProductDAO();
+
+            Product product = dao.getProductById(id);
             ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
             VoucherDAO voucherDAO = new VoucherDAO(conn);
-            int ids = Integer.parseInt(request.getParameter("id"));
-            Product product = dao.getProductById(id);
-
             CategoryDAO cdao = new CategoryDAO();
-            List<Category> categories = cdao.buildTree(cdao.getAllCategories());
 
+            List<Category> categories = cdao.buildTree(cdao.getAllCategories());
             String uploadPath = getServletContext().getRealPath("/resources");
             File folder = new File(uploadPath);
             List<String> imageList = new ArrayList<>();
 
             List<Voucher> vouchers = voucherDAO.getAll();
             List<Integer> selectedVouchers = pvDAO.getVoucherIdsByProduct(id);
-            if (folder.exists()) {
+
+            if (folder.exists() && folder.listFiles() != null) {
                 for (File f : folder.listFiles()) {
                     imageList.add(f.getName());
                 }
@@ -219,28 +170,21 @@ public class ProductServlet extends HttpServlet {
             request.setAttribute("vouchers", vouchers);
             request.setAttribute("selectedVouchers", selectedVouchers);
             request.setAttribute("contentPage", "/WEB-INF/admin/productEdit.jsp");
-
-            request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp")
-                    .forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    // UPDATE PRODUCT
 
-    private void updateProduct(HttpServletRequest request,
-                               HttpServletResponse response)
+    private void updateProduct(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-
+        Connection conn = null;
         try {
-
-            Connection conn = DBConnection.getConnection();
-            ProductDAO dao = new ProductDAO();
-            ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
-            String[] voucherIds = request.getParameterValues("voucherIds");
             int productId = Integer.parseInt(request.getParameter("id"));
+            String[] voucherIds = request.getParameterValues("voucherIds");
             Product oldProduct = dao.getProductById(productId);
+
             Product p = new Product();
             p.setId(productId);
             p.setName(request.getParameter("name"));
@@ -248,40 +192,40 @@ public class ProductServlet extends HttpServlet {
             p.setStockQuantity(Integer.parseInt(request.getParameter("stockQuantity")));
             p.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             p.setUnit(request.getParameter("unit"));
+
             String imageUrl = request.getParameter("imageUrl");
             Part filePart = request.getPart("imageFile");
-            String fileName = filePart.getSubmittedFileName();
+            String fileName = filePart != null ? filePart.getSubmittedFileName() : null;
             String imageName;
+            String uploadPath = getServletContext().getRealPath("/resources");
+
             if (fileName != null && !fileName.isEmpty()) {
-                imageName = System.currentTimeMillis()
-                        + "_"
-                        + fileName;
-                String uploadPath = getServletContext().getRealPath("/resources");
+                imageName = System.currentTimeMillis() + "_" + fileName;
                 File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
-                }
-                filePart.write(uploadPath
-                        + File.separator
-                        + imageName
-                );
+                if (!uploadDir.exists()) uploadDir.mkdirs();
+
+                filePart.write(uploadPath + File.separator + imageName);
+
                 if (oldProduct.getImageUrl() != null && !oldProduct.getImageUrl().equals("no-image.png")) {
-                    File oldFile = new File(uploadPath
-                            + File.separator
-                            + oldProduct.getImageUrl());
-                    if (oldFile.exists()) {
-                        oldFile.delete();
-                    }
+                    File oldFile = new File(uploadPath + File.separator + oldProduct.getImageUrl());
+                    if (oldFile.exists()) oldFile.delete();
                 }
-            }
-            else if (imageUrl != null && !imageUrl.isEmpty()) {
+            } else if (imageUrl != null && !imageUrl.isEmpty()) {
                 imageName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-            }
-            else {
+            } else {
                 imageName = oldProduct.getImageUrl();
             }
             p.setImageUrl(imageName);
+
+            // Bắt đầu cấu trúc khối Transaction hợp nhất
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
+
+            // Ép ProductDAO cập nhật thông tin dựa trên Transaction Connection dùng chung này
             dao.updateProduct(p);
+
             pvDAO.deleteByProduct(productId);
             if (voucherIds != null) {
                 for (String vid : voucherIds) {
@@ -289,61 +233,41 @@ public class ProductServlet extends HttpServlet {
                 }
             }
 
+            conn.commit();
         } catch (Exception e) {
             e.printStackTrace();
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ignored) {}
+            }
+        } finally {
+            if (conn != null) {
+                try { conn.close(); } catch (SQLException ignored) {}
+            }
         }
 
-        response.sendRedirect(request.getContextPath() + "/admin/products");
+        response.sendRedirect(request.getContextPath() + "/admin/products?msg=success");
     }
-    //DELETE PRODUCT
-
 
     private void deleteProduct(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-
         try {
-
             int id = Integer.parseInt(request.getParameter("id"));
-
             dao.deleteProduct(id);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         response.sendRedirect(request.getContextPath() + "/admin/products");
     }
 
-    //DETAIL PRODUCT
-    private void showDetail(HttpServletRequest request,
-                            HttpServletResponse response)
+    private void showDetail(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         try {
-
             int id = Integer.parseInt(request.getParameter("id"));
-
-            System.out.println("DETAIL ID = " + id);
-
             Product product = dao.getProductById(id);
 
-            System.out.println("PRODUCT = " + product);
-
-            if(product != null){
-                System.out.println("NAME = " + product.getName());
-            }
-
             request.setAttribute("product", product);
-
-            request.setAttribute(
-                    "contentPage",
-                    "/WEB-INF/admin/productDetail.jsp"
-            );
-
-            request.getRequestDispatcher(
-                    "/WEB-INF/admin/layout-admin.jsp"
-            ).forward(request, response);
-
+            request.setAttribute("contentPage", "/WEB-INF/admin/productDetail.jsp");
+            request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
         }

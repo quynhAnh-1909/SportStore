@@ -13,28 +13,24 @@
             <h4 class="mb-0 text-success fw-bold">
                 <i class="fas fa-box me-2"></i> Quản lý kho hàng
             </h4>
-
-            <a href="${root}/admin/products?action=create"
-               class="btn btn-success rounded-pill px-4 shadow-sm">
+            <a href="${root}/admin/products?action=create" class="btn btn-success rounded-pill px-4 shadow-sm">
                 <i class="fas fa-plus me-1"></i> Thêm sản phẩm
             </a>
         </div>
 
         <div class="row mb-3 gx-2 align-items-center">
             <div class="col-md-4" id="searchContainer"></div>
-
             <div class="col-md-4">
                 <select id="categoryFilter" class="form-select">
                     <option value="">-- Tất cả danh mục --</option>
                     <c:forEach var="c" items="${categories}">
-                        <option value="${c.name}">${c.name}</option>
+                        <option value="${c.name.replaceAll('[|\\-+ ]', '').trim()}">${c.name}</option>
                     </c:forEach>
                 </select>
             </div>
-
             <div class="col-md-4">
                 <select id="stockFilter" class="form-select">
-                    <option value="">-- Trạng thái --</option>
+                    <option value="">-- Trạng thái kho --</option>
                     <option value="Còn hàng">✅ Còn hàng</option>
                     <option value="Hết hàng">❌ Hết hàng</option>
                 </select>
@@ -48,37 +44,29 @@
                     <th style="width: 80px;">Ảnh</th>
                     <th class="text-start">Tên sản phẩm</th>
                     <th>Giá</th>
-                    <th>Tồn</th>
+                    <th>Tồn kho</th>
                     <th>Mã Giảm</th>
                     <th>Danh mục</th>
                     <th style="width: 140px;">Thao tác</th>
                 </tr>
                 </thead>
-
                 <tbody>
                 <c:forEach var="item" items="${products}">
                     <tr class="${item.stockQuantity <= 0 ? 'table-danger' : ''}">
                         <td>
                             <c:choose>
                                 <c:when test="${not empty item.imageUrl}">
-                                    <img src="${root}/resources/${item.imageUrl}"
-                                         class="rounded shadow-sm"
-                                         style="width:60px;height:60px;object-fit:cover;">
+                                    <img src="${root}/resources/${item.imageUrl}" class="rounded shadow-sm" style="width:60px;height:60px;object-fit:cover;">
                                 </c:when>
                                 <c:otherwise>
-                                    <img src="${root}/resources/no-image.png"
-                                         class="rounded"
-                                         style="width:60px;height:60px;object-fit:cover;">
+                                    <img src="${root}/resources/no-image.png" class="rounded" style="width:60px;height:60px;object-fit:cover;">
                                 </c:otherwise>
                             </c:choose>
                         </td>
-
                         <td class="text-start fw-bold ps-3">${item.name}</td>
-
                         <td class="text-danger fw-bold">
                             <fmt:formatNumber value="${item.price}" groupingUsed="true"/> ₫
                         </td>
-
                         <td data-search="${item.stockQuantity <= 0 ? 'Hết hàng' : 'Còn hàng'}">
                             <c:choose>
                                 <c:when test="${item.stockQuantity <= 0}">
@@ -92,7 +80,6 @@
                                 </c:otherwise>
                             </c:choose>
                         </td>
-
                         <td>
                             <c:choose>
                                 <c:when test="${not empty item.vouchers}">
@@ -105,24 +92,18 @@
                                 </c:otherwise>
                             </c:choose>
                         </td>
-
-                        <td>
+                        <td data-search="${item.categoryName.trim()}">
                             <span class="badge bg-info text-dark px-3">${item.categoryName}</span>
                         </td>
-
                         <td>
                             <div class="btn-group">
-                                <a href="${root}/admin/products?action=edit&id=${item.id}"
-                                   class="btn btn-sm btn-outline-primary">
+                                <a href="${root}/admin/products?action=edit&id=${item.id}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="${root}/admin/products?action=detail&id=${item.id}"
-                                   class="btn btn-sm btn-outline-info">
+                                <a href="${root}/admin/products?action=detail&id=${item.id}" class="btn btn-sm btn-outline-info">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="${root}/admin/products?action=delete&id=${item.id}"
-                                   class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirmDelete(event, this.href)">
+                                <a href="${root}/admin/products?action=delete&id=${item.id}" class="btn btn-sm btn-outline-danger" onclick="return confirmDelete(event, this.href)">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>
@@ -136,50 +117,24 @@
         <c:if test="${empty products}">
             <div class="text-center mt-4 p-5 border rounded">
                 <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                <p class="text-muted">Chưa có sản phẩm</p>
+                <p class="text-muted">Chưa có sản phẩm nào trong hệ thống</p>
             </div>
         </c:if>
-
     </div>
 </div>
 
 <style>
-    table tbody tr:hover {
-        background-color: rgba(0, 123, 255, 0.05);
-    }
-    td, th {
-        vertical-align: middle !important;
-    }
-    td img {
-        border: 1px solid #dee2e6;
-    }
-    .table-danger {
-        background-color: #f8d7da !important;
-    }
-    .dataTables_wrapper .dataTables_filter {
-        float: left !important;
-        text-align: left !important;
-        width: 100%;
-    }
-    .dataTables_wrapper .dataTables_filter label {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+    table tbody tr:hover { background-color: rgba(0, 123, 255, 0.05); }
+    td, th { vertical-align: middle !important; }
+    td img { border: 1px solid #dee2e6; }
+    .table-danger { background-color: #f8d7da !important; }
+    .dataTables_wrapper .dataTables_filter { float: left !important; text-align: left !important; width: 100%; }
+    .dataTables_wrapper .dataTables_filter label { width: 100%; display: flex; align-items: center; gap: 10px; }
     .dataTables_wrapper .dataTables_filter input {
-        width: 100% !important;
-        margin-left: 0 !important;
-        display: inline-block;
-        height: 38px;
-        border-radius: 6px;
-        border: 1px solid #ced4da;
-        padding: 0.375rem 0.75rem;
+        width: 100% !important; margin-left: 0 !important; display: inline-block;
+        height: 38px; border-radius: 6px; border: 1px solid #ced4da; padding: 0.375rem 0.75rem;
     }
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0px !important;
-        margin: 2px !important;
-    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 0px !important; margin: 2px !important; }
 </style>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -213,33 +168,43 @@
 
         $('#categoryFilter').on('change', function() {
             const val = $.fn.dataTable.util.escapeRegex($(this).val());
-            table.column(5).search(val ? '^'+val+'$' : '', true, false).draw();
+            table.column(5).search(val ? '^' + val + '$' : '', true, false).draw();
         });
 
         $('#stockFilter').on('change', function() {
             const val = $(this).val();
             table.column(3).search(val).draw();
         });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('msg') === 'success') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: 'Dữ liệu sản phẩm đã được cập nhật ổn định.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     });
 
     function confirmDelete(event, url) {
         event.preventDefault();
-
         Swal.fire({
-            title: 'Bạn chắc chắn?',
-            text: 'Sản phẩm sẽ bị xóa!',
+            title: 'Bạn chắc chắn chứ?',
+            text: 'Sản phẩm này sẽ bị xóa vĩnh viễn khỏi hệ thống kho!',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d81f19',
+            confirmButtonColor: '#dc3545',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy'
+            confirmButtonText: 'Đồng ý xóa',
+            cancelButtonText: 'Hủy bỏ'
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href = url;
             }
         });
-
         return false;
     }
 </script>
