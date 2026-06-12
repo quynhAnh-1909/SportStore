@@ -24,7 +24,8 @@ public class Customer {
 
     private boolean status;
 
-
+    private boolean loyal;
+    private String tierName;
 
     public Customer() {
 
@@ -40,7 +41,7 @@ public class Customer {
 
 
 
-// Getters and Setters
+
 
     public int getUserId() { return userId; }
 
@@ -100,4 +101,10 @@ public class Customer {
 
     public void setStatus(boolean status) { this.status = status; }
 
+
+    public boolean isLoyal() { return loyal; }
+    public void setLoyal(boolean loyal) { this.loyal = loyal; }
+
+    public String getTierName() { return tierName; }
+    public void setTierName(String tierName) { this.tierName = tierName; }
 }
