@@ -231,6 +231,17 @@
 
     .req-invalid { color: #ea3838; }
     .req-valid { color: #2ed573; font-weight: 500; }
+
+    .forgot-password{
+        text-align:center;
+        margin-top:10px;
+    }
+
+    .forgot-password a{
+        color:#0d6efd;
+        text-decoration:none;
+        font-size:14px;
+    }
 </style>
 
 <div class="overlay" id="authOverlay">
@@ -269,6 +280,12 @@
             </c:if>
 
             <button type="submit" class="btn-submit">ĐĂNG NHẬP</button>
+            <div class="forgot-password">
+                <a href="#"
+                   onclick="openForgotModal();return false;">
+                    Quên mật khẩu?
+                </a>
+            </div>
         </form>
 
         <form id="registerForm" action="${root}/register" method="post" onsubmit="return validateRegister()" style="display:none;">
@@ -355,6 +372,127 @@
         </div>
     </div>
 </div>
+
+<div class="overlay" id="forgotOverlay">
+
+    <div class="auth-box">
+
+        <div class="close-btn"
+             onclick="closeForgotModal()">
+            ✖
+        </div>
+
+        <h3>Quên mật khẩu</h3>
+
+        <div class="form-group">
+
+            <label>Email</label>
+
+            <input
+                    type="text"
+                    id="forgotEmail"
+                    oninput="checkDetailedEmail(this,'forgotEmailError')">
+
+            <div class="error" id="forgotEmailError"></div>
+
+        </div>
+
+        <button
+                type="button"
+                class="btn-submit"
+                onclick="sendOTP()">
+
+            Gửi OTP
+
+        </button>
+
+    </div>
+
+</div>
+
+<div class="overlay" id="otpOverlay">
+
+    <div class="auth-box">
+
+        <div class="close-btn"
+             onclick="closeOTPModal()">
+            ✖
+        </div>
+
+        <h2 style="text-align:center">
+            Xác nhận OTP
+        </h2>
+
+        <div class="form-group">
+
+            <label>Mã OTP</label>
+
+            <input
+                    type="text"
+                    id="otpCode"
+                    placeholder="Nhập mã OTP">
+
+        </div>
+
+        <button
+                type="button"
+                class="btn-submit"
+                onclick="verifyOTP()">
+
+            XÁC NHẬN
+
+        </button>
+
+    </div>
+
+</div>
+
+<div class="overlay" id="resetOverlay">
+
+    <div class="auth-box">
+
+        <div class="close-btn"
+             onclick="closeResetModal()">
+            ✖
+        </div>
+
+        <h2 style="text-align:center">
+            Đặt lại mật khẩu
+        </h2>
+
+        <div class="form-group">
+
+            <label>Mật khẩu mới</label>
+
+            <input
+                    type="password"
+                    id="newPassword">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Xác nhận mật khẩu</label>
+
+            <input
+                    type="password"
+                    id="confirmPassword">
+
+        </div>
+
+        <button
+                type="button"
+                class="btn-submit"
+                onclick="resetPassword()">
+
+            ĐỔI MẬT KHẨU
+
+        </button>
+
+    </div>
+
+</div>
+
 
 <script>
     function openAuth(tab) {
@@ -580,4 +718,194 @@
         openAuth(targetTab);
         </c:if>
     });
+
+    function openForgotModal(){
+        document.getElementById("forgotOverlay")
+                .style.display="flex";
+    }
+
+    function closeForgotModal(){
+        document.getElementById("forgotOverlay")
+                .style.display="none";
+    }
+
+    function openOTPModal(){
+        document.getElementById("otpOverlay")
+                .style.display="flex";
+    }
+
+    function closeOTPModal(){
+        document.getElementById("otpOverlay")
+                .style.display="none";
+    }
+
+    function openResetModal(){
+        document.getElementById("resetOverlay")
+                .style.display="flex";
+    }
+
+    function closeResetModal(){
+        document.getElementById("resetOverlay")
+                .style.display="none";
+    }
+
+    async function sendOTP(){
+
+        let emailInput = document.getElementById("forgotEmail");
+        let email = emailInput.value.trim();
+
+        let emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if(email === ""){
+            alert("Vui lòng nhập email");
+            return;
+        }
+
+        if(!emailRegex.test(email)){
+            alert("Email không đúng định dạng");
+            return;
+        }
+
+        let response =
+                await fetch(
+                        "${root}/forgot-password",
+                        {
+                            method:"POST",
+
+                            headers:{
+                                "Content-Type":
+                                        "application/x-www-form-urlencoded"
+                            },
+
+                            body:
+                                    "email="
+                                    + encodeURIComponent(email)
+                        }
+                );
+
+        let result =
+                await response.json();
+
+        if(result.success){
+
+            alert("OTP đã gửi tới email");
+
+            closeForgotModal();
+
+            openOTPModal();
+
+        }else{
+
+            alert(result.message);
+        }
+    }
+
+    async function verifyOTP(){
+
+        let otp =
+                document.getElementById(
+                        "otpCode"
+                ).value;
+
+        let response =
+                await fetch(
+                        "${root}/verify-otp",
+                        {
+                            method:"POST",
+
+                            headers:{
+                                "Content-Type":
+                                        "application/x-www-form-urlencoded"
+                            },
+
+                            body:
+                                    "otp="
+                                    + encodeURIComponent(otp)
+                        }
+                );
+
+        let result =
+                await response.json();
+
+        if(result.success){
+
+            closeOTPModal();
+
+            openResetModal();
+
+        }else{
+
+            alert("OTP không đúng");
+        }
+    }
+
+    async function resetPassword(){
+
+        let pass =
+                document.getElementById(
+                        "newPassword"
+                ).value;
+
+        let confirm =
+                document.getElementById(
+                        "confirmPassword"
+                ).value;
+
+        let hasLength = pass.length >= 6;
+        let hasUpper = /[A-Z]/.test(pass);
+        let hasLower = /[a-z]/.test(pass);
+        let hasNumber = /[0-9]/.test(pass);
+        let hasSpecial = /[^A-Za-z0-9]/.test(pass);
+
+        if (!hasLength || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+            alert("Mật khẩu chưa đạt yêu cầu bảo mật");
+            return;
+        }
+
+        if(pass !== confirm){
+
+            alert(
+                    "Mật khẩu xác nhận không khớp"
+            );
+
+            return;
+        }
+
+        let response =
+                await fetch(
+                        "${root}/reset-password",
+                        {
+                            method:"POST",
+
+                            headers:{
+                                "Content-Type":
+                                        "application/x-www-form-urlencoded"
+                            },
+
+                            body:
+                                    "password="
+                                    + encodeURIComponent(pass)
+                        }
+                );
+
+        let result =
+                await response.json();
+
+        if(result.success){
+
+            alert(
+                    "Đổi mật khẩu thành công"
+            );
+
+            closeResetModal();
+
+            openAuth("login");
+
+        }else{
+
+            alert(
+                    "Không thể đổi mật khẩu"
+            );
+        }
+    }
 </script>

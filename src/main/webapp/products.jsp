@@ -225,7 +225,7 @@
 
 <div class="container-fluid px-5 mt-4">
 
-    <c:if test="${empty param.categoryId}">
+    <c:if test="${empty param.categoryId and empty param.keyword}">
 
         <!-- BEST SELLER -->
         <div class="d-flex justify-content-between align-items-center section-header">
@@ -364,10 +364,22 @@
 
     </c:if>
 
-    <c:if test="${not empty param.categoryId}">
+    <c:if test="${not empty param.categoryId or not empty param.keyword}">
 
         <h2 class="text-center text-success fw-bold mb-4 mt-5">
-            DANH SÁCH SẢN PHẨM
+
+            <c:choose>
+
+                <c:when test="${not empty param.keyword}">
+                    Kết quả tìm kiếm: "${param.keyword}"
+                </c:when>
+
+                <c:otherwise>
+                    DANH SÁCH SẢN PHẨM
+                </c:otherwise>
+
+            </c:choose>
+
         </h2>
 
         <c:choose>

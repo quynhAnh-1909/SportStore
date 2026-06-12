@@ -209,7 +209,7 @@ public class AuthServlet extends HttpServlet {
 
         try{
 
-//            MailUtils.sendOTP(email, otp);
+            MailUtils.sendOTP(email, otp);
 
             response.getWriter().write(
                     "{\"success\":true}"
