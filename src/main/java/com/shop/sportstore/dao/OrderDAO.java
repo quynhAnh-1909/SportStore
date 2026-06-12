@@ -15,7 +15,6 @@ import static com.shop.sportstore.untils.DBConnection.getConnection;
 
 public class OrderDAO extends DBConnection {
 
-
     public void decreaseProductStock(int orderId, Connection conn) throws SQLException {
         String selectSql = "SELECT ProductId, Quantity FROM orderdetails WHERE OrderId = ?";
         String updateSql = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?";
@@ -62,6 +61,7 @@ public class OrderDAO extends DBConnection {
             }
         }
     }
+
     public int countOrdersByStatus(String status) {
         int count = 0;
         String sql = "SELECT COUNT(*) FROM orders WHERE Status = ?";
@@ -80,6 +80,7 @@ public class OrderDAO extends DBConnection {
         }
         return count;
     }
+
     public long calculateDailyStats(String type, int day, int month, int year) {
         long result = 0;
         String column = "COUNT(Id)";
@@ -128,6 +129,7 @@ public class OrderDAO extends DBConnection {
         }
         return result;
     }
+
     private Order mapOrder(ResultSet rs) throws SQLException {
         Order o = new Order();
         o.setId(rs.getInt("Id"));
@@ -136,8 +138,11 @@ public class OrderDAO extends DBConnection {
         o.setTotalPrice(rs.getDouble("TotalPrice"));
         o.setPaymentMethod(rs.getString("PaymentMethod"));
         o.setStatus(rs.getString("Status"));
-        o.setReceiverName(rs.getString("ReceiverName"));
-        o.setReceiverPhone(rs.getString("ReceiverPhone"));
+
+
+        try { o.setReceiverName(rs.getString("receiver_name")); } catch (Exception e) { o.setReceiverName(rs.getString("ReceiverName")); }
+        try { o.setReceiverPhone(rs.getString("receiver_phone")); } catch (Exception e) { o.setReceiverPhone(rs.getString("ReceiverPhone")); }
+
         o.setAddress(rs.getString("Address"));
         o.setNote(rs.getString("Note"));
 
@@ -145,7 +150,7 @@ public class OrderDAO extends DBConnection {
         try { o.setDistrictId(rs.getInt("district_id")); } catch (Exception ignored) { try { o.setDistrictId(rs.getInt("DistrictId")); } catch (Exception ignored2) {} }
         try { o.setWardCode(rs.getString("ward_code")); } catch (Exception ignored) { try { o.setWardCode(rs.getString("WardCode")); } catch (Exception ignored2) {} }
         try { o.setShippingFee(rs.getDouble("shipping_fee")); } catch (Exception ignored) { try { o.setShippingFee(rs.getDouble("ShippingFee")); } catch (Exception ignored2) {} }
-        try { o.setDiscountAmount(rs.getDouble("DiscountAmount")); } catch (Exception ignored) { try { o.setDiscountAmount(rs.getDouble("discount_amount")); } catch (Exception ignored2) {} }
+        try { o.setDiscountAmount(rs.getDouble("discount_amount")); } catch (Exception ignored) { try { o.setDiscountAmount(rs.getDouble("DiscountAmount")); } catch (Exception ignored2) {} }
         try { o.setGhnCode(rs.getString("ghn_code")); } catch (Exception ignored) { try { o.setGhnCode(rs.getString("GhnCode")); } catch (Exception ignored2) {} }
 
         o.setCreatedAt(rs.getTimestamp("CreatedAt"));
@@ -168,7 +173,6 @@ public class OrderDAO extends DBConnection {
         } else {
             o.setPaid("COMPLETED".equalsIgnoreCase(o.getStatus()));
         }
-
 
         return o;
     }
@@ -196,7 +200,7 @@ public class OrderDAO extends DBConnection {
 
     public Map<String, String> getOrderDetailForEmail(String orderCode) throws SQLException {
         Map<String, String> data = new HashMap<>();
-        String sql = "SELECT o.Id, o.OrderCode, o.TotalPrice, o.Address, o.ReceiverName, " +
+        String sql = "SELECT o.Id, o.OrderCode, o.TotalPrice, o.Address, o.receiver_name, " +
                 "u.user_id AS userId, u.full_name, u.email " +
                 "FROM orders o JOIN users u ON o.UserId = u.user_id WHERE o.OrderCode = ?";
         try (Connection conn = getConnection();
@@ -208,7 +212,7 @@ public class OrderDAO extends DBConnection {
                     data.put("orderCode", rs.getString("OrderCode"));
                     data.put("totalPrice", rs.getString("TotalPrice"));
                     data.put("address", rs.getString("Address"));
-                    data.put("receiverName", rs.getString("ReceiverName"));
+                    data.put("receiverName", rs.getString("receiver_name"));
                     data.put("fullName", rs.getString("full_name"));
                     data.put("email", rs.getString("email"));
                 }
@@ -235,9 +239,11 @@ public class OrderDAO extends DBConnection {
     public boolean createOrder(Integer userId, String orderCode, double total, String paymentMethod, String status,
                                String receiverName, String receiverPhone, String address, int districtId, String wardCode,
                                String note, Integer voucherId, double discountAmount, double shippingFee, List<CartItem> cart) throws SQLException {
+
         String insertOrderSQL = "INSERT INTO orders (UserId, OrderCode, TotalPrice, PaymentMethod, Status, " +
-                "ReceiverName, ReceiverPhone, Address, district_id, ward_code, Note, VoucherId, DiscountAmount, " +
+                "receiver_name, receiver_phone, Address, district_id, ward_code, Note, VoucherId, discount_amount, " +
                 "shipping_fee, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         String insertDetailSQL = "INSERT INTO orderdetails (OrderId, ProductId, Quantity, Price) VALUES (?, ?, ?, ?)";
         Connection conn = null;
         try {
@@ -294,6 +300,7 @@ public class OrderDAO extends DBConnection {
             if (conn != null) conn.close();
         }
     }
+
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
@@ -333,6 +340,7 @@ public class OrderDAO extends DBConnection {
     }
 
     public boolean cancelOrder(String orderCode, int userId, String cancelReason) {
+        // Đồng bộ hóa điều kiện check chuỗi trạng thái bằng ENUM OrderStatus an toàn
         String sql = "UPDATE orders SET Status = 'CANCELLED', CancelReason = ?, refund_reason = ?, " +
                 "refund_status = ?, refund_requested_at = CASE WHEN ? = 'PENDING_REFUND' THEN NOW() ELSE NULL END, " +
                 "CancelledAt = NOW(), UpdatedAt = NOW() " +
@@ -358,7 +366,14 @@ public class OrderDAO extends DBConnection {
             ps.setString(5, orderCode);
             ps.setInt(6, userId);
 
-            return ps.executeUpdate() > 0;
+            boolean isUpdated = ps.executeUpdate() > 0;
+
+
+            if (isUpdated) {
+                increaseProductStock(order.getId(), conn);
+            }
+
+            return isUpdated;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -551,7 +566,7 @@ public class OrderDAO extends DBConnection {
     }
 
     public Order findOrderByCodeOrPhone(String keyword) {
-        String sql = "SELECT * FROM orders WHERE OrderCode = ? OR ReceiverPhone = ? OR Id = ? ORDER BY CreatedAt DESC LIMIT 1";
+        String sql = "SELECT * FROM orders WHERE OrderCode = ? OR receiver_phone = ? OR Id = ? ORDER BY CreatedAt DESC LIMIT 1";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             String cleanKeyword = keyword.trim();
@@ -570,38 +585,23 @@ public class OrderDAO extends DBConnection {
         }
         return null;
     }
+
     public Order getOrderByCode(String orderCode) {
-
         String sql = "SELECT * FROM orders WHERE OrderCode = ?";
-
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setString(1, orderCode);
-
             try (ResultSet rs = ps.executeQuery()) {
-
                 if (rs.next()) {
-
                     Order order = mapOrder(rs);
-
-                    OrderDetailDAO detailDAO =
-                            new OrderDetailDAO();
-
-                    order.setOrderDetails(
-                            detailDAO.getOrderDetailsByOrderId(
-                                    order.getId()
-                            )
-                    );
-
+                    OrderDetailDAO detailDAO = new OrderDetailDAO();
+                    order.setOrderDetails(detailDAO.getOrderDetailsByOrderId(order.getId()));
                     return order;
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
@@ -688,24 +688,13 @@ public class OrderDAO extends DBConnection {
     }
 
     public int confirmAllPendingOrders() {
-
-        String sql = """
-        UPDATE Orders
-        SET status = 'CONFIRMED'
-        WHERE status = 'PENDING'
-    """;
-
-        try (
-                Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
-
+        String sql = "UPDATE orders SET Status = 'CONFIRMED' WHERE Status = 'PENDING'";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             return ps.executeUpdate();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return 0;
     }
 

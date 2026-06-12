@@ -4,17 +4,17 @@ import com.shop.sportstore.dao.OrderDAO;
 import com.shop.sportstore.dao.VoucherDAO;
 import com.shop.sportstore.model.CartItem;
 import com.shop.sportstore.model.Voucher;
+import com.shop.sportstore.model.User;
 import com.shop.sportstore.untils.DBConnection;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,26 +23,20 @@ import java.util.List;
 public class CheckoutServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
         String type = request.getParameter("type");
-
-        List<CartItem> cart;
-
-        if ("buyNow".equals(type)) {
-
-            cart = (List<CartItem>)
-                    session.getAttribute("buyNowItems");
-
-        } else {
-
-            cart = (List<CartItem>)
-                    session.getAttribute("cart");
-        }
+        List<CartItem> cart = "buyNow".equals(type)
+                ? (List<CartItem>) session.getAttribute("buyNowItems")
+                : (List<CartItem>) session.getAttribute("cart");
 
         if (cart == null || cart.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/cart");
@@ -50,362 +44,209 @@ public class CheckoutServlet extends HttpServlet {
         }
 
         String selectedIds = request.getParameter("selectedIds");
-
         List<CartItem> selectedItems = new ArrayList<>();
-
         if (selectedIds != null && !selectedIds.isEmpty()) {
-
-            List<Integer> ids = Arrays.stream(selectedIds.split(","))
-                    .map(Integer::parseInt)
-                    .toList();
-
+            List<Integer> ids = Arrays.stream(selectedIds.split(",")).map(Integer::parseInt).toList();
             for (CartItem item : cart) {
                 if (ids.contains(item.getProduct().getId())) {
                     selectedItems.add(item);
                 }
             }
-
         } else {
             selectedItems = cart;
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
+        double subtotal = selectedItems.stream()
+                .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
+                .sum();
+        request.setAttribute("subtotal", subtotal);
 
+        try (Connection conn = DBConnection.getConnection()) {
             VoucherDAO voucherDAO = new VoucherDAO(conn);
 
-            request.setAttribute("vouchers", voucherDAO.getAll());
+
+            Voucher matchedVoucher = voucherDAO.getAutomaticVoucherByTier(user.getUserId(), user.getTierName());
+            double rankDiscount = 0;
+
+            if (matchedVoucher != null) {
+                request.setAttribute("appliedVoucher", matchedVoucher);
+                if ("PERCENT".equalsIgnoreCase(matchedVoucher.getDiscountType())) {
+                    rankDiscount = subtotal * matchedVoucher.getDiscountValue() / 100.0;
+                    if (matchedVoucher.getMaxDiscount() > 0 && rankDiscount > matchedVoucher.getMaxDiscount()) {
+                        rankDiscount = matchedVoucher.getMaxDiscount();
+                    }
+                } else {
+                    rankDiscount = matchedVoucher.getDiscountValue();
+                }
+                request.setAttribute("voucherDiscount", rankDiscount);
+            } else {
+                request.setAttribute("appliedVoucher", null);
+                request.setAttribute("voucherDiscount", 0.0);
+            }
+
+
+            List<Voucher> filteredVouchers = voucherDAO.getAllActiveVouchersForSelect();
+            request.setAttribute("vouchers", filteredVouchers);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         request.setAttribute("selectedItems", selectedItems);
-
-        request.getRequestDispatcher("/WEB-INF/client/checkout.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/client/checkout.jsp").forward(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
 
-        Integer userId =
-                (Integer) session.getAttribute("userId");
-
-        if (userId == null) {
-            response.sendRedirect(
-                    request.getContextPath() + "/login"
-            );
+        if (userId == null || user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         String type = request.getParameter("type");
+        List<CartItem> cart = "buyNow".equals(type)
+                ? (List<CartItem>) session.getAttribute("buyNowItems")
+                : (List<CartItem>) session.getAttribute("cart");
 
-        List<CartItem> cart;
-
-        if ("buyNow".equals(type)) {
-
-            cart = (List<CartItem>)
-                    session.getAttribute("buyNowItems");
-
-        } else {
-
-            cart = (List<CartItem>)
-                    session.getAttribute("cart");
-        }
-
-        String selectedIds =
-                request.getParameter("selectedIds");
-
+        String selectedIds = request.getParameter("selectedIds");
         List<CartItem> selectedCart = new ArrayList<>();
 
-        if (cart != null &&
-                selectedIds != null &&
-                !selectedIds.isEmpty()) {
-
-            List<Integer> ids =
-                    Arrays.stream(selectedIds.split(","))
-                            .map(Integer::parseInt)
-                            .toList();
-
+        if (cart != null && selectedIds != null && !selectedIds.isEmpty()) {
+            List<Integer> ids = Arrays.stream(selectedIds.split(",")).map(Integer::parseInt).toList();
             for (CartItem item : cart) {
-
                 if (ids.contains(item.getProduct().getId())) {
                     selectedCart.add(item);
                 }
             }
-
         } else {
-
-            selectedCart =
-                    (cart != null) ? cart : new ArrayList<>();
+            selectedCart = (cart != null) ? cart : new ArrayList<>();
         }
 
         if (selectedCart.isEmpty()) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/cart"
-            );
-
+            response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
 
-        // =========================
-        // THÔNG TIN NGƯỜI NHẬN
-        // =========================
-
-        String receiverName =
-                request.getParameter("receiverName");
-
-        String receiverPhone =
-                request.getParameter("receiverPhone");
-
-        String paymentMethod =
-                request.getParameter("paymentMethod");
-
-        String note =
-                request.getParameter("note");
-
-        // =========================
-        // ĐỊA CHỈ
-        // =========================
-
-        String province =
-                request.getParameter("province");
-
-        String district =
-                request.getParameter("district");
-
-        String ward =
-                request.getParameter("ward");
-
-        String shippingAddress =
-                request.getParameter("shippingAddress");
-
-        String fullAddress =
-                shippingAddress + ", "
-                        + ward + ", "
-                        + district + ", "
-                        + province;
-
-        // =========================
-        // GHN DATA
-        // =========================
+        String receiverName = request.getParameter("receiverName");
+        String receiverPhone = request.getParameter("receiverPhone");
+        String paymentMethod = request.getParameter("paymentMethod");
+        String note = request.getParameter("note");
+        String fullAddress = request.getParameter("shippingAddress") + ", " + request.getParameter("ward") + ", " + request.getParameter("district") + ", " + request.getParameter("province");
 
         int districtId = 0;
+        try { districtId = Integer.parseInt(request.getParameter("districtId")); } catch (Exception e) {}
+        String wardCode = request.getParameter("wardCode");
 
-        try {
-            districtId = Integer.parseInt(
-                    request.getParameter("districtId")
-            );
-        } catch (Exception e) {
-            districtId = 0;
-        }
-
-        String wardCode =
-                request.getParameter("wardCode");
-
-        // =========================
-        // TÍNH TIỀN
-        // =========================
-
-        double subtotal = 0;
-
-        for (CartItem item : selectedCart) {
-
-            subtotal +=
-                    item.getProduct().getPrice()
-                            * item.getQuantity();
-        }
-
-        // =========================
-        // SHIPPING FEE
-        // =========================
-
+        double subtotal = selectedCart.stream().mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity()).sum();
         double shippingFee = 30000;
+        try { shippingFee = Double.parseDouble(request.getParameter("shippingFee")); } catch (Exception e) {}
 
-        try {
+        double totalDiscount = 0;
+        Integer normalVoucherId = null;
+        Integer rankVoucherId = null;
 
-            shippingFee = Double.parseDouble(
-                    request.getParameter("shippingFee")
-            );
+        String voucherRaw = request.getParameter("voucherId");
+        String rankVoucherRaw = request.getParameter("rankVoucherId");
 
+        try (Connection conn = DBConnection.getConnection()) {
+            VoucherDAO voucherDAO = new VoucherDAO(conn);
+
+
+            if (rankVoucherRaw != null && !rankVoucherRaw.isEmpty()) {
+                rankVoucherId = Integer.parseInt(rankVoucherRaw);
+                Voucher rv = voucherDAO.findById(rankVoucherId);
+                if (rv != null) {
+                    if ("PERCENT".equalsIgnoreCase(rv.getDiscountType())) {
+                        double d = subtotal * rv.getDiscountValue() / 100.0;
+                        totalDiscount += (rv.getMaxDiscount() > 0 && d > rv.getMaxDiscount()) ? rv.getMaxDiscount() : d;
+                    } else {
+                        totalDiscount += rv.getDiscountValue();
+                    }
+                }
+            }
+
+
+            if (voucherRaw != null && !voucherRaw.isEmpty()) {
+                normalVoucherId = Integer.parseInt(voucherRaw);
+                Voucher nv = voucherDAO.findById(normalVoucherId);
+                if (nv != null) {
+                    if ("PERCENT".equalsIgnoreCase(nv.getDiscountType())) {
+                        double d = subtotal * nv.getDiscountValue() / 100.0;
+                        totalDiscount += (nv.getMaxDiscount() > 0 && d > nv.getMaxDiscount()) ? nv.getMaxDiscount() : d;
+                    } else {
+                        totalDiscount += nv.getDiscountValue();
+                    }
+                }
+            }
         } catch (Exception e) {
-
-            shippingFee = 30000;
+            e.printStackTrace();
         }
 
-        // =========================
-        // VOUCHER
-        // =========================
+        double total = subtotal - totalDiscount + shippingFee;
+        if (total < 0) total = 0;
 
-        double discount = 0;
+        String orderCode = "ORD" + System.currentTimeMillis();
 
-        Integer voucherId = null;
+        try {
+            OrderDAO orderDAO = new OrderDAO();
+            orderDAO.createOrder(
+                    userId, orderCode, total, paymentMethod, "PENDING",
+                    receiverName, receiverPhone, fullAddress, districtId,
+                    wardCode, note, normalVoucherId, totalDiscount, shippingFee, selectedCart
+            );
 
-        String voucherRaw =
-                request.getParameter("voucherId");
+            try (Connection conn = DBConnection.getConnection()) {
+                VoucherDAO voucherDAO = new VoucherDAO(conn);
 
-        if (voucherRaw != null &&
-                !voucherRaw.isEmpty()) {
+                if (normalVoucherId != null) {
+                    voucherDAO.updateUsed(normalVoucherId);
+                }
 
-            try {
+                if (rankVoucherId != null) {
+                    voucherDAO.updateUsed(rankVoucherId);
 
-                voucherId = Integer.parseInt(voucherRaw);
-
-                try (Connection conn =
-                             DBConnection.getConnection()) {
-
-                    VoucherDAO voucherDAO =
-                            new VoucherDAO(conn);
-
-                    Voucher v =
-                            voucherDAO.findById(voucherId);
-
-                    if (v != null) {
-
-                        if ("PERCENT".equalsIgnoreCase(
-                                v.getDiscountType())) {
-
-                            discount =
-                                    subtotal
-                                            * v.getDiscountValue()
-                                            / 100.0;
-
-                            if (discount > v.getMaxDiscount()) {
-                                discount = v.getMaxDiscount();
+                    String queryOrderId = "SELECT Id FROM orders WHERE OrderCode = ?";
+                    String insertUserVoucher = "INSERT INTO user_vouchers (user_id, voucher_id, order_id) VALUES (?, ?, ?)";
+                    try (PreparedStatement psGetId = conn.prepareStatement(queryOrderId)) {
+                        psGetId.setString(1, orderCode);
+                        var rs = psGetId.executeQuery();
+                        if (rs.next()) {
+                            int generatedOrderId = rs.getInt("Id");
+                            try (PreparedStatement psLog = conn.prepareStatement(insertUserVoucher)) {
+                                psLog.setInt(1, user.getUserId());
+                                psLog.setInt(2, rankVoucherId);
+                                psLog.setInt(3, generatedOrderId);
+                                psLog.executeUpdate();
                             }
-
-                        } else {
-
-                            discount =
-                                    v.getDiscountValue();
                         }
                     }
-
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        // =========================
-        // TOTAL
-        // =========================
-
-        double total =
-                subtotal - discount + shippingFee;
-
-        if (total < 0) {
-            total = 0;
-        }
-
-        // =========================
-        // ORDER CODE
-        // =========================
-
-        String orderCode =
-                "ORD" + System.currentTimeMillis();
-
-        try {
-
-            OrderDAO orderDAO = new OrderDAO();
-
-            orderDAO.createOrder(
-                    userId,
-                    orderCode,
-                    total,
-                    paymentMethod,
-                    "PENDING",
-                    receiverName,
-                    receiverPhone,
-                    fullAddress,
-                    districtId,
-                    wardCode,
-                    note,
-                    voucherId,
-                    discount,
-                    shippingFee,
-                    selectedCart
-            );
-
-            // =========================
-            // VNPAY
-            // =========================
-
-            if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
-
-                session.setAttribute(
-                        "paymentAmount",
-                        total
-                );
-
-                session.setAttribute(
-                        "pendingOrderCode",
-                        orderCode
-                );
-
-                response.sendRedirect(
-                        request.getContextPath()
-                                + "/vnpayPayment"
-                );
-
-                return;
-            }
-
-            // =========================
-            // UPDATE VOUCHER
-            // =========================
-
-            if (voucherId != null) {
-
-                try (Connection conn =
-                             DBConnection.getConnection()) {
-
-                    VoucherDAO voucherDAO =
-                            new VoucherDAO(conn);
-
-                    voucherDAO.updateUsed(voucherId);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
 
-            // =========================
-            // REMOVE CART
-            // =========================
-
-            if (!"buyNow".equals(type)) {
-
+            if (!"buyNow".equals(type) && cart != null) {
                 cart.removeAll(selectedCart);
-
                 session.setAttribute("cart", cart);
             }
 
-            response.sendRedirect(
-                    request.getContextPath()
-                            + "/orderSuccess?orderCode="
-                            + orderCode
-            );
+            if ("VNPAY".equalsIgnoreCase(paymentMethod)) {
+                session.setAttribute("paymentAmount", total);
+                session.setAttribute("pendingOrderCode", orderCode);
+                response.sendRedirect(request.getContextPath() + "/vnpayPayment");
+                return;
+            }
+
+            response.sendRedirect(request.getContextPath() + "/orderSuccess?orderCode=" + orderCode);
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
-            response.setContentType(
-                    "text/html;charset=UTF-8"
-            );
-
-            response.getWriter().println(
-                    "<h2>Lỗi tạo đơn hàng: "
-                            + e.getMessage()
-                            + "</h2>"
-            );
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().println("<h2>Lỗi tạo đơn hàng: " + e.getMessage() + "</h2>");
         }
     }
 }
