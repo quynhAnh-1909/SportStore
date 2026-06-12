@@ -49,24 +49,26 @@ public class CustomerServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
                 return;
             }
+
+
             if (action != null && action.equals("view")) {
                 int id = parseInt(request.getParameter("id"));
+
                 Customer c = dao.findById(id);
                 double[] stats = dao.getCustomerStats(id);
                 List<java.util.Map<String, Object>> orderHistory = dao.getOrderHistory(id);
-                String rank = "Khách Mới";
-                if (stats[1] >= 10000000) rank = "Khách VIP 👑";
-                else if (stats[1] >= 2000000) rank = "Khách Thân Thiết 🌟";
+
+
                 request.setAttribute("customer", c);
                 request.setAttribute("totalOrders", (int)stats[0]);
                 request.setAttribute("totalSpent", stats[1]);
                 request.setAttribute("orderHistory", orderHistory);
-                request.setAttribute("customerRank", rank); // Gửi rank sang JSP
 
                 request.setAttribute("contentPage", "/WEB-INF/admin/customerDetail.jsp");
                 request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
                 return;
             }
+
             List<Customer> list = dao.getAll();
             request.setAttribute("customers", list);
 
@@ -89,12 +91,12 @@ public class CustomerServlet extends HttpServlet {
             CustomerDAO dao = new CustomerDAO(conn);
 
             String action = request.getParameter("action");
-
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
             String address = request.getParameter("address");
             boolean status = "true".equals(request.getParameter("status"));
+
             if (fullName == null || fullName.trim().isEmpty() || email == null || email.trim().isEmpty()) {
                 request.setAttribute("error", "Vui lòng nhập đầy đủ Họ tên và Email");
                 doGet(request, response);
@@ -106,6 +108,7 @@ public class CustomerServlet extends HttpServlet {
                 doGet(request, response);
                 return;
             }
+
             Customer c = new Customer();
             c.setFullName(fullName);
             c.setEmail(email);
@@ -126,7 +129,6 @@ public class CustomerServlet extends HttpServlet {
                     doGet(request, response);
                     return;
                 }
-
                 dao.update(c);
             }
             response.sendRedirect(request.getContextPath() + "/admin/customers");

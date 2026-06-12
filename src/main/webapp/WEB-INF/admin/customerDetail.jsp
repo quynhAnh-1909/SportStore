@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <c:set var="root" value="${pageContext.request.contextPath}"/>
 
@@ -28,14 +29,24 @@
 
                         <div class="mb-3">
                             <c:choose>
-                                <c:when test="${customerRank == 'Khách VIP 👑'}">
-                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">👑 VIP</span>
-                                </c:when>
-                                <c:when test="${customerRank == 'Khách Thân Thiết 🌟'}">
-                                    <span class="badge bg-success px-3 py-2 rounded-pill fw-bold">🌟 THÂN THIẾT</span>
+                                <c:when test="${customer.loyal}">
+                                    <c:choose>
+                                        <c:when test="${fn:toLowerCase(customer.tierName) == 'bạc'}">
+                                            <span class="badge badge-tier tier-bac px-3 py-2 rounded-pill fw-bold"><i class="bi bi-award-fill me-1"></i> Thành viên Bạc</span>
+                                        </c:when>
+                                        <c:when test="${fn:toLowerCase(customer.tierName) == 'vàng'}">
+                                            <span class="badge badge-tier tier-vang px-3 py-2 rounded-pill fw-bold"><i class="bi bi-crown-fill me-1"></i> Thành viên Vàng</span>
+                                        </c:when>
+                                        <c:when test="${fn:toLowerCase(customer.tierName) == 'kim cương'}">
+                                            <span class="badge badge-tier tier-kimcuong px-3 py-2 rounded-pill fw-bold"><i class="bi bi-gem me-1"></i> Thành viên Kim Cương</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="badge badge-tier tier-dong px-3 py-2 rounded-pill fw-bold"><i class="bi bi-award me-1"></i> Thành viên Đồng</span>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="badge bg-info text-dark px-3 py-2 rounded-pill fw-bold">🆕 MỚI</span>
+                                    <span class="badge bg-secondary px-3 py-2 rounded-pill fw-bold text-white"><i class="bi bi-person-dash me-1"></i> Chưa Đăng Ký Loyalty</span>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -148,7 +159,7 @@
                 <div class="col-12">
                     <div class="bg-white rounded-lg p-4 shadow-sm border-top-success h-100">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h6 class="fw-bold text-gray-800 mb-0">🕒 Lịch sử mua hàng gần đây (10 đơn mới nhất)</h6>
+                            <h6 class="fw-bold text-gray-800 mb-0"> Lịch sử mua hàng gần đây (10 đơn mới nhất)</h6>
                         </div>
 
                         <div class="table-responsive">
@@ -212,7 +223,6 @@
 </div>
 
 <style>
-
     .text-gray-800 { color: #5a5c69; }
     .bg-white { background-color: #ffffff !important; }
     .shadow-sm { box-shadow: 0 .125rem .25rem 0 rgba(58,59,69,.05) !important; }
@@ -221,12 +231,10 @@
     .small { font-size: 80%; }
     .uppercase { text-transform: uppercase; }
 
-
     .border-top-primary { border-top: 4px solid #4e73df !important; }
     .border-left-primary { border-left: 4px solid #4e73df !important; }
     .border-top-success { border-top: 4px solid #1cc88a !important; }
 
-    /* Icon Liên hệ */
     .icon-shape {
         display: inline-flex;
         align-items: center;
@@ -237,7 +245,6 @@
         height: 40px;
     }
 
-    /* Card Thống kê & Icon */
     .card-stat {
         transition: transform 0.2s ease-in-out;
     }
@@ -253,12 +260,10 @@
         font-size: 1.5rem;
     }
 
-    /* Màu nền nhẹ (Light) */
     .bg-primary-light { background-color: #e4eaff; }
     .bg-success-light { background-color: #ddf7ed; }
     .bg-info-light { background-color: #d9f2f9; }
 
-    /* Cải thiện Table */
     .table-responsive {
         border-radius: 0.35rem;
         overflow: hidden;
@@ -272,4 +277,14 @@
     .table-striped tbody tr:nth-of-type(odd) {
         background-color: #fbfbfb;
     }
+
+
+    .badge-tier {
+        text-transform: uppercase;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+    .tier-dong { background: linear-gradient(135deg, #a770ef, #cf8bf3) !important; color: white !important; }
+    .tier-bac { background: linear-gradient(135deg, #bdc3c7, #2c3e50) !important; color: white !important; }
+    .tier-vang { background: linear-gradient(135deg, #ffe259, #ffa751) !important; color: #5d4037 !important; }
+    .tier-kimcuong { background: linear-gradient(135deg, #00c6ff, #0072ff) !important; color: white !important; }
 </style>
