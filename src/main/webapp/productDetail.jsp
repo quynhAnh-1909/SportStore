@@ -435,6 +435,41 @@
             font-weight: 600;
         }
 
+        .back-btn{
+            display:inline-flex;
+            align-items:center;
+            gap:10px;
+
+            padding:12px 22px;
+
+            background:white;
+            color:#333;
+
+            border:none;
+            border-radius:50px;
+
+            text-decoration:none;
+            font-weight:600;
+            font-size:15px;
+
+            box-shadow:0 4px 15px rgba(0,0,0,0.08);
+
+            transition:all 0.3s ease;
+        }
+
+        .back-btn i{
+            color:#e53935;
+            font-size:18px;
+        }
+
+        .back-btn:hover{
+            transform:translateY(-2px);
+
+            box-shadow:0 8px 20px rgba(0,0,0,0.12);
+
+            color:#e53935;
+        }
+
     </style>
 
 </head>
@@ -446,8 +481,9 @@
 <div class="container mt-5">
 
     <div class="detail-card">
-        <a href="${root}/products" class="back-link">
-            ← Quay lại
+        <a href="${root}/products" class="back-btn">
+            <i class="bi bi-arrow-left"></i>
+            Quay lại trang sản phẩm
         </a>
 
         <div class="row align-items-center">
@@ -606,20 +642,30 @@
         </div>
         <div class="row mt-2">
             <div class="col-md-3 text-muted">Trạng thái kho</div>
+
             <div class="col-md-9">
+
                 <c:choose>
+
                     <c:when test="${product.stockQuantity > 0}">
-                        <span class="badge bg-success">Còn hàng (${product.stockQuantity})</span>
+                        Còn hàng (${product.stockQuantity})
                     </c:when>
+
                     <c:otherwise>
-                        <span class="badge bg-danger">Hết hàng</span>
+                        Hết hàng
                     </c:otherwise>
+
                 </c:choose>
+
             </div>
         </div>
         <div class="row mt-2">
             <div class="col-md-3 text-muted">Số lượng đã bán</div>
-            <div class="col-md-9 fw-bold text-success">${product.soldQuantity} sản phẩm</div>
+
+            <div class="col-md-9">
+                ${product.soldQuantity} sản phẩm
+            </div>
+
         </div>
         <hr>
         <div class="section-title">MÔ TẢ SẢN PHẨM</div>
