@@ -321,7 +321,8 @@ public class AuthServlet extends HttpServlet {
         try {
             if (code == null) {
                 String clientId = "1021470481637-vv36ulkhn7f0mv47vumauputq70rqnt7.apps.googleusercontent.com";
-                String redirectUri = "https://norbert-wintrier-nicol.ngrok-free.dev/login-google";
+                String redirectUri =
+                        "https://turbofan-appendage-lethargic.ngrok-free.dev/login-google";
                 String googleURL = "https://accounts.google.com/o/oauth2/v2/auth?"
                         + "scope=email profile"
                         + "&redirect_uri=" + redirectUri
@@ -373,7 +374,7 @@ public class AuthServlet extends HttpServlet {
                 String appId = "3605093742977294";
 
                 String redirectUri =
-                        "https://norbert-wintrier-nicol.ngrok-free.dev/login-facebook";
+                        "https://turbofan-appendage-lethargic.ngrok-free.dev/login-facebook";
 
                 String fbURL = "https://www.facebook.com/v18.0/dialog/oauth?"
                         + "client_id=" + appId
