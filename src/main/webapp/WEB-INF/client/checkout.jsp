@@ -10,6 +10,7 @@
     <meta charset="UTF-8">
     <title>Checkout - Thanh toán đơn hàng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         body { background: linear-gradient(to bottom, #f6f7fb, #eef1f7); font-family: 'Segoe UI', sans-serif; color: #333; }
         .card { border-radius: 18px; border: none; box-shadow: 0 8px 24px rgba(0,0,0,0.08); background: #ffffff; overflow: hidden; }
@@ -44,9 +45,9 @@
                         <div class="alert alert-danger fw-bold mb-3" style="border-radius:12px;"> ${error}</div>
                     </c:if>
 
-                    <form action="${root}/checkout" method="post" id="checkoutForm">
-                        <input type="hidden" name="selectedIds" value="${selectedIds}">
-                        <input type="hidden" name="type" value="${type}">
+                    <form action="${root}/checkout?selectedIds=${param.selectedIds}&type=${param.type}" method="post" id="checkoutForm">
+                        <input type="hidden" name="selectedIds" value="${param.selectedIds}">
+                        <input type="hidden" name="type" value="${param.type}">
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -78,37 +79,64 @@
                             <textarea name="note" class="form-control" rows="2"></textarea>
                         </div>
 
-                        <c:if test="${not empty appliedVoucher && voucherDiscount > 0}">
-                            <div class="mb-3 mt-4 p-3 bg-light rounded-3 border">
-                                <label class="form-label fw-bold mb-1 d-block">🎉 Ưu đãi hạng thành viên</label>
-                                <div class="d-flex align-items-center justify-content-between text-success fw-bold">
-                                    <span>Hạng <span class="badge bg-danger">${sessionScope.user.tierName}</span>:
-                                          Mã <span class="badge bg-success">${appliedVoucher.code}</span>
+                        <div class="mb-3 mt-4 p-3 bg-light rounded-3 border">
+                            <label class="form-label fw-bold mb-1 d-block"> Chương trình Khách hàng thân thiết</label>
+                            <div class="d-flex align-items-center justify-content-between fw-bold">
+                                <span>Cấp độ tài khoản hiện tại:
+                                    <span class="badge bg-danger">
+                                        <c:out value="${not empty sessionScope.user.tierName ? sessionScope.user.tierName : 'Đồng'}" />
                                     </span>
-                                    <small class="text-muted">Tự động kích hoạt (Đã cộng dồn)</small>
-                                </div>
+                                    <c:if test="${not empty appliedVoucher}">
+                                        | Đang áp dụng: <span class="badge bg-success">${appliedVoucher.code}</span>
+                                    </c:if>
+                                </span>
+                                <small class="text-muted">Ưu đãi tự động kích hoạt</small>
                             </div>
-                        </c:if>
+                        </div>
 
                         <input type="hidden" name="rankVoucherId" id="rankVoucherId" value="${not empty appliedVoucher ? appliedVoucher.id : ''}">
                         <input type="hidden" id="rankDiscountValue" value="${not empty voucherDiscount ? voucherDiscount : 0}">
 
                         <div class="mb-3 mt-3 p-3 bg-white rounded-3 border">
-                            <label class="form-label fw-bold mb-2 d-block"> Chọn mã giảm giá thêm (Nếu có)</label>
+                            <label class="form-label fw-bold mb-2 d-block">
+                                <i class="bi bi-ticket-perforated-fill text-danger me-1"></i> Chọn mã giảm giá thêm (Nếu có)
+                            </label>
                             <select name="voucherId" id="productVoucherSelect" class="form-select">
                                 <option value="" data-discount-type="NONE" data-discount-value="0" data-max-discount="0">-- Bấm để chọn 1 trong các mã giảm giá khả dụng --</option>
-                                <c:forEach var="v" items="${vouchers}">
-                                    <option value="${v.id}"
-                                            data-discount-type="${v.discountType}"
-                                            data-discount-value="${v.discountValue}"
-                                            data-max-discount="${v.maxDiscount}">
-                                            ${v.code} - Giảm ${v.discountValue}${v.discountType == 'PERCENT' ? '%' : 'đ'}
-                                        <c:if test="${v.discountType == 'PERCENT'}">(Tối đa <fmt:formatNumber value="${v.maxDiscount}" type="number"/>đ)</c:if>
-                                    </option>
-                                </c:forEach>
+
+                                <optgroup label=" Ưu đãi hệ thống dành cho bạn">
+                                    <c:forEach var="v" items="${vouchers}">
+                                        <option value="${v.id}"
+                                                data-discount-type="${v.discountType}"
+                                                data-discount-value="${v.discountValue}"
+                                                data-max-discount="${v.maxDiscount}">
+                                                ${v.code} - Giảm ${v.discountValue}${v.discountType == 'PERCENT' ? '%' : 'đ'}
+                                            <c:if test="${v.discountType == 'PERCENT'}">(Tối đa <fmt:formatNumber value="${v.maxDiscount}" type="number"/>đ)</c:if>
+                                        </option>
+                                    </c:forEach>
+                                </optgroup>
+
+                                <c:if test="${not empty savedVouchers}">
+                                    <optgroup label=" Mã giảm giá bạn đã lưu từ trang Promotion">
+                                        <c:forEach var="sv" items="${savedVouchers}">
+                                            <option value="${sv.id}"
+                                                    data-discount-type="${sv.discountType}"
+                                                    data-discount-value="${sv.discountValue}"
+                                                    data-max-discount="${sv.maxDiscount}">
+                                                    ${sv.code} - Giảm ${sv.discountValue}${sv.discountType == 'PERCENT' ? '%' : 'đ'}
+                                                <c:if test="${sv.discountType == 'PERCENT'}">(Tối đa <fmt:formatNumber value="${sv.maxDiscount}" type="number"/>đ)</c:if>
+                                            </option>
+                                        </c:forEach>
+                                    </optgroup>
+                                </c:if>
+
+                                <c:if test="${empty savedVouchers}">
+                                    <optgroup label=" Mã giảm giá bạn đã lưu" disabled>
+                                        <option value="">(Bạn chưa lưu thêm mã nào từ trang Khuyến mãi)</option>
+                                    </optgroup>
+                                </c:if>
                             </select>
                         </div>
-
                         <h5 class="fw-bold mt-4">Phương thức thanh toán</h5>
                         <div class="row g-3 mt-2">
                             <div class="col-6">
@@ -136,17 +164,17 @@
             <div class="card shadow-sm order-summary">
                 <div class="card-body p-4">
                     <h5 class="fw-bold border-bottom pb-2">Đơn hàng của bạn</h5>
-                    <c:set var="total" value="0" />
+                    <c:set var="totalPriceSum" value="0" />
                     <c:forEach var="item" items="${selectedItems}">
                         <div class="d-flex align-items-center mb-3">
                             <img src="${root}/resources/${item.product.imageUrl}" width="50" height="50" onerror="this.src='https://placehold.co/50'">
                             <div class="ms-3 flex-grow-1"><b>${item.product.name}</b><br><small class="text-muted">SL: ${item.quantity}</small></div>
                             <div class="fw-semibold"><fmt:formatNumber value="${item.product.price * item.quantity}" type="number" /> ₫</div>
                         </div>
-                        <c:set var="total" value="${total + (item.product.price * item.quantity)}" />
+                        <c:set var="totalPriceSum" value="${totalPriceSum + (item.product.price * item.quantity)}" />
                     </c:forEach>
                     <hr>
-                    <div class="d-flex justify-content-between"><span>Tạm tính</span><span id="subtotalPrice" class="fw-semibold"><fmt:formatNumber value="${total}" type="number" /> ₫</span></div>
+                    <div class="d-flex justify-content-between"><span>Tạm tính</span><span id="subtotalPrice" class="fw-semibold"><fmt:formatNumber value="${totalPriceSum}" type="number" /> ₫</span></div>
 
                     <div class="d-flex justify-content-between mt-2"><span>Giảm giá Rank:</span><span class="text-danger fw-bold" id="rankDiscountPrice">- 0 ₫</span></div>
                     <div class="d-flex justify-content-between mt-2"><span>Giảm giá thêm (Voucher):</span><span class="text-danger fw-bold" id="productDiscountPrice">- 0 ₫</span></div>
@@ -163,7 +191,7 @@
 <jsp:include page="/footer.jsp" />
 
 <script>
-    const subtotal = parseInt("${total}") || 0;
+    const orderSubtotalPrice = parseInt("${totalPriceSum}") || 0;
 
     let rankDiscount = parseFloat(document.getElementById("rankDiscountValue").value) || 0;
     let productDiscount = 0;
@@ -186,9 +214,9 @@
     let selectedWardCode = null;
     let shipTimeout = null;
 
-    const form = document.getElementById("checkoutForm");
-    const districtInput = document.createElement("input"); districtInput.type = "hidden"; districtInput.name = "districtId"; form.appendChild(districtInput);
-    const wardInput = document.createElement("input"); wardInput.type = "hidden"; wardInput.name = "wardCode"; form.appendChild(wardInput);
+    const checkoutFormEl = document.getElementById("checkoutForm");
+    const districtInput = document.createElement("input"); districtInput.type = "hidden"; districtInput.name = "districtId"; checkoutFormEl.appendChild(districtInput);
+    const wardInput = document.createElement("input"); wardInput.type = "hidden"; wardInput.name = "wardCode"; checkoutFormEl.appendChild(wardInput);
 
     function resetSelect(select, text) { select.innerHTML = ""; const opt = new Option("-- " + text + " --", ""); opt.disabled = true; opt.selected = true; select.add(opt); }
 
@@ -205,7 +233,7 @@
         const maxDiscount = parseFloat(selectedOpt.dataset.maxDiscount) || 0;
 
         if (type === "PERCENT") {
-            productDiscount = subtotal * value / 100.0;
+            productDiscount = orderSubtotalPrice * value / 100.0;
             if (maxDiscount > 0 && productDiscount > maxDiscount) {
                 productDiscount = maxDiscount;
             }
@@ -223,13 +251,24 @@
         updateTotal();
     });
 
-    fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province", { headers: { "Token": GHN_TOKEN } })
-            .then(r => r.json()).then(res => {
-        (res.data || []).forEach(p => { const opt = new Option(p.ProvinceName, p.ProvinceName); opt.dataset.id = p.ProvinceID; provinceSelect.add(opt); });
-    }).catch(err => console.error(err));
+    fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province", {
+        headers: { "Token": GHN_TOKEN }
+    })
+            .then(r => r.json())
+            .then(res => {
+                (res.data || []).forEach(p => {
+                    const opt = new Option(p.ProvinceName, p.ProvinceName);
+                    opt.dataset.id = p.ProvinceID;
+                    provinceSelect.add(opt);
+                });
+            })
+            .catch(err => console.error(err));
 
     provinceSelect.addEventListener("change", function () {
         resetSelect(districtSelect, "Quận/Huyện"); resetSelect(wardSelect, "Phường/Xã");
+        districtInput.value = ""; wardInput.value = "";
+        selectedDistrictId = null; selectedWardCode = null;
+
         const provinceId = this.selectedOptions[0].dataset.id; if (!provinceId) return;
         fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=" + provinceId, { headers: { "Token": GHN_TOKEN } })
                 .then(r => r.json()).then(res => {
@@ -239,6 +278,8 @@
 
     districtSelect.addEventListener("change", function () {
         resetSelect(wardSelect, "Phường/Xã");
+        wardInput.value = ""; selectedWardCode = null;
+
         const districtId = this.selectedOptions[0].dataset.id; if (!districtId) return;
         selectedDistrictId = districtId; districtInput.value = districtId;
         fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=" + districtId, { headers: { "Token": GHN_TOKEN } })
@@ -253,7 +294,7 @@
         if (!selectedDistrictId || !selectedWardCode) return;
         clearTimeout(shipTimeout);
         shipTimeout = setTimeout(() => {
-            fetch("${root}/api/get-shipping-fee?districtId=" + selectedDistrictId + "&wardCode=" + selectedWardCode + "&subtotal=" + subtotal)
+            fetch("${root}/api/get-shipping-fee?districtId=" + selectedDistrictId + "&wardCode=" + selectedWardCode + "&subtotal=" + orderSubtotalPrice)
                     .then(r => r.json()).then(res => {
                 let feeVal = 30000;
                 if (res) {
@@ -280,10 +321,10 @@
         const cleanRankDiscount = Number(rankDiscount) || 0;
         const cleanProductDiscount = Number(productDiscount) || 0;
 
-        const total = Math.max(0, subtotal - cleanRankDiscount - cleanProductDiscount + cleanShippingFee);
+        const totalFinalCalculated = Math.max(0, orderSubtotalPrice - cleanRankDiscount - cleanProductDiscount + cleanShippingFee);
 
         shippingFeeDisplay.innerText = cleanShippingFee.toLocaleString("vi-VN") + " ₫";
-        finalPrice.innerText = total.toLocaleString("vi-VN") + " ₫";
+        finalPrice.innerText = totalFinalCalculated.toLocaleString("vi-VN") + " ₫";
         shippingFeeInput.value = cleanShippingFee;
     }
 

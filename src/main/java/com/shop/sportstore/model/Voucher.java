@@ -1,153 +1,73 @@
 package com.shop.sportstore.model;
 
-import lombok.Data;
 import java.util.Date;
 
-@Data
 public class Voucher {
     private int id;
     private String code;
     private String discountType;
     private double discountValue;
     private double minOrderValue;
-    private double maxDiscount;
+
+    private Double maxDiscount;
+    private Integer categoryId;
+
     private int quantity;
     private int usedCount;
     private String paymentMethod;
     private double minProductPrice;
-    private int categoryId;
     private Date startDate;
     private Date expiryDate;
     private boolean status;
     private String applicableTier;
     private int usageLimitPerUser;
 
-    public int getId() {
-        return id;
-    }
+    // GETTER & SETTER
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
 
-    public String getCode() {
-        return code;
-    }
+    public String getDiscountType() { return discountType; }
+    public void setDiscountType(String discountType) { this.discountType = discountType; }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+    public double getDiscountValue() { return discountValue; }
+    public void setDiscountValue(double discountValue) { this.discountValue = discountValue; }
 
-    public String getDiscountType() {
-        return discountType;
-    }
+    public double getMinOrderValue() { return minOrderValue; }
+    public void setMinOrderValue(double minOrderValue) { this.minOrderValue = minOrderValue; }
 
-    public void setDiscountType(String discountType) {
-        this.discountType = discountType;
-    }
+    public Double getMaxDiscount() { return maxDiscount; }
+    public void setMaxDiscount(Double maxDiscount) { this.maxDiscount = maxDiscount; }
 
-    public double getDiscountValue() {
-        return discountValue;
-    }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public void setDiscountValue(double discountValue) {
-        this.discountValue = discountValue;
-    }
+    public int getUsedCount() { return usedCount; }
+    public void setUsedCount(int usedCount) { this.usedCount = usedCount; }
 
-    public double getMinOrderValue() {
-        return minOrderValue;
-    }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
-    public void setMinOrderValue(double minOrderValue) {
-        this.minOrderValue = minOrderValue;
-    }
+    public double getMinProductPrice() { return minProductPrice; }
+    public void setMinProductPrice(double minProductPrice) { this.minProductPrice = minProductPrice; }
 
-    public double getMaxDiscount() {
-        return maxDiscount;
-    }
+    public Integer getCategoryId() { return categoryId; }
+    public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }
 
-    public void setMaxDiscount(double maxDiscount) {
-        this.maxDiscount = maxDiscount;
-    }
+    public Date getStartDate() { return startDate; }
+    public void setStartDate(Date startDate) { this.startDate = startDate; }
 
-    public int getQuantity() {
-        return quantity;
-    }
+    public Date getExpiryDate() { return expiryDate; }
+    public void setExpiryDate(Date expiryDate) { this.expiryDate = expiryDate; }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
+    public boolean isStatus() { return status; }
+    public void setStatus(boolean status) { this.status = status; }
 
-    public int getUsedCount() {
-        return usedCount;
-    }
+    public String getApplicableTier() { return applicableTier; }
+    public void setApplicableTier(String applicableTier) { this.applicableTier = applicableTier; }
 
-    public void setUsedCount(int usedCount) {
-        this.usedCount = usedCount;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public double getMinProductPrice() {
-        return minProductPrice;
-    }
-
-    public void setMinProductPrice(double minProductPrice) {
-        this.minProductPrice = minProductPrice;
-    }
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Date expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-
-    public String getApplicableTier() {
-        return applicableTier;
-    }
-
-    public void setApplicableTier(String applicableTier) {
-        this.applicableTier = applicableTier;
-    }
-
-    public int getUsageLimitPerUser() {
-        return usageLimitPerUser;
-    }
-
-    public void setUsageLimitPerUser(int usageLimitPerUser) {
-        this.usageLimitPerUser = usageLimitPerUser;
-    }
+    public int getUsageLimitPerUser() { return usageLimitPerUser; }
+    public void setUsageLimitPerUser(int usageLimitPerUser) { this.usageLimitPerUser = usageLimitPerUser; }
 }

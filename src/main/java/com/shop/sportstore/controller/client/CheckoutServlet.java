@@ -1,5 +1,4 @@
 package com.shop.sportstore.controller.client;
-
 import com.shop.sportstore.dao.OrderDAO;
 import com.shop.sportstore.dao.VoucherDAO;
 import com.shop.sportstore.model.CartItem;
@@ -15,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +64,6 @@ public class CheckoutServlet extends HttpServlet {
         try (Connection conn = DBConnection.getConnection()) {
             VoucherDAO voucherDAO = new VoucherDAO(conn);
 
-
             Voucher matchedVoucher = voucherDAO.getAutomaticVoucherByTier(user.getUserId(), user.getTierName());
             double rankDiscount = 0;
 
@@ -88,6 +87,9 @@ public class CheckoutServlet extends HttpServlet {
             List<Voucher> filteredVouchers = voucherDAO.getAllActiveVouchersForSelect();
             request.setAttribute("vouchers", filteredVouchers);
 
+
+            List<Voucher> savedVouchers = voucherDAO.getSavedVouchersByUserId(user.getUserId());
+            request.setAttribute("savedVouchers", savedVouchers);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -124,8 +126,8 @@ public class CheckoutServlet extends HttpServlet {
                     selectedCart.add(item);
                 }
             }
-        } else {
-            selectedCart = (cart != null) ? cart : new ArrayList<>();
+        } else if (cart != null) {
+            selectedCart = cart;
         }
 
         if (selectedCart.isEmpty()) {
@@ -156,8 +158,6 @@ public class CheckoutServlet extends HttpServlet {
 
         try (Connection conn = DBConnection.getConnection()) {
             VoucherDAO voucherDAO = new VoucherDAO(conn);
-
-
             if (rankVoucherRaw != null && !rankVoucherRaw.isEmpty()) {
                 rankVoucherId = Integer.parseInt(rankVoucherRaw);
                 Voucher rv = voucherDAO.findById(rankVoucherId);
@@ -171,11 +171,20 @@ public class CheckoutServlet extends HttpServlet {
                 }
             }
 
-
             if (voucherRaw != null && !voucherRaw.isEmpty()) {
                 normalVoucherId = Integer.parseInt(voucherRaw);
                 Voucher nv = voucherDAO.findById(normalVoucherId);
                 if (nv != null) {
+                    if (!nv.isStatus()) {
+                        throw new RuntimeException("Voucher không khả dụng");
+                    }
+                    if (subtotal < nv.getMinOrderValue()) {
+                        throw new RuntimeException("Đơn hàng chưa đạt giá trị tối thiểu");
+                    }
+                    if (nv.getUsedCount() >= nv.getQuantity()) {
+                        throw new RuntimeException("Voucher đã hết lượt sử dụng");
+                    }
+
                     if ("PERCENT".equalsIgnoreCase(nv.getDiscountType())) {
                         double d = subtotal * nv.getDiscountValue() / 100.0;
                         totalDiscount += (nv.getMaxDiscount() > 0 && d > nv.getMaxDiscount()) ? nv.getMaxDiscount() : d;
@@ -185,7 +194,9 @@ public class CheckoutServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            request.setAttribute("error", e.getMessage());
+            doGet(request, response);
+            return;
         }
 
         double total = subtotal - totalDiscount + shippingFee;
@@ -204,26 +215,65 @@ public class CheckoutServlet extends HttpServlet {
             try (Connection conn = DBConnection.getConnection()) {
                 VoucherDAO voucherDAO = new VoucherDAO(conn);
 
-                if (normalVoucherId != null) {
-                    voucherDAO.updateUsed(normalVoucherId);
+
+                int generatedOrderId = 0;
+                String queryOrderId = "SELECT Id FROM orders WHERE OrderCode = ?";
+                try (PreparedStatement psGetId = conn.prepareStatement(queryOrderId)) {
+                    psGetId.setString(1, orderCode);
+                    try (ResultSet rs = psGetId.executeQuery()) {
+                        if (rs.next()) {
+                            generatedOrderId = rs.getInt("Id");
+                        }
+                    }
                 }
 
-                if (rankVoucherId != null) {
-                    voucherDAO.updateUsed(rankVoucherId);
 
-                    String queryOrderId = "SELECT Id FROM orders WHERE OrderCode = ?";
-                    String insertUserVoucher = "INSERT INTO user_vouchers (user_id, voucher_id, order_id) VALUES (?, ?, ?)";
-                    try (PreparedStatement psGetId = conn.prepareStatement(queryOrderId)) {
-                        psGetId.setString(1, orderCode);
-                        var rs = psGetId.executeQuery();
-                        if (rs.next()) {
-                            int generatedOrderId = rs.getInt("Id");
-                            try (PreparedStatement psLog = conn.prepareStatement(insertUserVoucher)) {
-                                psLog.setInt(1, user.getUserId());
-                                psLog.setInt(2, rankVoucherId);
-                                psLog.setInt(3, generatedOrderId);
-                                psLog.executeUpdate();
-                            }
+                if (normalVoucherId != null && generatedOrderId > 0) {
+                    voucherDAO.updateUsed(normalVoucherId); // Tăng tổng lượt dùng trong hệ thống lên 1
+
+
+                    String checkSavedSql = "SELECT 1 FROM user_vouchers WHERE user_id = ? AND voucher_id = ? AND order_id IS NULL LIMIT 1";
+                    boolean isPreSaved = false;
+                    try (PreparedStatement psCheck = conn.prepareStatement(checkSavedSql)) {
+                        psCheck.setInt(1, userId);
+                        psCheck.setInt(2, normalVoucherId);
+                        try (ResultSet rsCheck = psCheck.executeQuery()) {
+                            if (rsCheck.next()) isPreSaved = true;
+                        }
+                    }
+
+                    if (isPreSaved) {
+
+                        String updateSavedVoucherSql = "UPDATE user_vouchers SET order_id = ?, used_at = NOW() WHERE user_id = ? AND voucher_id = ? AND order_id IS NULL";
+                        try (PreparedStatement psUp = conn.prepareStatement(updateSavedVoucherSql)) {
+                            psUp.setInt(1, generatedOrderId);
+                            psUp.setInt(2, userId);
+                            psUp.setInt(3, normalVoucherId);
+                            psUp.executeUpdate();
+                        }
+                    } else {
+
+                        String insertNormalSql = "INSERT INTO user_vouchers (user_id, voucher_id, order_id, used_at) VALUES (?, ?, ?, NOW())";
+                        try (PreparedStatement psIn = conn.prepareStatement(insertNormalSql)) {
+                            psIn.setInt(1, userId);
+                            psIn.setInt(2, normalVoucherId);
+                            psIn.setInt(3, generatedOrderId);
+                            psIn.executeUpdate();
+                        }
+                    }
+                }
+
+                if (rankVoucherId != null && generatedOrderId > 0) {
+                    Voucher rv = voucherDAO.findById(rankVoucherId);
+                    if (rv != null && rv.getDiscountValue() > 0) {
+                        voucherDAO.updateUsed(rankVoucherId);
+
+                        String insertUserVoucher = "INSERT INTO user_vouchers (user_id, voucher_id, order_id, used_at) VALUES (?, ?, ?, NOW())";
+                        try (PreparedStatement psLog = conn.prepareStatement(insertUserVoucher)) {
+                            psLog.setInt(1, userId);
+                            psLog.setInt(2, rankVoucherId);
+                            psLog.setInt(3, generatedOrderId);
+                            psLog.executeUpdate();
                         }
                     }
                 }
@@ -245,8 +295,8 @@ public class CheckoutServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.setContentType("text/html;charset=UTF-8");
-            response.getWriter().println("<h2>Lỗi tạo đơn hàng: " + e.getMessage() + "</h2>");
+            request.setAttribute("error", "Lỗi tải dữ liệu đơn hàng: " + e.getMessage());
+            doGet(request, response);
         }
     }
 }
