@@ -1219,7 +1219,16 @@
                             }
 
                             var unreadClass = noti.isRead ? "" : "unread";
-                            var itemLink = (noti.linkUrl && noti.linkUrl !== "#") ? "${pageContext.request.contextPath}" + noti.linkUrl : "javascript:void(0);";
+
+
+                            var itemLink = "javascript:void(0);";
+                            if (noti.linkUrl && noti.linkUrl !== "#") {
+                                if (noti.linkUrl.startsWith("${pageContext.request.contextPath}")) {
+                                    itemLink = noti.linkUrl;
+                                } else {
+                                    itemLink = "${pageContext.request.contextPath}" + noti.linkUrl;
+                                }
+                            }
 
                             html += '<a href="' + itemLink + '" class="noti-item ' + unreadClass + '" data-id="' + noti.id + '">';
                             html += '  <div style="font-weight: 600; font-size: 13.5px; color: #212529; margin-bottom: 2px;">' + noti.title + '</div>';
@@ -1231,7 +1240,6 @@
                     } else {
                         $("#noti-list-box").html('<p class="text-center text-muted m-0" style="padding: 20px 10px; font-size: 13px;">Bạn chưa có thông báo nào.</p>');
                     }
-
 
                     if (unreadCount > 0) {
                         $("#noti-badge").text(unreadCount).show();

@@ -4,6 +4,8 @@ import com.shop.sportstore.dao.CategoryDAO;
 import com.shop.sportstore.dao.ProductDAO;
 import com.shop.sportstore.dao.ProductVoucherDAO;
 import com.shop.sportstore.dao.VoucherDAO;
+import com.shop.sportstore.dao.UserDAO;
+import com.shop.sportstore.dao.NotificationDAO;
 import com.shop.sportstore.model.Category;
 import com.shop.sportstore.model.Product;
 import com.shop.sportstore.model.Voucher;
@@ -133,7 +135,30 @@ public class ProductServlet extends HttpServlet {
                     p.setImageUrl("no-image.png");
                 }
             }
+
+
             dao.insertProduct(p);
+
+            try {
+                UserDAO userDAO = new UserDAO();
+                NotificationDAO notificationDAO = new NotificationDAO();
+
+                List<Integer> allUserIds = userDAO.getAllUserIds();
+
+                if (allUserIds != null && !allUserIds.isEmpty()) {
+                    for (int uId : allUserIds) {
+                        notificationDAO.insertNotification(
+                                uId,
+                                "👟 Sản phẩm mới lên kệ",
+                                "Siêu phẩm '" + p.getName() + "' vừa mới cập bến SportStore. Đến xem ngay bộ sưu tập mới nhất!",
+                                "/products"
+                        );
+                    }
+                }
+            } catch (Exception ex) {
+                System.out.println("⚠ Lỗi kích hoạt tự động bắn thông báo sản phẩm: " + ex.getMessage());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -217,13 +242,13 @@ public class ProductServlet extends HttpServlet {
             }
             p.setImageUrl(imageName);
 
-            // Bắt đầu cấu trúc khối Transaction hợp nhất
+
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false);
 
             ProductVoucherDAO pvDAO = new ProductVoucherDAO(conn);
 
-            // Ép ProductDAO cập nhật thông tin dựa trên Transaction Connection dùng chung này
+
             dao.updateProduct(p);
 
             pvDAO.deleteByProduct(productId);

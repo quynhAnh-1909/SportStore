@@ -26,7 +26,6 @@ public class NotificationServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-
         if (user == null) {
             try (PrintWriter out = response.getWriter()) {
                 out.print("[]");
@@ -37,15 +36,14 @@ public class NotificationServlet extends HttpServlet {
         if ("list".equals(action)) {
             List<Notification> list = notificationDAO.getNotificationsByUserId(user.getUserId());
 
-
             StringBuilder json = new StringBuilder("[");
             for (int i = 0; i < list.size(); i++) {
                 Notification n = list.get(i);
                 json.append("{")
                         .append("\"id\":").append(n.getId()).append(",")
-                        .append("\"title\":\"").append(n.getTitle().replace("\"", "\\\"")).append("\",")
-                        .append("\"content\":\"").append(n.getContent().replace("\"", "\\\"")).append("\",")
-                        .append("\"linkUrl\":\"").append(n.getLinkUrl()).append("\",")
+                        .append("\"title\":\"").append(escapeJson(n.getTitle())).append("\",")
+                        .append("\"content\":\"").append(escapeJson(n.getContent())).append("\",")
+                        .append("\"linkUrl\":\"").append(escapeJson(n.getLinkUrl())).append("\",")
                         .append("\"isRead\":").append(n.isRead())
                         .append("}");
                 if (i < list.size() - 1) json.append(",");
@@ -75,5 +73,32 @@ public class NotificationServlet extends HttpServlet {
         } else if ("readAll".equals(action)) {
             notificationDAO.markAllAsRead(user.getUserId());
         }
+    }
+
+    private String escapeJson(String input) {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
+            switch (ch) {
+                case '"' -> sb.append("\\\"");
+                case '\\' -> sb.append("\\\\");
+                case '/' -> sb.append("\\/");
+                case '\b' -> sb.append("\\b");
+                case '\f' -> sb.append("\\f");
+                case '\n' -> sb.append("\\n");
+                case '\r' -> sb.append("\\r");
+                case '\t' -> sb.append("\\t");
+                default -> {
+                    if (ch < ' ') {
+                        String t = "000" + Integer.toHexString(ch);
+                        sb.append("\\u").append(t.substring(t.length() - 4));
+                    } else {
+                        sb.append(ch);
+                    }
+                }
+            }
+        }
+        return sb.toString();
     }
 }

@@ -1,6 +1,8 @@
 package com.shop.sportstore.controller.admin;
 
 import com.shop.sportstore.dao.VoucherDAO;
+import com.shop.sportstore.dao.UserDAO;
+import com.shop.sportstore.dao.NotificationDAO;
 import com.shop.sportstore.model.Voucher;
 import com.shop.sportstore.untils.DBConnection;
 
@@ -20,7 +22,7 @@ import static java.lang.Integer.parseInt;
 @WebServlet("/admin/vouchers")
 public class VoucherServlet extends HttpServlet {
 
-    // ================== GET ==================
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -31,7 +33,7 @@ public class VoucherServlet extends HttpServlet {
             Connection conn = DBConnection.getConnection();
             VoucherDAO dao = new VoucherDAO(conn);
 
-            // DELETE
+
             if (action != null && action.equals("delete")) {
                 int id = parseInt(request.getParameter("id"));
                 dao.delete(id);
@@ -39,7 +41,7 @@ public class VoucherServlet extends HttpServlet {
                 return;
             }
 
-            // EDIT
+
             if (action != null && action.equals("edit")) {
                 int id = parseInt(request.getParameter("id"));
                 Voucher v = dao.findById(id);
@@ -49,14 +51,14 @@ public class VoucherServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
                 return;
             }
-            // CREATE PAGE
+
             if (action != null && action.equals("create")) {
                 request.setAttribute("contentPage", "/WEB-INF/admin/voucherCreate.jsp");
                 request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
                 return;
             }
 
-            // LIST
+
             List<Voucher> list = dao.getAll();
             request.setAttribute("vouchers", list);
 
@@ -68,7 +70,7 @@ public class VoucherServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
 
-    // ================== POST ==================
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -81,7 +83,7 @@ public class VoucherServlet extends HttpServlet {
 
             String action = request.getParameter("action");
 
-            // ===== LẤY DATA AN TOÀN =====
+
             String code = request.getParameter("code");
             String type = request.getParameter("type");
 
@@ -96,14 +98,14 @@ public class VoucherServlet extends HttpServlet {
             String cate = request.getParameter("categoryId");
             int categoryId = (cate != null && !cate.isEmpty()) ? parseInt(cate) : 0;
 
-            // DATE
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date startDate = sdf.parse(request.getParameter("startDate"));
             Date expiryDate = sdf.parse(request.getParameter("expiryDate"));
 
             boolean status = "true".equals(request.getParameter("status"));
 
-            // ===== VALIDATE =====
+
             if (code == null || code.trim().isEmpty()) {
                 request.setAttribute("error", "Nhập mã voucher");
                 doGet(request, response);
@@ -122,7 +124,7 @@ public class VoucherServlet extends HttpServlet {
                 return;
             }
 
-            // ===== SET OBJECT =====
+
             Voucher v = new Voucher();
             v.setCode(code);
             v.setDiscountType(type);
@@ -137,18 +139,42 @@ public class VoucherServlet extends HttpServlet {
             v.setExpiryDate(expiryDate);
             v.setStatus(status);
 
-            // ===== CREATE =====
+
             if ("create".equals(action)) {
+
                 dao.insert(v);
+
+
+                try {
+                    UserDAO userDAO = new UserDAO();
+                    NotificationDAO notificationDAO = new NotificationDAO();
+
+                    List<Integer> allUserIds = userDAO.getAllUserIds();
+
+                    if (allUserIds != null && !allUserIds.isEmpty()) {
+
+                        String discountInfo = "PERCENT".equalsIgnoreCase(v.getDiscountType()) ? (int)v.getDiscountValue() + "%" : (int)v.getDiscountValue() + "đ";
+
+                        for (int uId : allUserIds) {
+                            notificationDAO.insertNotification(
+                                    uId,
+                                    " Tặng bạn mã giảm giá mới",
+                                    "Nhập ngay mã '" + v.getCode() + "' để được giảm giá " + discountInfo + " cho đơn hàng của bạn. Số lượng có hạn!",
+                                    "/vouchers"
+                            );
+                        }
+                    }
+                } catch (Exception ex) {
+                    System.out.println("Lỗi kích hoạt tự động bắn thông báo voucher: " + ex.getMessage());
+                }
             }
 
-            // ===== UPDATE =====
+
             if ("update".equals(action)) {
                 int id = parseInt(request.getParameter("id"));
                 v.setId(id);
                 dao.update(v);
             }
-
 
             response.sendRedirect(request.getContextPath() + "/admin/vouchers");
 
