@@ -2,8 +2,12 @@ package com.shop.sportstore.controller.client;
 
 import com.shop.sportstore.dao.OrderDAO;
 import com.shop.sportstore.dao.UserDAO;
+import com.shop.sportstore.dao.VoucherDAO;
 import com.shop.sportstore.model.Order;
 import com.shop.sportstore.model.User;
+import com.shop.sportstore.model.Voucher;
+import com.shop.sportstore.untils.DBConnection;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,6 +20,7 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 import java.util.List;
 import java.util.Scanner;
 
@@ -36,11 +41,9 @@ public class AccountServlet extends HttpServlet {
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
 
-
             if (user.getAvatar() == null || user.getAvatar().trim().isEmpty()) {
                 user.setAvatar("/resources/default-avatar.png");
             }
-
 
             try {
                 boolean currentLoyalStatus = userDAO.checkLoyalStatus(user.getUserId());
@@ -52,8 +55,20 @@ public class AccountServlet extends HttpServlet {
             List<Order> listOrders = orderDAO.getOrdersByUser(user.getUserId());
             request.setAttribute("orders", listOrders);
 
-
             calculateUserTier(user, request);
+
+
+            try (Connection conn = DBConnection.getConnection()) {
+                if (conn != null) {
+                    VoucherDAO voucherDAO = new VoucherDAO(conn);
+                    List<Voucher> userVouchers = voucherDAO.getSavedVouchersByUserId(user.getUserId());
+                    request.setAttribute("userVouchers", userVouchers);
+                }
+            } catch (Exception e) {
+                System.out.println(" Lỗi khi kết nối lấy kho Voucher: " + e.getMessage());
+                e.printStackTrace();
+            }
+
 
             request.setAttribute("user", user);
             request.getRequestDispatcher("/WEB-INF/client/account.jsp").forward(request, response);
