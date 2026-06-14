@@ -2,22 +2,20 @@ package com.shop.sportstore.dao;
 
 import com.shop.sportstore.model.User;
 import com.shop.sportstore.untils.DBConnection;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
-import java.io.IOException;
 import java.sql.*;
-import java.util.Scanner;
 
 public class UserDAO extends DBConnection {
 
     public User checkLogin(String email, String password) {
-        String sql = "SELECT * FROM users WHERE LOWER(email) = LOWER(?)";
+        if (email == null || password == null) return null;
+
+        String cleanEmail = email.trim().toLowerCase();
+        String sql = "SELECT * FROM users WHERE email = ?";
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, email.trim());
+            ps.setString(1, cleanEmail);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -26,10 +24,10 @@ public class UserDAO extends DBConnection {
                     if (dbPassword != null && dbPassword.trim().equals(password.trim())) {
                         return mapResultSetToUser(rs);
                     } else {
-                        System.out.println("⚠Mật khẩu nhập vào không khớp với mật khẩu được lưu trong DB!");
+                        System.out.println("Mật khẩu nhập vào không khớp với mật khẩu được lưu trong DB!");
                     }
                 } else {
-                    System.out.println(" Không tìm thấy tài khoản nào khớp với Email: " + email);
+                    System.out.println(" Không tìm thấy tài khoản nào khớp với Email: " + cleanEmail);
                 }
             }
         } catch (Exception e) {
@@ -40,15 +38,18 @@ public class UserDAO extends DBConnection {
     }
 
     public boolean registerUser(User user) {
-        String sql = "INSERT INTO users (full_name, email, password, phone_number, gender, role, provider, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
+        if (user == null || user.getEmail() == null) return false;
+
+        String sql = "INSERT INTO users (full_name, email, password, phone_number, gender, role, provider, status, tier_name) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, 1, 'Đồng')";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getFullName());
-            ps.setString(2, user.getEmail());
+            ps.setString(2, user.getEmail().trim().toLowerCase());
             ps.setString(3, user.getPassword());
+
             String phone = user.getPhoneNumber();
             if (phone != null) {
                 phone = phone.replaceAll("\\s+", "");
@@ -56,7 +57,7 @@ public class UserDAO extends DBConnection {
             ps.setString(4, phone);
             ps.setString(5, user.getGioiTinh());
 
-            String role = (user.getRole() == null || user.getRole().trim().isEmpty()) ? "USER" : user.getRole();
+            String role = (user.getRole() == null || user.getRole().trim().isEmpty()) ? "USER" : user.getRole().trim();
             ps.setString(6, role);
             ps.setString(7, "LOCAL");
 
@@ -72,11 +73,16 @@ public class UserDAO extends DBConnection {
         return false;
     }
 
+
     public User findByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE LOWER(email) = LOWER(?)";
+        if (email == null) return null;
+
+        String cleanEmail = email.trim().toLowerCase();
+        String sql = "SELECT * FROM users WHERE email = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email.trim());
+
+            ps.setString(1, cleanEmail);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapResultSetToUser(rs);
@@ -88,16 +94,20 @@ public class UserDAO extends DBConnection {
         return null;
     }
 
+
     public User findOrCreateSocialUser(String email, String name, String provider, String avatar) {
-        User user = findByEmail(email);
+        if (email == null) return null;
+
+        String cleanEmail = email.trim().toLowerCase();
+        User user = findByEmail(cleanEmail);
 
         if (user == null) {
-            String sql = "INSERT INTO users (full_name, email, password, role, provider, avatar) VALUES (?, ?, '', 'USER', ?, ?)";
+            String sql = "INSERT INTO users (full_name, email, password, role, provider, avatar, status, tier_name) VALUES (?, ?, '', 'USER', ?, ?, 1, 'Đồng')";
             try (Connection conn = getConnection();
                  PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
                 ps.setString(1, name);
-                ps.setString(2, email);
+                ps.setString(2, cleanEmail);
                 ps.setString(3, provider);
                 ps.setString(4, avatar);
 
@@ -108,12 +118,13 @@ public class UserDAO extends DBConnection {
                         user = new User();
                         user.setUserId(rs.getInt(1));
                         user.setFullName(name);
-                        user.setEmail(email);
+                        user.setEmail(cleanEmail);
                         user.setRole("USER");
                         user.setProvider(provider);
                         user.setAvatar(avatar);
                         user.setStatus(true);
                         user.setLoyal(false);
+                        user.setTierName("Đồng");
                     }
                 }
             } catch (Exception e) {
@@ -126,7 +137,7 @@ public class UserDAO extends DBConnection {
 
                 ps.setString(1, avatar);
                 ps.setString(2, provider);
-                ps.setString(3, email);
+                ps.setString(3, cleanEmail);
 
                 ps.executeUpdate();
 
@@ -144,7 +155,10 @@ public class UserDAO extends DBConnection {
         User user = new User();
         user.setUserId(rs.getInt("user_id"));
         user.setFullName(rs.getString("full_name"));
-        user.setEmail(rs.getString("email"));
+
+        String dbEmail = rs.getString("email");
+        user.setEmail(dbEmail != null ? dbEmail.trim().toLowerCase() : null);
+
         user.setPassword(rs.getString("password"));
         user.setPhoneNumber(rs.getString("phone_number"));
         user.setRole(rs.getString("role"));
@@ -152,26 +166,29 @@ public class UserDAO extends DBConnection {
         user.setProvider(rs.getString("provider"));
         user.setAddress(rs.getString("address"));
 
-        user.setStatus(rs.getInt("status") == 1 || rs.getBoolean("status"));
+        int statusInt = rs.getInt("status");
+        user.setStatus(statusInt == 1);
 
 
         try {
             user.setLoyal(rs.getInt("is_loyal") == 1);
             user.setLoyalDate(rs.getTimestamp("loyal_date"));
+
+            user.setTierName(rs.getString("tier_name"));
         } catch (SQLException e) {
-            System.out.println("⚠️ Cột is_loyal hoặc loyal_date chưa có giá trị hoặc chưa đồng bộ cấu trúc bảng.");
+            System.out.println("  Cột dữ liệu phân hạng (Loyal/Tier) chưa đồng bộ đầy đủ.");
         }
 
         try {
             user.setGioiTinh(rs.getString("gender"));
         } catch (SQLException e) {
-            System.out.println("Cột giới tính chưa tồn tại trong ResultSet");
+            System.out.println("Cột giới tính (gender) chưa tồn tại hoặc bị lỗi cấu trúc bảng.");
         }
         return user;
     }
 
+
     public User getUserById(int id) throws SQLException {
-        System.out.println("SEARCH USER ID = " + id);
         String sql = "SELECT * FROM users WHERE user_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -179,10 +196,8 @@ public class UserDAO extends DBConnection {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    System.out.println("FOUND USER IN DB");
                     return mapResultSetToUser(rs);
                 }
-                System.out.println("NOT FOUND USER IN DB");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -207,6 +222,7 @@ public class UserDAO extends DBConnection {
         return false;
     }
 
+
     public boolean lockUserAccount(int userId) {
         String sql = "UPDATE users SET status = 0 WHERE user_id = ?";
         try (Connection conn = getConnection();
@@ -218,6 +234,7 @@ public class UserDAO extends DBConnection {
         }
         return false;
     }
+
 
     public boolean updateBasicInfo(int userId, String fullName, String phone, String address) {
         String sql = "UPDATE users SET full_name = ?, phone_number = ?, address = ? WHERE user_id = ?";
@@ -238,6 +255,7 @@ public class UserDAO extends DBConnection {
         return false;
     }
 
+
     public boolean updatePhoneNumber(int userId, String newPhone) {
         String sql = "UPDATE users SET phone_number = ? WHERE user_id = ?";
         try (Connection conn = getConnection();
@@ -255,19 +273,23 @@ public class UserDAO extends DBConnection {
         return false;
     }
 
+
     public boolean updatePassword(String email, String newPassword) {
+        if (email == null) return false;
+
         String sql = "UPDATE users SET password = ? WHERE email = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, newPassword);
-            ps.setString(2, email);
+            ps.setString(2, email.trim().toLowerCase());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
+
 
     public boolean changePassword(int userId, String newPassword) {
         String sql = "UPDATE users SET password = ? WHERE user_id = ?";
@@ -278,11 +300,28 @@ public class UserDAO extends DBConnection {
             ps.setInt(2, userId);
 
             int result = ps.executeUpdate();
-            System.out.println("UPDATE RESULT = " + result);
             return result > 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public java.util.List<Integer> getAllUserIds() {
+        java.util.List<Integer> list = new java.util.ArrayList<>();
+        String sql = "SELECT user_id FROM users WHERE status = 1";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(rs.getInt("user_id"));
+            }
+        } catch (Exception e) {
+            System.out.println(" LỖI HỆ THỐNG TẠI USERDAO.GETALLUSERIDS:");
+            e.printStackTrace();
+        }
+        return list;
     }
 }
