@@ -3,6 +3,7 @@ package com.shop.sportstore.controller.admin;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.shop.sportstore.dao.OrderDAO;
+import com.shop.sportstore.dao.NotificationDAO; // Tích hợp DAO thông báo
 import com.shop.sportstore.model.Order;
 import com.shop.sportstore.service.GhnOrderService;
 import jakarta.servlet.ServletException;
@@ -18,10 +19,12 @@ public class OrdersServlet extends HttpServlet {
     private static final String GHN_TOKEN = "2eb2d430-50e9-11f1-a973-aee5264794df";
     private static final String GHN_SHOP_ID = "200403";
     private OrderDAO orderDAO;
+    private NotificationDAO notificationDAO;
 
     @Override
     public void init() throws ServletException {
         orderDAO = new OrderDAO();
+        notificationDAO = new NotificationDAO();
     }
 
     @Override
@@ -74,10 +77,30 @@ public class OrdersServlet extends HttpServlet {
             switch (action) {
                 case "confirm":
                     orderDAO.confirmOrder(id);
+
+                    Order orderConfirm = orderDAO.getOrderById(id);
+                    if (orderConfirm != null) {
+                        notificationDAO.insertNotification(
+                                orderConfirm.getUserId(),
+                                "🛒 Đơn hàng đã được xác nhận",
+                                "Đơn hàng #" + orderConfirm.getOrderCode() + " của bạn đã được SportStore xác nhận thành công.",
+                                "/account"
+                        );
+                    }
                     break;
 
                 case "cancel":
                     orderDAO.cancelOrderByAdmin(id);
+
+                    Order orderCancel = orderDAO.getOrderById(id);
+                    if (orderCancel != null) {
+                        notificationDAO.insertNotification(
+                                orderCancel.getUserId(),
+                                " Đơn hàng đã bị hủy",
+                                "Đơn hàng #" + orderCancel.getOrderCode() + " đã bị hủy bởi hệ thống. Vui lòng liên hệ hỗ trợ nếu có thắc mắc.",
+                                "/account"
+                        );
+                    }
                     break;
 
                 case "shipping":
@@ -95,10 +118,28 @@ public class OrdersServlet extends HttpServlet {
 
                     orderDAO.updateGhnCode(id, ghnCode);
                     orderDAO.shippingOrder(id);
+
+
+                    notificationDAO.insertNotification(
+                            order.getUserId(),
+                            " Đơn hàng đang được giao",
+                            "Đơn hàng #" + order.getOrderCode() + " đã bàn giao cho đối tác GHN. Mã vận đơn: " + ghnCode,
+                            "/account"
+                    );
                     break;
 
                 case "complete":
                     orderDAO.completeOrder(id);
+
+                    Order orderComplete = orderDAO.getOrderById(id);
+                    if (orderComplete != null) {
+                        notificationDAO.insertNotification(
+                                orderComplete.getUserId(),
+                                " Đơn hàng hoàn thành",
+                                "Đơn hàng #" + orderComplete.getOrderCode() + " đã giao thành công. Cảm ơn bạn đã mua sắm tại SportStore!",
+                                "/account"
+                        );
+                    }
                     break;
 
                 case "approveRefund":
@@ -109,6 +150,14 @@ public class OrdersServlet extends HttpServlet {
                     }
                     orderDAO.approveRefund(id);
                     orderDAO.updateOrderStatus(refundOrder.getOrderCode(), "REFUNDED");
+
+
+                    notificationDAO.insertNotification(
+                            refundOrder.getUserId(),
+                            " Phê duyệt hoàn tiền",
+                            "Yêu cầu hoàn tiền cho đơn hàng #" + refundOrder.getOrderCode() + " đã được phê duyệt thành công.",
+                            "/account"
+                    );
                     break;
 
                 case "rejectRefund":
@@ -119,6 +168,14 @@ public class OrdersServlet extends HttpServlet {
                     }
                     orderDAO.rejectRefund(id);
                     orderDAO.updateOrderStatus(rejectOrder.getOrderCode(), "REFUND_REJECTED");
+
+
+                    notificationDAO.insertNotification(
+                            rejectOrder.getUserId(),
+                            "⚠ Từ chối hoàn tiền",
+                            "Yêu cầu hoàn tiền cho đơn hàng #" + rejectOrder.getOrderCode() + " đã bị từ chối.",
+                            "/account"
+                    );
                     break;
 
                 default:
@@ -159,6 +216,8 @@ public class OrdersServlet extends HttpServlet {
 
                                 if ("delivered".equals(ghnStatus)) {
                                     orderDAO.updateStatusByGhnCode(ghnCode, "COMPLETED");
+
+                                    notificationDAO.insertNotification(order.getUserId(), " Đơn hàng hoàn thành", "Đơn hàng #" + order.getOrderCode() + " đã giao thành công bởi GHN.", "/account");
                                 } else if ("cancel".equals(ghnStatus)) {
                                     java.sql.Connection conn = null;
                                     try {
@@ -167,6 +226,8 @@ public class OrdersServlet extends HttpServlet {
                                         orderDAO.updateStatusByGhnCode(ghnCode, "CANCELLED");
                                         orderDAO.increaseProductStock(order.getId(), conn);
                                         conn.commit();
+
+                                        notificationDAO.insertNotification(order.getUserId(), " Đơn hàng đã bị hủy", "Đơn hàng #" + order.getOrderCode() + " đã bị hủy tự động trên hệ thống giao hàng.", "/account");
                                     } catch (Exception ex) {
                                         if (conn != null) conn.rollback();
                                         throw ex;
@@ -177,6 +238,8 @@ public class OrdersServlet extends HttpServlet {
                                         || "damage".equals(ghnStatus) || "lost".equals(ghnStatus)) {
                                     orderDAO.requestRefund(order.getId(), "Đơn hàng bị trả về hoặc gặp sự cố từ đối tác giao hàng GHN.");
                                     orderDAO.updateOrderStatus(order.getOrderCode(), "PENDING_REFUND");
+                                    // BẮN THÔNG BÁO: Trục trặc vận chuyển
+                                    notificationDAO.insertNotification(order.getUserId(), "⚠ Đơn hàng gặp sự cố", "Đơn hàng #" + order.getOrderCode() + " đang được hoàn trả lại do lỗi vận chuyển.", "/account");
                                 }
                             }
                         }

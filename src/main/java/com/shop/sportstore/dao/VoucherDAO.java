@@ -4,6 +4,8 @@ import com.shop.sportstore.model.Voucher;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.shop.sportstore.untils.DBConnection;
+import java.sql.Connection;
 
 public class VoucherDAO {
 
@@ -260,17 +262,98 @@ public class VoucherDAO {
         v.setDiscountType(rs.getString("discount_type"));
         v.setDiscountValue(rs.getDouble("discount_value"));
         v.setMinOrderValue(rs.getDouble("min_order_value"));
-        v.setMaxDiscount(rs.getDouble("max_discount"));
+
+
+        v.setMaxDiscount(rs.getObject("max_discount") != null ? rs.getDouble("max_discount") : null);
+
         v.setQuantity(rs.getInt("quantity"));
         v.setUsedCount(rs.getInt("used_count"));
         v.setPaymentMethod(rs.getString("payment_method"));
         v.setMinProductPrice(rs.getDouble("min_product_price"));
-        v.setCategoryId(rs.getInt("category_id"));
+
+        int catId = rs.getInt("category_id");
+        v.setCategoryId(rs.wasNull() ? null : catId);
+
         v.setStartDate(rs.getTimestamp("start_date"));
         v.setExpiryDate(rs.getTimestamp("expiry_date"));
         v.setStatus(rs.getBoolean("status"));
         v.setApplicableTier(rs.getString("applicable_tier"));
         v.setUsageLimitPerUser(rs.getInt("usage_limit_per_user"));
         return v;
+    }
+
+
+    public List<Voucher> getActiveVouchersForPromotionPage(String userTier) {
+        List<Voucher> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM vouchers WHERE status = true "
+                + "AND NOW() BETWEEN start_date AND expiry_date "
+                + "AND used_count < quantity "
+                + "ORDER BY FIELD(applicable_tier, 'Đồng', 'Bạc', 'Vàng', 'Kim Cương'), id DESC";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapVoucher(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Voucher> getSavedVouchersByUserId(int userId) {
+        List<Voucher> list = new ArrayList<>();
+        String sql = "SELECT v.* FROM vouchers v "
+                + "JOIN user_vouchers uv ON v.id = uv.voucher_id "
+                + "WHERE uv.user_id = ? "
+                + "AND v.status = true "
+                + "AND NOW() BETWEEN v.start_date AND v.expiry_date "
+                + "AND v.used_count < v.quantity "
+                + "AND uv.order_id IS NULL "
+                + "ORDER BY v.id DESC";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+
+                    list.add(mapVoucher(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+
+    public boolean saveVoucher(int userId, int voucherId) {
+
+        String checkSql = "SELECT 1 FROM user_vouchers WHERE user_id = ? AND voucher_id = ? AND order_id IS NULL LIMIT 1";
+
+        String insertSql = "INSERT INTO user_vouchers (user_id, voucher_id, order_id, used_at) VALUES (?, ?, NULL, NULL)";
+
+        try {
+
+            try (PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
+                psCheck.setInt(1, userId);
+                psCheck.setInt(2, voucherId);
+                try (ResultSet rs = psCheck.executeQuery()) {
+                    if (rs.next()) {
+                        return false;
+                    }
+                }
+            }
+
+
+            try (PreparedStatement psInsert = conn.prepareStatement(insertSql)) {
+                psInsert.setInt(1, userId);
+                psInsert.setInt(2, voucherId);
+                return psInsert.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
