@@ -10,7 +10,6 @@ import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet("/order-history")
 public class OrderHistoryServlet extends HttpServlet {
@@ -18,69 +17,28 @@ public class OrderHistoryServlet extends HttpServlet {
     private final OrderDAO orderDAO = new OrderDAO();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
+        User user = (session != null)
+                ? (User) session.getAttribute("user")
+                : null;
 
         if (user == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(
+                    request.getContextPath() + "/login.jsp");
             return;
         }
-        List<Order> allOrders = orderDAO.getOrdersByUser(user.getUserId());
-        String statusParam = request.getParameter("status");
-        if (statusParam == null || statusParam.trim().isEmpty()) {
-            statusParam = "ALL";
-        } else {
-            statusParam = statusParam.trim().toUpperCase();
-        }
-        List<Order> filteredOrders;
-        switch (statusParam) {
-            case "PENDING":
-                filteredOrders = allOrders.stream()
-                        .filter(o -> "PENDING".equalsIgnoreCase(o.getStatus())
-                                || "CONFIRMED".equalsIgnoreCase(o.getStatus())
-                                || "0".equalsIgnoreCase(o.getStatus())
-                                || "CHỜ XÁC NHẬN".equalsIgnoreCase(o.getStatus()))
-                        .collect(Collectors.toList());
-                break;
 
-            case "SHIPPING":
-                filteredOrders = allOrders.stream()
-                        .filter(o -> "SHIPPING".equalsIgnoreCase(o.getStatus())
-                                || "ĐANG GIAO".equalsIgnoreCase(o.getStatus()))
-                        .collect(Collectors.toList());
-                break;
+        List<Order> orders =
+                orderDAO.getOrdersByUser(user.getUserId());
 
-            case "COMPLETED":
-                filteredOrders = allOrders.stream()
-                        .filter(o -> "COMPLETED".equalsIgnoreCase(o.getStatus())
-                                || "HOÀN TẤT".equalsIgnoreCase(o.getStatus()))
-                        .collect(Collectors.toList());
-                break;
+        request.setAttribute("orders", orders);
 
-            case "CANCELLED":
-                filteredOrders = allOrders.stream()
-                        .filter(o -> "CANCELLED".equalsIgnoreCase(o.getStatus())
-                                || "ĐÃ HỦY".equalsIgnoreCase(o.getStatus()))
-                        .collect(Collectors.toList());
-                break;
-
-            case "REFUND":
-                filteredOrders = allOrders.stream()
-                        .filter(o -> o.getRefundStatus() != null && !o.getRefundStatus().trim().isEmpty())
-                        .collect(Collectors.toList());
-                break;
-
-            default:
-                filteredOrders = allOrders;
-                break;
-        }
-        request.setAttribute("orders", filteredOrders);
-        request.setAttribute("currentStatus", statusParam);
-
-        request.getRequestDispatcher("/WEB-INF/client/account.jsp")
+        request.getRequestDispatcher(
+                        "/WEB-INF/client/account.jsp")
                 .forward(request, response);
     }
 }

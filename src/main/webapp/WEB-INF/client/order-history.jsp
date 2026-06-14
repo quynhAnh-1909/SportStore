@@ -127,7 +127,7 @@
                     </thead>
                     <tbody>
                     <c:forEach var="item" items="${orders}">
-                        <c:set var="statusLower" value="${not empty item.status ? fn:toLowerCase(item.status) : 'pending'}" />
+                        <c:set var="statusLower" value="${not empty item.status ? fn:trim(fn:toLowerCase(item.status)) : 'pending'}" />
                         <tr class="order-row"
                             data-status="${statusLower}"
                             data-refund="${not empty item.refundStatus ? 'has-refund' : 'none'}">
@@ -167,9 +167,9 @@
                             </td>
                             <td>
                                 <c:choose>
-                                    <c:when test="${statusLower eq 'pending' or statusLower eq 'chờ xác nhận'}">
+                                    <c:when test="${statusLower eq 'pending' or statusLower eq 'confirmed' or statusLower eq 'paid' or statusLower eq 'chờ xác nhận'}">
                                         <span class="badge bg-primary-subtle text-primary px-2 py-1">
-                                            <i class="fas fa-sync-alt fa-spin me-1"></i>Chờ xác nhận
+                                            <i class="fas fa-sync-alt fa-spin me-1"></i>Chờ xử lý
                                         </span>
                                     </c:when>
                                     <c:when test="${statusLower eq 'shipping' or statusLower eq 'đang giao'}">
@@ -177,12 +177,12 @@
                                             <i class="fas fa-truck me-1"></i>Đang giao
                                         </span>
                                     </c:when>
-                                    <c:when test="${statusLower eq 'delivered' or statusLower eq 'completed' or statusLower eq 'hoàn tất' or statusLower eq 'đã giao'}">
+                                    <c:when test="${statusLower eq 'completed' or statusLower eq 'delivered' or statusLower eq 'hoàn tất' or statusLower eq 'đã giao'}">
                                         <span class="badge bg-success text-white px-2 py-1">
                                             <i class="fas fa-check me-1"></i>Hoàn tất
                                         </span>
                                     </c:when>
-                                    <c:when test="${statusLower eq 'cancelled' or statusLower eq 'đã hủy'}">
+                                    <c:when test="${statusLower eq 'cancelled' or statusLower eq 'failed' or statusLower eq 'đã hủy'}">
                                         <span class="badge bg-light text-secondary border px-2 py-1 text-decoration-line-through">
                                             <i class="fas fa-ban me-1"></i>Đã hủy
                                         </span>
@@ -210,14 +210,11 @@
                                 <c:set var="isUnder30Mins" value="false"/>
 
                                 <c:if test="${not empty item.createdAt}">
-                                    <c:set var="timeDiff"
-                                           value="${now.time - item.createdAt.time}" />
-
-                                    <c:set var="isUnder30Mins"
-                                           value="${timeDiff lt 1800000}" />
+                                    <c:set var="timeDiff" value="${now.time - item.createdAt.time}" />
+                                    <c:set var="isUnder30Mins" value="${timeDiff lt 1800000}" />
                                 </c:if>
                                 <c:choose>
-                                    <c:when test="${(statusLower eq 'pending' or statusLower eq 'chờ xác nhận') && isUnder30Mins}">
+                                    <c:when test="${(statusLower eq 'pending' or statusLower eq 'confirmed' or statusLower eq 'chờ xác nhận') && isUnder30Mins}">
                                         <button type="button" class="btn btn-sm btn-danger w-100" data-order-code="${item.orderCode}"
                                                 onclick="openCancelModal(this.dataset.orderCode)">
                                             <i class="fas fa-times me-1"></i>Hủy đơn
@@ -231,12 +228,12 @@
                                             </button>
                                         </form>
                                     </c:when>
-                                    <c:when test="${statusLower eq 'delivered' or statusLower eq 'completed' or statusLower eq 'hoàn tất' or statusLower eq 'đã giao'}">
+                                    <c:when test="${statusLower eq 'completed' or statusLower eq 'delivered' or statusLower eq 'hoàn tất' or statusLower eq 'đã giao'}">
                                         <a href="${pageContext.request.contextPath}/productDetail?id=${item.id}#reviewForm" class="btn btn-sm btn-outline-danger w-100">
                                             <i class="fas fa-star me-1"></i>Đánh giá
                                         </a>
                                     </c:when>
-                                    <c:when test="${(statusLower eq 'cancelled' or statusLower eq 'đã hủy') && item.paymentMethod eq 'VNPAY' && item.paid}">
+                                    <c:when test="${(statusLower eq 'cancelled' or statusLower eq 'failed' or statusLower eq 'đã hủy') && item.paymentMethod eq 'VNPAY' && item.paid}">
                                         <c:choose>
                                             <c:when test="${empty item.refundStatus}">
                                                 <button type="button" class="btn btn-sm btn-warning w-100" onclick="openRefundModal('${item.id}')">
@@ -331,191 +328,139 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        console.log("Order History Loaded - Fixed Tab Click Logic");
+        const orderTabsContainer = document.getElementById("orderTabs");
 
-        console.log("Order History Loaded");
+        if (orderTabsContainer) {
+            orderTabsContainer.addEventListener("click", function (e) {
+                const tabBtn = e.target.closest(".nav-link");
 
-        const tabButtons = document.querySelectorAll("#orderTabs .nav-link");
-
-        console.log("Tab count:", tabButtons.length);
-
-        tabButtons.forEach(button => {
-
-            button.addEventListener("click", function () {
-
-                tabButtons.forEach(btn =>
-                        btn.classList.remove("active")
-                );
-
-                this.classList.add("active");
-
-                filterTableRows(
-                        this.dataset.filter
-                );
+                if (tabBtn) {
+                    e.preventDefault();
+                    const allTabs = orderTabsContainer.querySelectorAll(".nav-link");
+                    allTabs.forEach(btn => btn.classList.remove("active"));
+                    tabBtn.classList.add("active");
+                    if (typeof filterTableRows === "function") {
+                        filterTableRows(tabBtn.dataset.filter);
+                    }
+                }
             });
+        }
+        const cancelModalEl = document.getElementById("cancelOrderModal");
+        if (cancelModalEl) {
+            cancelModalEl.addEventListener("hidden.bs.modal", function () {
+                const reasonSelect = document.getElementById("cancelReason");
+                const otherWrapper = document.getElementById("otherReasonFieldWrapper");
+                const otherInput = document.getElementById("otherReason");
 
-        });
+                if (reasonSelect) reasonSelect.selectedIndex = 0;
+                if (otherWrapper) otherWrapper.classList.add("d-none");
+                if (otherInput) {
+                    otherInput.value = "";
+                    otherInput.required = false;
+                }
+            });
+        }
 
+        const refundModalEl = document.getElementById("refundModal");
+        if (refundModalEl) {
+            refundModalEl.addEventListener("hidden.bs.modal", function () {
+                const textarea = this.querySelector("textarea");
+                if (textarea) textarea.value = "";
+            });
+        }
     });
-
     function filterTableRows(filterValue) {
-
-        const rows =
-                document.querySelectorAll(".order-row");
-
-        const alertEmpty =
-                document.getElementById("emptyFilterAlert");
-
-        const orderArea =
-                document.getElementById("orderArea");
+        const rows = document.querySelectorAll(".order-row");
+        const alertEmpty = document.getElementById("emptyFilterAlert");
+        const orderArea = document.getElementById("orderArea");
 
         let hasVisibleRow = false;
 
         rows.forEach(row => {
-
-            const status =
-                    row.dataset.status;
-
-            const refund =
-                    row.dataset.refund;
-
+            const status = (row.dataset.status || "").trim().toLowerCase();
+            const refund = (row.dataset.refund || "").trim();
             let isMatch = false;
 
             switch (filterValue) {
-
                 case "all":
                     isMatch = true;
                     break;
-
                 case "pending":
-                    isMatch =
-                            status === "pending" ||
-                            status === "chờ xác nhận";
+                    isMatch = ["pending", "confirmed", "paid", "chờ xác nhận", "chờ xử lý"].includes(status);
                     break;
-
                 case "shipping":
-                    isMatch =
-                            status === "shipping" ||
-                            status === "đang giao";
+                    isMatch = ["shipping", "đang giao", "đang giao hàng"].includes(status);
                     break;
-
                 case "completed":
-                    isMatch =
-                            status === "completed" ||
-                            status === "delivered" ||
-                            status === "hoàn tất" ||
-                            status === "đã giao";
+                    isMatch = ["completed", "delivered", "hoàn tất", "đã giao", "thành công"].includes(status);
                     break;
-
                 case "cancelled":
-                    isMatch =
-                            status === "cancelled" ||
-                            status === "đã hủy";
+                    isMatch = ["cancelled", "failed", "đã hủy", "hủy"].includes(status);
                     break;
-
                 case "refund":
-                    isMatch =
-                            refund === "has-refund";
+                    isMatch = (refund === "has-refund");
                     break;
             }
 
-            row.style.display =
-                    isMatch ? "" : "none";
-
-            if(isMatch){
+            if (isMatch) {
+                row.classList.remove("d-none");
                 hasVisibleRow = true;
+            } else {
+                row.classList.add("d-none");
             }
         });
 
-        if(alertEmpty && orderArea){
-
-            if(hasVisibleRow){
-
+        // Xử lý bật/tắt thông báo trống
+        if (alertEmpty && orderArea) {
+            if (hasVisibleRow) {
                 alertEmpty.classList.add("d-none");
                 orderArea.classList.remove("d-none");
-
-            }else{
-
+            } else {
                 alertEmpty.classList.remove("d-none");
                 orderArea.classList.add("d-none");
-
             }
         }
     }
     function openCancelModal(orderCode) {
+        const cancelInput = document.getElementById("cancelOrderCode");
+        const displayCode = document.getElementById("displayOrderCode");
 
-        document.getElementById("cancelOrderCode").value =
-                orderCode;
+        if (cancelInput) cancelInput.value = orderCode;
+        if (displayCode) displayCode.innerText = orderCode;
 
-        document.getElementById("displayOrderCode").innerText =
-                orderCode;
-
-        const modal =
-                new bootstrap.Modal(
-                        document.getElementById("cancelOrderModal")
-                );
-
-        modal.show();
+        const modalEl = document.getElementById("cancelOrderModal");
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
     }
 
     function openRefundModal(orderId) {
+        const refundInput = document.getElementById("refundOrderId");
+        if (refundInput) refundInput.value = orderId;
 
-        document.getElementById("refundOrderId").value =
-                orderId;
-
-        const modal =
-                new bootstrap.Modal(
-                        document.getElementById("refundModal")
-                );
-
-        modal.show();
-    }
-    function toggleOtherReasonField() {
-
-        const reason =
-                document.getElementById("cancelReason");
-
-        const wrapper =
-                document.getElementById("otherReasonFieldWrapper");
-
-        const other =
-                document.getElementById("otherReason");
-
-        if (reason.value === "Khác") {
-
-            wrapper.classList.remove("d-none");
-            other.required = true;
-
-        } else {
-
-            wrapper.classList.add("d-none");
-            other.required = false;
-            other.value = "";
+        const modalEl = document.getElementById("refundModal");
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
         }
     }
-    document
-            .getElementById("cancelOrderModal")
-            .addEventListener("hidden.bs.modal", function () {
 
-                document.getElementById("cancelReason").selectedIndex = 0;
+    function toggleOtherReasonField() {
+        const reason = document.getElementById("cancelReason");
+        const wrapper = document.getElementById("otherReasonFieldWrapper");
+        const other = document.getElementById("otherReason");
 
-                document
-                        .getElementById("otherReasonFieldWrapper")
-                        .classList.add("d-none");
-
-                document
-                        .getElementById("otherReason")
-                        .value = "";
-            });
-
-    document
-            .getElementById("refundModal")
-            .addEventListener("hidden.bs.modal", function () {
-
-                const textarea =
-                        this.querySelector("textarea");
-
-                if(textarea){
-                    textarea.value = "";
-                }
-            });
+        if (reason && wrapper && other) {
+            if (reason.value === "Khác") {
+                wrapper.classList.remove("d-none");
+                other.required = true;
+            } else {
+                wrapper.classList.add("d-none");
+                other.required = false;
+                other.value = "";
+            }
+        }
+    }
 </script>
