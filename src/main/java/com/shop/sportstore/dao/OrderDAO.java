@@ -592,21 +592,26 @@ public class OrderDAO extends DBConnection {
         }
     }
     public boolean requestRefund(int orderId, String reason) throws SQLException {
-        String sql = "UPDATE orders SET refund_status = ?, refund_reason = ?, refund_requested_at = NOW(), UpdatedAt = NOW() " +
-                "WHERE Id = ? AND refund_status IS NULL";
+        String sql = "UPDATE orders SET Status = ?, refund_status = ?, refund_reason = ?, " +
+                "refund_requested_at = NOW(), UpdatedAt = NOW() " +
+                "WHERE Id = ? AND (refund_status IS NULL OR refund_status = '')";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, RefundStatus.PENDING_REFUND.name());
-            ps.setString(2, reason);
-            ps.setInt(3, orderId);
+            String pendingStatus = RefundStatus.PENDING_REFUND.name().trim().toUpperCase(); // 'PENDING_REFUND'
+
+            ps.setString(1, pendingStatus); // Cột Status chính
+            ps.setString(2, pendingStatus); // Cột refund_status phụ
+            ps.setString(3, reason);
+            ps.setInt(4, orderId);
 
             return ps.executeUpdate() > 0;
         }
     }
     public boolean approveRefund(int id) {
-        String sql = "UPDATE orders SET refund_status = 'REFUNDED', refunded_at = NOW(), UpdatedAt = NOW() WHERE Id = ?";
+        String sql = "UPDATE orders SET Status = 'REFUNDED', refund_status = 'REFUNDED', " +
+                "refunded_at = NOW(), UpdatedAt = NOW() WHERE Id = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -616,26 +621,61 @@ public class OrderDAO extends DBConnection {
         }
         return false;
     }
-
     public boolean rejectRefund(int id) {
-        String sql = "UPDATE orders SET refund_status = 'REJECTED', refund_rejected_at = NOW(), UpdatedAt = NOW() WHERE Id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+        String sql = "UPDATE orders SET Status = 'REFUND_REJECTED', refund_status = 'REFUND_REJECTED', " +
+                "refund_rejected_at = NOW(), UpdatedAt = NOW() WHERE Id = ?";
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, id);
+                int k = ps.executeUpdate();
+                if (k == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+            try {
+                decreaseProductStock(id, conn);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            conn.commit();
+            return true;
         } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return false;
     }
-
     public List<Order> getOrdersByRefundStatus(String refundStatus) {
+        if (refundStatus == null) return new ArrayList<>();
+
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
-                "JOIN users u ON o.UserId = u.user_id WHERE o.refund_status = ? ORDER BY o.CreatedAt DESC";
+                "JOIN users u ON o.UserId = u.user_id " +
+                "WHERE UPPER(o.refund_status) = ? ORDER BY o.CreatedAt DESC";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, refundStatus);
+            ps.setString(1, refundStatus.trim().toUpperCase());
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     orders.add(mapOrder(rs));
@@ -646,7 +686,6 @@ public class OrderDAO extends DBConnection {
         }
         return orders;
     }
-
     public int confirmAllPendingOrders() {
         String sql = "UPDATE orders SET Status = 'CONFIRMED' WHERE Status = 'PENDING'";
         try (Connection conn = getConnection();
@@ -657,7 +696,6 @@ public class OrderDAO extends DBConnection {
         }
         return 0;
     }
-
     public double getTotalSpendingByUserId(int userId) {
         double total = 0;
         String sql = "SELECT SUM(TotalPrice) FROM orders WHERE UserId = ? AND Status = 'COMPLETED'";

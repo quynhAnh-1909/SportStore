@@ -82,7 +82,7 @@
                                     <c:when test="${order.status eq 'CANCELLED'}">
                                         <span class="badge bg-danger text-white">Đã hủy</span>
                                     </c:when>
-                                    <c:when test="${order.status eq 'PENDING_REFUND' || order.status eq 'REFUND_PENDING'}">
+                                    <c:when test="${order.status eq 'PENDING_REFUND'}">
                                         <span class="badge bg-warning text-dark">Chờ hoàn tiền</span>
                                     </c:when>
                                     <c:when test="${order.status eq 'REFUNDED'}">
@@ -142,15 +142,13 @@
                                                 <button type="submit" class="btn btn-sm btn-success">Hoàn thành</button>
                                             </form>
                                         </c:if>
-
-                                        <c:if test="${order.status eq 'PENDING_REFUND' || order.status eq 'REFUND_PENDING'}">
+                                        <c:if test="${order.status eq 'PENDING_REFUND'}">
                                             <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
                                                   data-success-msg="Đã phê duyệt và thực hiện hoàn tiền!" data-success-color="#198754">
                                                 <input type="hidden" name="action" value="approveRefund">
                                                 <input type="hidden" name="id" value="${order.id}">
                                                 <button type="submit" class="btn btn-sm btn-success">Hoàn tiền</button>
                                             </form>
-
                                             <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
                                                   data-success-msg="Đã từ chối yêu cầu hoàn tiền!" data-success-color="#dc3545">
                                                 <input type="hidden" name="action" value="rejectRefund">
