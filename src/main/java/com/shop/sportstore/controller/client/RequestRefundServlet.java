@@ -19,10 +19,7 @@ public class RequestRefundServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-
         HttpSession session = request.getSession();
         User loginUser = (User) session.getAttribute("user");
         if (loginUser == null) {
@@ -57,42 +54,55 @@ public class RequestRefundServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/order-history");
             return;
         }
-
         if (order.getUserId() != userId) {
             session.setAttribute("errorMsg", "Bạn không có quyền yêu cầu hoàn tiền cho đơn hàng này!");
             response.sendRedirect(request.getContextPath() + "/order-history");
             return;
         }
 
-        String status = order.getStatus() != null ? order.getStatus().trim().toUpperCase() : "";
-        boolean isDelivered = status.equals("DELIVERED")
-                || status.equals("COMPLETED")
-                || status.equals("2")
-                || status.equals("HOÀN TẤT")
-                || status.equals("ĐÃ GIAO");
-
-        if (!isDelivered) {
-            session.setAttribute("errorMsg", "Đơn hàng chưa được giao thành công, không thể yêu cầu hoàn tiền!");
+        if (!order.isPaid()) {
+            session.setAttribute("errorMsg",
+                    "Đơn hàng chưa thanh toán nên không thể yêu cầu hoàn tiền!");
             response.sendRedirect(request.getContextPath() + "/order-history");
             return;
         }
 
-        if ("PENDING_REFUND".equals(status) || "REFUNDED".equals(status) || "REFUND_REJECTED".equals(status)) {
-            session.setAttribute("errorMsg", "Đơn hàng này đã gửi yêu cầu hoặc đã được xử lý hoàn tiền trước đó!");
+        if (!"VNPAY".equalsIgnoreCase(order.getPaymentMethod())) {
+            session.setAttribute("errorMsg",
+                    "Chỉ đơn hàng thanh toán qua VNPAY mới được yêu cầu hoàn tiền!");
+            response.sendRedirect(request.getContextPath() + "/order-history");
+            return;
+        }
+        String status = order.getStatus();
+
+        if (!"CANCELLED".equalsIgnoreCase(status)
+                && !"FAILED".equalsIgnoreCase(status)) {
+
+            session.setAttribute("errorMsg",
+                    "Chỉ đơn hàng đã hủy mới được gửi yêu cầu hoàn tiền!");
             response.sendRedirect(request.getContextPath() + "/order-history");
             return;
         }
 
+
+        String refundStatus = order.getRefundStatus();
+        if ("PENDING_REFUND".equalsIgnoreCase(refundStatus)
+                || "REFUNDED".equalsIgnoreCase(refundStatus)
+                || "REJECTED".equalsIgnoreCase(refundStatus)) {
+            session.setAttribute("errorMsg",
+                    "Đơn hàng này đã gửi yêu cầu hoặc đã được xử lý hoàn tiền trước đó!");
+            response.sendRedirect(request.getContextPath() + "/order-history");
+            return;
+        }
         try {
             boolean success = orderDAO.requestRefund(orderId, reason);
-
             if (success) {
-                orderDAO.updateOrderStatus(order.getOrderCode(), "PENDING_REFUND");
-                session.setAttribute("successMsg", "Đã gửi yêu cầu hoàn tiền thành công! Vui lòng chờ Admin duyệt.");
+                session.setAttribute("successMsg",
+                        "Đã gửi yêu cầu hoàn tiền thành công! Vui lòng chờ Admin duyệt.");
             } else {
                 session.setAttribute("errorMsg", "Hệ thống gặp sự cố. Không thể gửi yêu cầu hoàn tiền!");
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             session.setAttribute("errorMsg", "Lỗi kết nối cơ sở dữ liệu khi cập nhật trạng thái đơn hàng!");
         }

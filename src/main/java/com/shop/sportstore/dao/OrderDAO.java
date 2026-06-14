@@ -159,7 +159,6 @@ public class OrderDAO extends DBConnection {
 
         if (hasColumn(rs, "receiver_phone")) o.setReceiverPhone(rs.getString("receiver_phone"));
         else if (hasColumn(rs, "ReceiverPhone")) o.setReceiverPhone(rs.getString("ReceiverPhone"));
-
         o.getAddress();
         o.setAddress(rs.getString("Address"));
         o.setNote(rs.getString("Note"));
@@ -194,18 +193,12 @@ public class OrderDAO extends DBConnection {
         if (hasColumn(rs, "refund_requested_at")) o.setRefundRequestedAt(rs.getTimestamp("refund_requested_at"));
         if (hasColumn(rs, "refunded_at")) o.setRefundedAt(rs.getTimestamp("refunded_at"));
         if (hasColumn(rs, "refund_rejected_at")) o.setRefundRejectedAt(rs.getTimestamp("refund_rejected_at"));
-
-        // Giải quyết lỗi thiếu alias khi lấy dữ liệu userFullName từ câu lệnh JOIN
         if (hasColumn(rs, "userFullName")) {
             o.setUserFullName(rs.getString("userFullName"));
         }
-
         if ("VNPAY".equalsIgnoreCase(o.getPaymentMethod())) {
-            o.setPaid(!"CANCELLED".equalsIgnoreCase(o.getStatus()));
-        } else {
-            o.setPaid("COMPLETED".equalsIgnoreCase(o.getStatus()));
+            o.setPaid(true);
         }
-
         return o;
     }
 
@@ -230,44 +223,6 @@ public class OrderDAO extends DBConnection {
     public void updatePaymentStatus(String orderCode, boolean isPaid) throws SQLException {
     }
 
-    public Map<String, String> getOrderDetailForEmail(String orderCode) throws SQLException {
-        Map<String, String> data = new HashMap<>();
-        String sql = "SELECT o.Id, o.OrderCode, o.TotalPrice, o.Address, o.receiver_name, " +
-                "u.user_id AS userId, u.full_name, u.email " +
-                "FROM orders o JOIN users u ON o.UserId = u.user_id WHERE o.OrderCode = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, orderCode);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    data.put("orderId", rs.getString("Id"));
-                    data.put("orderCode", rs.getString("OrderCode"));
-                    data.put("totalPrice", rs.getString("TotalPrice"));
-                    data.put("address", rs.getString("Address"));
-                    data.put("receiverName", rs.getString("receiver_name"));
-                    data.put("fullName", rs.getString("full_name"));
-                    data.put("email", rs.getString("email"));
-                }
-            }
-        }
-        return data;
-    }
-
-    public String getOrderStatus(String orderCode) throws SQLException {
-        String status = null;
-        String sql = "SELECT Status FROM orders WHERE OrderCode = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, orderCode);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    status = rs.getString("Status");
-                }
-            }
-        }
-        return status != null ? status.trim().toUpperCase() : null;
-    }
-
     public boolean createOrder(Integer userId, String orderCode, double total, String paymentMethod, String status,
                                String receiverName, String receiverPhone, String address, int districtId, String wardCode,
                                String note, Integer voucherId, double discountAmount, double shippingFee, List<CartItem> cart) throws SQLException {
@@ -287,7 +242,6 @@ public class OrderDAO extends DBConnection {
                 psOrder.setString(2, orderCode);
                 psOrder.setDouble(3, total);
                 psOrder.setString(4, paymentMethod);
-                // Đồng bộ chuẩn hóa Status đầu vào khi lưu xuống Database
                 psOrder.setString(5, status.trim().toUpperCase());
                 psOrder.setString(6, receiverName);
                 psOrder.setString(7, receiverPhone);
@@ -371,46 +325,37 @@ public class OrderDAO extends DBConnection {
         }
         return items;
     }
-
     public boolean cancelOrder(String orderCode, int userId, String cancelReason) {
-        String sql = "UPDATE orders SET Status = 'CANCELLED', CancelReason = ?, refund_reason = ?, " +
-                "refund_status = ?, refund_requested_at = CASE WHEN ? = 'PENDING_REFUND' THEN NOW() ELSE NULL END, " +
-                "CancelledAt = NOW(), UpdatedAt = NOW() " +
-                "WHERE OrderCode = ? AND UserId = ? AND Status IN ('PENDING', 'CONFIRMED', '0', 'CHỜ XÁC NHẬN')";
-
+        String sql = "UPDATE orders SET Status = 'CANCELLED', " +
+                "CancelReason = ?, " +
+                "refund_reason = ?, " +
+                "refund_status = ?, " +
+                "refund_requested_at = NULL, " +
+                "CancelledAt = NOW(), " +
+                "UpdatedAt = NOW() " +
+                "WHERE OrderCode = ? " +
+                "AND UserId = ? " +
+                "AND Status IN ('PENDING', 'CONFIRMED', '0', 'CHỜ XÁC NHẬN')";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             Order order = getOrderByCode(orderCode);
             if (order == null) return false;
-
-            boolean isPaid = "VNPAY".equalsIgnoreCase(order.getPaymentMethod());
-            String targetRefundStatus = isPaid ? "PENDING_REFUND" : null;
-
             ps.setString(1, cancelReason);
-            ps.setString(2, isPaid ? cancelReason : null);
-            if (targetRefundStatus != null) {
-                ps.setString(3, targetRefundStatus);
-            } else {
-                ps.setNull(3, Types.VARCHAR);
-            }
-            ps.setString(4, targetRefundStatus != null ? targetRefundStatus : "");
-            ps.setString(5, orderCode);
-            ps.setInt(6, userId);
-
+            ps.setNull(2, Types.VARCHAR);
+            ps.setNull(3, Types.VARCHAR);
+            ps.setString(4, orderCode);
+            ps.setInt(5, userId);
             boolean isUpdated = ps.executeUpdate() > 0;
-
             if (isUpdated) {
                 increaseProductStock(order.getId(), conn);
             }
-
             return isUpdated;
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
-
     public int countCanceledOrdersInLastHour(int userId) {
         String sql = "SELECT COUNT(*) FROM orders WHERE UserId = ? AND Status = 'CANCELLED' " +
                 "AND UpdatedAt >= NOW() - INTERVAL 1 HOUR";
@@ -467,8 +412,6 @@ public class OrderDAO extends DBConnection {
         }
         return orders;
     }
-
-    // FIX LỖI SỐ 3: Đã sửa lại JOIN để lấy đầy đủ trường `userFullName` tránh lỗi đổ data lên UI rỗng
     public List<Order> getOrdersByUser(int userId) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
@@ -485,31 +428,9 @@ public class OrderDAO extends DBConnection {
                 }
             }
         } catch (Exception e) { e.printStackTrace(); }
-
-        // Đoạn log debug nhanh độ dài mảng dữ liệu trả về
         System.out.println("USER ORDERS SIZE = " + orders.size());
         return orders;
     }
-
-    // FIX LỖI SỐ 4: Đã thêm JOIN lấy userFullName đồng thời bọc .toUpperCase() cho biến status
-    public List<Order> getOrdersByUserAndStatus(int userId, String status) {
-        List<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
-                "JOIN users u ON o.UserId = u.user_id WHERE o.UserId = ? AND o.Status = ? ORDER BY o.CreatedAt DESC";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.setString(2, status.trim().toUpperCase());
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    orders.add(mapOrder(rs));
-                }
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return orders;
-    }
-
-    // FIX LỖI TIỀM ẨN: Thêm JOIN users để map đầy đủ dữ liệu khi gọi chi tiết Order theo ID
     public Order getOrderById(int id) {
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
                 "JOIN users u ON o.UserId = u.user_id WHERE o.Id = ?";
@@ -604,8 +525,6 @@ public class OrderDAO extends DBConnection {
         }
         return cartItems;
     }
-
-    // FIX LỖI TIỀM ẨN: Thêm JOIN lấy userFullName đồng bộ cho hàm tìm kiếm đơn hàng
     public Order findOrderByCodeOrPhone(String keyword) {
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
                 "JOIN users u ON o.UserId = u.user_id " +
@@ -628,8 +547,6 @@ public class OrderDAO extends DBConnection {
         }
         return null;
     }
-
-    // FIX LỖI TIỀM ẨN: Thêm JOIN bảng users lấy userFullName đồng bộ khi tìm đơn bằng Code
     public Order getOrderByCode(String orderCode) {
         String sql = "SELECT o.*, u.full_name AS userFullName FROM orders o " +
                 "JOIN users u ON o.UserId = u.user_id WHERE o.OrderCode = ?";
@@ -674,22 +591,20 @@ public class OrderDAO extends DBConnection {
             e.printStackTrace();
         }
     }
-
-    public boolean requestRefund(int orderId, String reason) {
+    public boolean requestRefund(int orderId, String reason) throws SQLException {
         String sql = "UPDATE orders SET refund_status = ?, refund_reason = ?, refund_requested_at = NOW(), UpdatedAt = NOW() " +
                 "WHERE Id = ? AND refund_status IS NULL";
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, RefundStatus.PENDING_REFUND.name());
             ps.setString(2, reason);
             ps.setInt(3, orderId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
+            return ps.executeUpdate() > 0;
+        }
+    }
     public boolean approveRefund(int id) {
         String sql = "UPDATE orders SET refund_status = 'REFUNDED', refunded_at = NOW(), UpdatedAt = NOW() WHERE Id = ?";
         try (Connection conn = getConnection();

@@ -128,10 +128,16 @@
                     <tbody>
                     <c:forEach var="item" items="${orders}">
                         <c:set var="statusLower" value="${not empty item.status ? fn:trim(fn:toLowerCase(item.status)) : 'pending'}" />
+
+                        <%-- ĐÃ SỬA: Đồng bộ logic Backend với JS bằng cách thêm điều kiện 'đã hủy' và 'item.paid' --%>
                         <tr class="order-row"
                             data-status="${statusLower}"
-                            data-refund="${not empty item.refundStatus ? 'has-refund' : 'none'}">
-
+                            data-refund="${item.paid and item.paymentMethod eq 'VNPAY'
+              and (statusLower eq 'cancelled'
+              or statusLower eq 'failed'
+              or statusLower eq 'đã hủy')
+              ? 'has-refund'
+              : 'none'}">
                             <td class="fw-bold">#<c:out value="${item.orderCode}" default="0000" /></td>
                             <td class="small text-muted">
                                 <c:catch var="errDate">
@@ -229,14 +235,19 @@
                                         </form>
                                     </c:when>
                                     <c:when test="${statusLower eq 'completed' or statusLower eq 'delivered' or statusLower eq 'hoàn tất' or statusLower eq 'đã giao'}">
-                                        <a href="${pageContext.request.contextPath}/productDetail?id=${item.id}#reviewForm" class="btn btn-sm btn-outline-danger w-100">
+                                        <a href="${pageContext.request.contextPath}/order-detail?id=${item.id}" class="btn btn-sm btn-outline-danger w-100">
                                             <i class="fas fa-star me-1"></i>Đánh giá
                                         </a>
                                     </c:when>
-                                    <c:when test="${(statusLower eq 'cancelled' or statusLower eq 'failed' or statusLower eq 'đã hủy') && item.paymentMethod eq 'VNPAY' && item.paid}">
+                                    <c:when test="${
+    item.paid and item.paymentMethod eq 'VNPAY'
+    and (statusLower eq 'cancelled'
+         or statusLower eq 'failed'
+         or statusLower eq 'đã hủy')
+}">
                                         <c:choose>
                                             <c:when test="${empty item.refundStatus}">
-                                                <button type="button" class="btn btn-sm btn-warning w-100" onclick="openRefundModal('${item.id}')">
+                                                <button type="button" class="btn btn-sm btn-warning w-100" onclick="openRefundModal('${fn:escapeXml(item.id)}')">
                                                     <i class="fas fa-rotate-left me-1"></i>Hoàn tiền
                                                 </button>
                                             </c:when>
@@ -410,8 +421,6 @@
                 row.classList.add("d-none");
             }
         });
-
-        // Xử lý bật/tắt thông báo trống
         if (alertEmpty && orderArea) {
             if (hasVisibleRow) {
                 alertEmpty.classList.add("d-none");
