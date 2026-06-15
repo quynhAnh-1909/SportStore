@@ -9,15 +9,11 @@ import java.util.List;
 
 public class BannerDAO {
 
-    // =========================
-    // FIND ALL
-    // =========================
     public List<Banner> findAll() {
 
         List<Banner> list = new ArrayList<>();
 
-        String sql =
-                "SELECT * FROM banners ORDER BY id DESC";
+        String sql = "SELECT * FROM banners ORDER BY id DESC";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -34,9 +30,7 @@ public class BannerDAO {
                 b.setImage(rs.getString("image"));
                 b.setStatus(rs.getBoolean("status"));
 
-                b.setProductId(
-                        (Integer) rs.getObject("product_id")
-                );
+                b.setProductId((Integer) rs.getObject("product_id"));
 
                 list.add(b);
             }
@@ -48,18 +42,11 @@ public class BannerDAO {
         return list;
     }
 
-    // =========================
-    // FIND ACTIVE BANNERS
-    // =========================
     public List<Banner> findActiveBanners() {
 
         List<Banner> list = new ArrayList<>();
 
-        String sql =
-                "SELECT * FROM banners " +
-                        "WHERE status = true " +
-                        "ORDER BY id DESC " +
-                        "LIMIT 3";
+        String sql = "SELECT * FROM banners WHERE status = true ORDER BY id DESC LIMIT 3";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -76,9 +63,7 @@ public class BannerDAO {
                 b.setImage(rs.getString("image"));
                 b.setStatus(rs.getBoolean("status"));
 
-                b.setProductId(
-                        (Integer) rs.getObject("product_id")
-                );
+                b.setProductId((Integer) rs.getObject("product_id"));
 
                 list.add(b);
             }
@@ -90,13 +75,9 @@ public class BannerDAO {
         return list;
     }
 
-    // =========================
-    // FIND BY ID
-    // =========================
     public Banner findById(int id) {
 
-        String sql =
-                "SELECT * FROM banners WHERE id=?";
+        String sql = "SELECT * FROM banners WHERE id=?";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -116,9 +97,7 @@ public class BannerDAO {
                 b.setImage(rs.getString("image"));
                 b.setStatus(rs.getBoolean("status"));
 
-                b.setProductId(
-                        (Integer) rs.getObject("product_id")
-                );
+                b.setProductId((Integer) rs.getObject("product_id"));
 
                 return b;
             }
@@ -130,14 +109,9 @@ public class BannerDAO {
         return null;
     }
 
-    // =========================
-    // INSERT
-    // =========================
     public void insert(Banner banner) {
 
-        String sql =
-                "INSERT INTO banners(title,image,status,product_id) " +
-                        "VALUES(?,?,?,?)";
+        String sql = "INSERT INTO banners(title,image,status,product_id) VALUES(?,?,?,?)";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -164,13 +138,9 @@ public class BannerDAO {
         }
     }
 
-    // =========================
-    // DELETE
-    // =========================
     public void delete(int id) {
 
-        String sql =
-                "DELETE FROM banners WHERE id=?";
+        String sql = "DELETE FROM banners WHERE id=?";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -186,16 +156,9 @@ public class BannerDAO {
         }
     }
 
-    // =========================
-    // UPDATE STATUS
-    // =========================
-    public void updateStatus(int id,
-                             boolean status) {
+    public void updateStatus(int id, boolean status) {
 
-        String sql =
-                "UPDATE banners " +
-                        "SET status=? " +
-                        "WHERE id=?";
+        String sql = "UPDATE banners SET status=? WHERE id=?";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -212,21 +175,14 @@ public class BannerDAO {
         }
     }
 
-    // =========================
-    // UPDATE
-    // =========================
     public void update(Banner banner) {
 
-        String sql =
-                "UPDATE banners " +
-                        "SET title=?, image=?, status=?, product_id=? " +
-                        "WHERE id=?";
+        String sql = "UPDATE banners SET title=?, image=?, status=?, product_id=? WHERE id=?";
 
         try (
                 Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
-
             ps.setString(1, banner.getTitle());
             ps.setString(2, banner.getImage());
             ps.setBoolean(3, banner.isStatus());
