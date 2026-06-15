@@ -17,140 +17,145 @@ import java.util.List;
 public class BannerServlet extends HttpServlet {
 
     private final BannerDAO bannerDAO = new BannerDAO();
+    private final ProductDAO productDAO = new ProductDAO();
 
-    // =========================
-    // GET
-    // =========================
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-
         String action = request.getParameter("action");
 
-        // =========================
-        // ADD PAGE
-        // =========================
         if ("add".equals(action)) {
-
-            ProductDAO productDAO = new ProductDAO();
-
-            request.setAttribute("products",
-                    productDAO.getAllProducts());
-
-            request.setAttribute(
-                    "contentPage",
-                    "/WEB-INF/admin/bannerCreate.jsp"
-            );
-
-            request.getRequestDispatcher(
-                    "/WEB-INF/admin/layout-admin.jsp"
-            ).forward(request, response);
+            request.setAttribute("products", productDAO.getAllProducts());
+            request.setAttribute("contentPage", "/WEB-INF/admin/bannerCreate.jsp");
+            request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
             return;
         }
 
-        // =========================
-        // DELETE
-        // =========================
+        if ("edit".equals(action)) {
+            String idRaw = request.getParameter("id");
+            if (idRaw != null && !idRaw.isEmpty()) {
+                int id = Integer.parseInt(idRaw);
+                Banner banner = bannerDAO.findById(id);
+
+                if (banner != null) {
+                    request.setAttribute("banner", banner);
+                    request.setAttribute("products", productDAO.getAllProducts());
+                    request.setAttribute("contentPage", "/WEB-INF/admin/bannerEdit.jsp");
+                    request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
+                    return;
+                }
+            }
+            response.sendRedirect(request.getContextPath() + "/admin/banners");
+            return;
+        }
+
         if ("delete".equals(action)) {
-
             int id = Integer.parseInt(request.getParameter("id"));
-
             bannerDAO.delete(id);
-
-            response.sendRedirect(
-                    request.getContextPath() + "/admin/banners"
-            );
+            response.sendRedirect(request.getContextPath() + "/admin/banners");
             return;
         }
 
-        // =========================
-        // TOGGLE STATUS
-        // =========================
         if ("toggle".equals(action)) {
-
             int id = Integer.parseInt(request.getParameter("id"));
-
             Banner banner = bannerDAO.findById(id);
 
             if (banner != null) {
                 bannerDAO.updateStatus(id, !banner.isStatus());
             }
 
-            response.sendRedirect(
-                    request.getContextPath() + "/admin/banners"
-            );
+            response.sendRedirect(request.getContextPath() + "/admin/banners");
             return;
         }
 
-        // =========================
-        // LIST
-        // =========================
         List<Banner> banners = bannerDAO.findAll();
-
         request.setAttribute("banners", banners);
-        request.setAttribute("contentPage",
-                "/WEB-INF/admin/banner.jsp");
-
-        request.getRequestDispatcher(
-                "/WEB-INF/admin/layout-admin.jsp"
-        ).forward(request, response);
+        request.setAttribute("contentPage", "/WEB-INF/admin/banner.jsp");
+        request.getRequestDispatcher("/WEB-INF/admin/layout-admin.jsp").forward(request, response);
     }
 
-    // =========================
-    // POST (ADD BANNER)
-    // =========================
     @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        String action = request.getParameter("action");
+
+        if ("update".equals(action)) {
+            handleUpdateBanner(request, response);
+        } else {
+            handleCreateBanner(request, response);
+        }
+    }
+
+    private void handleCreateBanner(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
         String title = request.getParameter("title");
         String productIdRaw = request.getParameter("productId");
-
         Part imagePart = request.getPart("image");
 
-        if (imagePart == null ||
-                imagePart.getSubmittedFileName() == null ||
-                imagePart.getSubmittedFileName().isEmpty()) {
-
-            response.sendRedirect(
-                    request.getContextPath() + "/admin/banners"
-            );
+        if (imagePart == null || imagePart.getSubmittedFileName() == null || imagePart.getSubmittedFileName().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/admin/banners");
             return;
         }
-
         String fileName = imagePart.getSubmittedFileName();
-
-        // upload folder
-        String uploadPath =
-                getServletContext().getRealPath("/resources");
-
+        String uploadPath = getServletContext().getRealPath("/resources");
         File dir = new File(uploadPath);
         if (!dir.exists()) dir.mkdirs();
 
-        // save file
         imagePart.write(uploadPath + File.separator + fileName);
 
-        // create banner
         Banner banner = new Banner();
         banner.setTitle(title);
         banner.setImage(fileName);
         banner.setStatus(true);
 
-        // product link
         if (productIdRaw != null && !productIdRaw.isEmpty()) {
             banner.setProductId(Integer.parseInt(productIdRaw));
         }
 
         bannerDAO.insert(banner);
+        response.sendRedirect(request.getContextPath() + "/admin/banners");
+    }
 
-        response.sendRedirect(
-                request.getContextPath() + "/admin/banners"
-        );
+    private void handleUpdateBanner(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        int id = Integer.parseInt(request.getParameter("id"));
+        String title = request.getParameter("title");
+        String productIdRaw = request.getParameter("productId");
+        Part imagePart = request.getPart("image");
+
+        Banner banner = bannerDAO.findById(id);
+        if (banner == null) {
+            response.sendRedirect(request.getContextPath() + "/admin/banners");
+            return;
+        }
+
+        banner.setTitle(title);
+        if (productIdRaw != null && !productIdRaw.isEmpty()) {
+            banner.setProductId(Integer.parseInt(productIdRaw));
+        } else {
+            banner.setProductId(null);
+        }
+
+        if (imagePart != null && imagePart.getSubmittedFileName() != null && !imagePart.getSubmittedFileName().isEmpty()) {
+            String fileName = imagePart.getSubmittedFileName();
+            String uploadPath = getServletContext().getRealPath("/resources");
+
+            File dir = new File(uploadPath);
+            if (!dir.exists()) dir.mkdirs();
+
+            imagePart.write(uploadPath + File.separator + fileName);
+            banner.setImage(fileName);
+        }
+
+        bannerDAO.update(banner);
+        response.sendRedirect(request.getContextPath() + "/admin/banners");
     }
 }

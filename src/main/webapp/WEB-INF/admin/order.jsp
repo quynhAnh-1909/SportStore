@@ -82,7 +82,7 @@
                                     <c:when test="${order.status eq 'CANCELLED'}">
                                         <span class="badge bg-danger text-white">Đã hủy</span>
                                     </c:when>
-                                    <c:when test="${order.status eq 'PENDING_REFUND' || order.status eq 'REFUND_PENDING'}">
+                                    <c:when test="${order.status eq 'PENDING_REFUND'}">
                                         <span class="badge bg-warning text-dark">Chờ hoàn tiền</span>
                                     </c:when>
                                     <c:when test="${order.status eq 'REFUNDED'}">
@@ -115,7 +115,8 @@
                                                   data-success-msg="Đã hủy đơn hàng thành công!" data-success-color="#dc3545">
                                                 <input type="hidden" name="action" value="cancel">
                                                 <input type="hidden" name="id" value="${order.id}">
-                                                <button type="submit" class="btn btn-sm btn-danger">Hủy</button>
+                                                <input type="hidden" name="cancelReason" class="cancel-reason-input" value="">
+                                                <button type="button" class="btn btn-sm btn-danger btn-trigger-cancel">Hủy</button>
                                             </form>
                                         </c:if>
 
@@ -143,19 +144,19 @@
                                             </form>
                                         </c:if>
 
-                                        <c:if test="${order.status eq 'PENDING_REFUND' || order.status eq 'REFUND_PENDING'}">
+                                        <c:if test="${order.status eq 'PENDING_REFUND'}">
                                             <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
                                                   data-success-msg="Đã phê duyệt và thực hiện hoàn tiền!" data-success-color="#198754">
                                                 <input type="hidden" name="action" value="approveRefund">
                                                 <input type="hidden" name="id" value="${order.id}">
-                                                <button type="submit" class="btn btn-sm btn-success">Hoàn tiền</button>
+                                                <button type="button" class="btn btn-sm btn-success btn-trigger-refund">Hoàn tiền</button>
                                             </form>
-
                                             <form action="${pageContext.request.contextPath}/admin/orders" method="post" class="d-inline ajax-form"
                                                   data-success-msg="Đã từ chối yêu cầu hoàn tiền!" data-success-color="#dc3545">
                                                 <input type="hidden" name="action" value="rejectRefund">
                                                 <input type="hidden" name="id" value="${order.id}">
-                                                <button type="submit" class="btn btn-sm btn-danger">Từ chối</button>
+                                                <input type="hidden" name="rejectReason" class="reject-reason-input" value="">
+                                                <button type="button" class="btn btn-sm btn-danger btn-trigger-reject">Từ Chối</button>
                                             </form>
                                         </c:if>
 
@@ -219,6 +220,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     function showToast(message, color) {
@@ -274,6 +276,7 @@
                 this.data(i++);
             });
         }).draw();
+
         const confirmAllForm = document.getElementById('confirmAllForm');
         if (confirmAllForm) {
             confirmAllForm.addEventListener('submit', function(event) {
@@ -320,8 +323,95 @@
                         });
             });
         }
+
         const ajaxForms = document.querySelectorAll('.ajax-form');
         ajaxForms.forEach(form => {
+            // 1. Xử lý nút HỦY ĐƠN HÀNG thông thường (Trạng thái PENDING)
+            const cancelBtn = form.querySelector('.btn-trigger-cancel');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    Swal.fire({
+                        title: 'Xác nhận hủy đơn hàng',
+                        text: 'Vui lòng nhập lý do hủy đơn hàng này:',
+                        input: 'text',
+                        inputPlaceholder: 'Lý do hủy đơn...',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Xác nhận hủy',
+                        cancelButtonText: 'Đóng',
+                        inputValidator: (value) => {
+                            if (!value || value.trim() === '') {
+                                return 'Bạn cần phải nhập lý do hủy đơn!';
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const cancelInput = form.querySelector('.cancel-reason-input');
+                            if (cancelInput) {
+                                cancelInput.value = result.value;
+                            }
+                            form.requestSubmit();
+                        }
+                    });
+                });
+            }
+
+            // 2. Xử lý nút TỪ CHỐI HOÀN TIỀN (Trạng thái PENDING_REFUND)
+            const rejectBtn = form.querySelector('.btn-trigger-reject');
+            if (rejectBtn) {
+                rejectBtn.addEventListener('click', function() {
+                    Swal.fire({
+                        title: 'Từ chối yêu cầu hoàn tiền',
+                        text: 'Vui lòng nhập lý do không đồng ý hoàn tiền:',
+                        input: 'text',
+                        inputPlaceholder: 'Lý do từ chối hoàn tiền...',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Xác nhận từ chối',
+                        cancelButtonText: 'Quay lại',
+                        inputValidator: (value) => {
+                            if (!value || value.trim() === '') {
+                                return 'Bạn phải điền lý do từ chối!';
+                            }
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const rejectInput = form.querySelector('.reject-reason-input');
+                            if (rejectInput) {
+                                rejectInput.value = result.value;
+                            }
+                            form.requestSubmit();
+                        }
+                    });
+                });
+            }
+
+            // 3. Xử lý nút XÁC NHẬN HOÀN TIỀN (Trạng thái PENDING_REFUND)
+            const refundBtn = form.querySelector('.btn-trigger-refund');
+            if (refundBtn) {
+                refundBtn.addEventListener('click', function() {
+                    Swal.fire({
+                        title: 'Xác nhận hoàn tiền?',
+                        text: "Hệ thống sẽ phê duyệt và thực hiện lệnh hoàn trả tiền mặt cho đơn hàng này.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#198754',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Đồng ý hoàn tiền',
+                        cancelButtonText: 'Hủy bỏ'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.requestSubmit();
+                        }
+                    });
+                });
+            }
+
+            // Xử lý gửi Form bằng Fetch API AJAX chung
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
 
@@ -329,7 +419,7 @@
                 const actionUrl = this.getAttribute('action');
                 const successMsg = this.getAttribute('data-success-msg') || 'Thao tác thành công!';
                 const successColor = this.getAttribute('data-success-color') || '#198754';
-                const submitBtn = this.querySelector('button[type="submit"]');
+                const submitBtn = this.querySelector('button');
                 const originalBtnText = submitBtn.innerHTML;
 
                 submitBtn.disabled = true;
@@ -364,6 +454,7 @@
                         });
             });
         });
+
         const trackingModalElement = document.getElementById('trackingModal');
         if (trackingModalElement) {
             const trackingModal = new bootstrap.Modal(trackingModalElement);

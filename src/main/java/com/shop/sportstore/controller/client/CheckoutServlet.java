@@ -83,10 +83,8 @@ public class CheckoutServlet extends HttpServlet {
                 request.setAttribute("voucherDiscount", 0.0);
             }
 
-
             List<Voucher> filteredVouchers = voucherDAO.getAllActiveVouchersForSelect();
             request.setAttribute("vouchers", filteredVouchers);
-
 
             List<Voucher> savedVouchers = voucherDAO.getSavedVouchersByUserId(user.getUserId());
             request.setAttribute("savedVouchers", savedVouchers);
@@ -214,8 +212,6 @@ public class CheckoutServlet extends HttpServlet {
 
             try (Connection conn = DBConnection.getConnection()) {
                 VoucherDAO voucherDAO = new VoucherDAO(conn);
-
-
                 int generatedOrderId = 0;
                 String queryOrderId = "SELECT Id FROM orders WHERE OrderCode = ?";
                 try (PreparedStatement psGetId = conn.prepareStatement(queryOrderId)) {
@@ -226,54 +222,31 @@ public class CheckoutServlet extends HttpServlet {
                         }
                     }
                 }
-
-
                 if (normalVoucherId != null && generatedOrderId > 0) {
-                    voucherDAO.updateUsed(normalVoucherId); // Tăng tổng lượt dùng trong hệ thống lên 1
+                    voucherDAO.updateUsed(normalVoucherId);
 
-
-                    String checkSavedSql = "SELECT 1 FROM user_vouchers WHERE user_id = ? AND voucher_id = ? AND order_id IS NULL LIMIT 1";
-                    boolean isPreSaved = false;
-                    try (PreparedStatement psCheck = conn.prepareStatement(checkSavedSql)) {
-                        psCheck.setInt(1, userId);
-                        psCheck.setInt(2, normalVoucherId);
-                        try (ResultSet rsCheck = psCheck.executeQuery()) {
-                            if (rsCheck.next()) isPreSaved = true;
-                        }
-                    }
-
-                    if (isPreSaved) {
-
-                        String updateSavedVoucherSql = "UPDATE user_vouchers SET order_id = ?, used_at = NOW() WHERE user_id = ? AND voucher_id = ? AND order_id IS NULL";
-                        try (PreparedStatement psUp = conn.prepareStatement(updateSavedVoucherSql)) {
-                            psUp.setInt(1, generatedOrderId);
-                            psUp.setInt(2, userId);
-                            psUp.setInt(3, normalVoucherId);
-                            psUp.executeUpdate();
-                        }
-                    } else {
-
-                        String insertNormalSql = "INSERT INTO user_vouchers (user_id, voucher_id, order_id, used_at) VALUES (?, ?, ?, NOW())";
-                        try (PreparedStatement psIn = conn.prepareStatement(insertNormalSql)) {
-                            psIn.setInt(1, userId);
-                            psIn.setInt(2, normalVoucherId);
-                            psIn.setInt(3, generatedOrderId);
-                            psIn.executeUpdate();
-                        }
+                    String saveNormalSql = "INSERT INTO user_vouchers (user_id, voucher_id, order_id, used_at) "
+                            + "VALUES (?, ?, ?, NOW()) "
+                            + "ON DUPLICATE KEY UPDATE order_id = VALUES(order_id), used_at = NOW()";
+                    try (PreparedStatement psNormal = conn.prepareStatement(saveNormalSql)) {
+                        psNormal.setInt(1, userId);
+                        psNormal.setInt(2, normalVoucherId);
+                        psNormal.setInt(3, generatedOrderId);
+                        psNormal.executeUpdate();
                     }
                 }
-
                 if (rankVoucherId != null && generatedOrderId > 0) {
                     Voucher rv = voucherDAO.findById(rankVoucherId);
                     if (rv != null && rv.getDiscountValue() > 0) {
                         voucherDAO.updateUsed(rankVoucherId);
-
-                        String insertUserVoucher = "INSERT INTO user_vouchers (user_id, voucher_id, order_id, used_at) VALUES (?, ?, ?, NOW())";
-                        try (PreparedStatement psLog = conn.prepareStatement(insertUserVoucher)) {
-                            psLog.setInt(1, userId);
-                            psLog.setInt(2, rankVoucherId);
-                            psLog.setInt(3, generatedOrderId);
-                            psLog.executeUpdate();
+                        String saveRankSql = "INSERT INTO user_vouchers (user_id, voucher_id, order_id, used_at) "
+                                + "VALUES (?, ?, ?, NOW()) "
+                                + "ON DUPLICATE KEY UPDATE order_id = VALUES(order_id), used_at = NOW()";
+                        try (PreparedStatement psRank = conn.prepareStatement(saveRankSql)) {
+                            psRank.setInt(1, userId);
+                            psRank.setInt(2, rankVoucherId);
+                            psRank.setInt(3, generatedOrderId);
+                            psRank.executeUpdate();
                         }
                     }
                 }
